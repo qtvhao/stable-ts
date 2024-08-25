@@ -22,16 +22,20 @@ print(all_translated_text)
 with open('/output/all.txt', 'w') as f:
     f.write(all_translated_text)
 
-model = stable_whisper.load_model('base')
-text = 'Machines thinking, breeding. You were to bear us a new, promised land.'
-result = model.align('in.wav', all_translated_text, language='vi')
-# print(result)
+segments_file_path = "/output/segments-" + str(djb2_hash(all_translated_text)) + ".json"
+if os.path.exists(segments_file_path):
+    with open(segments_file_path, 'r') as f:
+        segments = json.load(f)
+else:
+    model = stable_whisper.load_model('base')
+    result = model.align('in.wav', all_translated_text, language='vi')
+    alignment_json = "/output/alignment.json"
+    # segments = result.segments
+    result.save_as_json(alignment_json)
 
-alignment_json = "/output/alignment.json"
-segments = result.segments
-result.save_as_json(alignment_json)
-
-alignment_json_data = json.load(open(alignment_json))
-print(alignment_json_data['segments'])
-with open('/output/segments.json', 'w') as f:
-    f.write(str(alignment_json_data['segments']))
+    alignment_json_data = json.load(open(alignment_json))
+    print(alignment_json_data['segments'])
+    segments = alignment_json_data['segments']
+    with open(segments_file_path, 'w') as f:
+        # f.write(str(segments)) with formated json
+        json.dump(segments, f)
