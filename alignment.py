@@ -1,6 +1,12 @@
 import stable_whisper
 import os
 import json
+import sys
+
+cli_args = sys.argv
+print(cli_args)
+if len(cli_args) < 2:
+    exit()
 
 # define a function
 def djb2_hash(string):
@@ -10,17 +16,10 @@ def djb2_hash(string):
     return hash & 0xFFFFFFFF
 
 audio_file = "audio.json"
-# read the audio file and the text file
 audio_json = json.load(open(audio_file))
-# print(audio_json['data']['videoScript'])
 videoScript = audio_json['data']['videoScript']
-all_translated_text = ""
-for i in range(len(videoScript)):
-    all_translated_text += videoScript[i]['translated'] + " "
 
 print(all_translated_text)
-with open('/output/all.txt', 'w') as f:
-    f.write(all_translated_text)
 
 segments_file_path = "/output/segments-" + str(djb2_hash(all_translated_text)) + ".json"
 if os.path.exists(segments_file_path):
@@ -29,7 +28,7 @@ if os.path.exists(segments_file_path):
 else:
     model = stable_whisper.load_model('base')
     result = model.align('in.wav', all_translated_text, language='vi')
-    alignment_json = "/output/alignment.json"
+    alignment_json = "/tmp/alignment.json"
     # segments = result.segments
     result.save_as_json(alignment_json)
 
@@ -39,3 +38,23 @@ else:
     with open(segments_file_path, 'w') as f:
         # f.write(str(segments)) with formated json
         json.dump(segments, f)
+
+for i in range(len(segments)):
+    words = segments[i]["words"]
+    for j in range(len(words)):
+        word = words[j]["word"]
+        words[j] = {
+            "start": words[j]["start"],
+            "end": words[j]["end"],
+            "word": word
+        }
+    segments[i] = {
+        "start": segments[i]["start"],
+        "end": segments[i]["end"],
+        "text": segments[i]["text"],
+        "words": words
+    }
+    
+with open(segments_file_path, 'w') as f:
+    json.dump(segments, f)
+# stable-ts in.wav --model base --language vi --align /output/all.txt --overwrite
