@@ -57,4 +57,4 @@ for i in range(len(segments)):
     
 with open(segments_file_path, 'w') as f:
     json.dump(segments, f)
-# stable-ts in.wav --model base --language vi --align /output/all.txt --overwrite
+# stable-ts in.wav --model base --language vi --align /output/all.txt --overwrite --output ni.json
