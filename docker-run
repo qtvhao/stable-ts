@@ -1,0 +1,11 @@
+#!/bin/bash
+set -xeo pipefail
+
+docker build -t alignment .
+docker run -it --rm \
+    -v $(pwd)/data:/data \
+    -v $(pwd)/output:/output \
+    -v ./audio.json:/workspace/audio.json \
+    -v ./alignment.py:/workspace/alignment.py \
+    alignment /bin/bash
+
