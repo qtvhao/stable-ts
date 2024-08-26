@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bull": "^4.16.0",
     "fast-levenshtein": "^3.0.0",
     "remove-markdown": "^0.5.2"
   }

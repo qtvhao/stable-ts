@@ -1,12 +1,24 @@
 var levenshtein = require('fast-levenshtein');
 let removeMd = require('remove-markdown');
-console.log('='.repeat(350));
-// var distance = levenshtein.get('back', 'book');   // 2
-// var distance = levenshtein.get('我愛你', '我叫你');   // 1
+let Queue = require('bull');
 
-// console.log(distance);
-let audio = require('./audio.json');
+let queueName = process.env.QUEUE_NAME;
+if (typeof queueName !== 'undefined') {
+    console.log('queueName', queueName);
+    console.log('='.repeat(350));
+    let queue = new Queue(queueName);
+    queue.process(async job => {
+        let audio = job.data.audio;
+        let alignedSubtitle = job.data.alignedSubtitle;
+        let videoScript = audio.data.videoScript;
+        let segments = alignedSubtitle.segments;
+        let currentSegment = 0;
+        videoScript = videoScript.map(x => {});
+    });
+} else {
 let alignedSubtitle = require('./ni.json');
+let audio = require('./audio.json');
+function getAlignedSubtitle(audio, alignedSubtitle) {
 let videoScript = audio.data.videoScript;
 let segments = alignedSubtitle.segments;
 let currentSegment = 0;
@@ -56,3 +68,6 @@ for (let i = 0; i < videoScript.length; i++) {
     // break;
 }
 console.log(videoScript);
+}
+getAlignedSubtitle(audio, alignedSubtitle);
+}
