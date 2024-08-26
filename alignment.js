@@ -1,19 +1,49 @@
 var levenshtein = require('fast-levenshtein');
 let removeMd = require('remove-markdown');
 let Queue = require('bull');
-console.log('='.repeat(350));
+let child_process = require('child_process');
+let fs = require('fs');
 
-let queueName = process.env.QUEUE_NAME;
-if (typeof queueName !== 'undefined') {
-    console.log('queueName', queueName);
-    let queue = new Queue(queueName);
-    queue.process(async job => {
-        let audio = job.data.audio;
-        let alignedSubtitle = job.data.alignedSubtitle;
-        let videoScript = audio.data.videoScript;
-        let segments = alignedSubtitle.segments;
-        let currentSegment = 0;
-        videoScript = videoScript.map(x => { });
+console.log('='.repeat(350));
+let queueInName = process.env.QUEUE_IN_NAME;
+let queueOutName = process.env.QUEUE_OUT_NAME;
+if (typeof queueInName !== 'undefined') {
+    console.log('queueName', queueInName);
+    let queueIn = new Queue(queueInName);
+    let queueOut = new Queue(queueOutName);
+    queueIn.process(async job => {
+        let alignedSubtitle;
+        let jobData = job.data;
+        let videoScript = jobData.videoScript;
+        let audioFile = jobData.audioFile;
+        let texts = videoScript.map(x => x.text);
+        let joinedText = texts.join('.\n');
+
+        // 
+        let djb2_id = djb2(joinedText);
+        let alignFile = `/tmp/align-${djb2_id}.txt`;
+        let outputFile = `/tmp/output-${djb2_id}.json`;
+        let model = 'tiny';
+        let language = 'vi';
+        //
+        fs.writeFileSync(alignFile, joinedText);
+        // child_process.execFileSync('stable-ts', ['in.wav', '--model', model, '--language', language, '--align', alignFile, '--overwrite', '--output', outputFile]);
+        let executedFileSync = child_process.execFileSync('stable-ts', [
+            audioFile, 
+            '--model', model, 
+            '--language', language, 
+            '--align', alignFile, 
+            '--overwrite', 
+            '--output', outputFile
+        ]);
+        console.log('executedFileSync', executedFileSync.toString());
+        job.log('executedFileSync', executedFileSync.toString());
+        
+        // stable-ts in.wav --model tiny --language vi --align all.txt --overwrite --output ni.json
+        let aligned = getAlignedSubtitle(job, alignedSubtitle);
+        await queueOut.add(aligned);
+
+        return aligned;
     });
 } else {
     let alignedSubtitle = require('./ni.json');
