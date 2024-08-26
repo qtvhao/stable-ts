@@ -22,6 +22,7 @@ for (let i = 0; i < videoScript.length; i++) {
     // let bestMatchIndex = 0;
     // let segmentsFromCurrent // this is the text from the current segment to the best match segment
     let aligned
+    let last200
     let alignedAt
 
     for (let j = currentSegment; j < segments.length; j++) {
@@ -37,12 +38,14 @@ for (let i = 0; i < videoScript.length; i++) {
             bestMatch = distance;
             alignedAt = j;
             aligned = segmentsFromCurrent;
+            last200 = segmentsFromCurrentLast200;
         }else{
             // break;
         }
     }
     currentSegment = alignedAt;
     videoScript[i].aligned = aligned;
+    videoScript[i].segmentsFromCurrentLast200 = last200;
     console.log('bestMatch', bestMatch);
     console.log('-'.repeat(100));
     console.log('aligned', aligned);
