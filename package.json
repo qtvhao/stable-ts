@@ -1,0 +1,17 @@
+{
+  "name": "stable-ts",
+  "version": "1.0.0",
+  "description": "This library modifies [Whisper](https://github.com/openai/whisper) to produce more reliable timestamps and extends its functionality.",
+  "main": "alignment.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fast-levenshtein": "^3.0.0"
+  }
+}

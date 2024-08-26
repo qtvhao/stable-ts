@@ -2,10 +2,12 @@
 set -xeo pipefail
 
 docker build -t alignment .
-docker run -it --rm \
-    -v $(pwd)/data:/data \
-    -v $(pwd)/output:/output \
+docker rm -f alignment || true
+docker run -it \
+    --name alignment \
+    -v ./data:/data \
+    -v ./output:/output \
     -v ./audio.json:/workspace/audio.json \
+    -v ./alignment.js:/workspace/alignment.js \
     -v ./alignment.py:/workspace/alignment.py \
-    alignment /bin/bash
-
+    alignment /bin/bash -c "node alignment.js"
