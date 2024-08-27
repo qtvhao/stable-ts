@@ -13,3 +13,4 @@ RUN yarn install
 COPY audio.json .
 COPY alignment.js .
 RUN node /workspace/alignment.js
+
