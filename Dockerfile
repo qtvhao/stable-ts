@@ -9,4 +9,5 @@ RUN stable-ts in.wav --model tiny --language vi --align all.txt --overwrite --ou
 RUN bash -c "set -xeo pipefail; cat ni.json | grep 'trong IaC mang lại nhiều lợi ích cho doanh nghiệp' > /dev/null"
 COPY yarn.lock package.json ./
 RUN yarn install
+COPY alignment.js .
 
