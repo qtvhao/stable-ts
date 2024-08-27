@@ -63,8 +63,17 @@ function getAlignedSubtitle(audio, alignedSubtitle) {
 }
 if (typeof queueInName !== 'undefined') {
     console.log('queueName', queueInName);
-    let queueIn = new Queue(queueInName);
-    let queueOut = new Queue(queueOutName);
+    let password = process.env.REDIS_PASSWORD
+    let redisHost = process.env.REDIS_HOST || 'redis'
+    
+    let opts = {
+        redis: {
+            host: redisHost,
+            password
+        },
+    };
+    let queueIn = new Queue(queueInName, opts);
+    let queueOut = new Queue(queueOutName, opts);
     queueIn.process(async job => {
         let alignedSubtitle;
         let jobData = job.data;
