@@ -45,6 +45,20 @@ function getAlignedSubtitle(audio, alignedSubtitle) {
                 // break;
             }
         }
+        aligned = aligned.map(x => {
+            return {
+                start: x.start,
+                end: x.end,
+                text: x.text,
+                words: x.words.map(y => {
+                    return {
+                        word: y.word,
+                        start: y.start,
+                        end: y.end,
+                    };
+                }),
+            };
+        });
         currentSegment = alignedAt;
         videoScript[i].aligned = aligned;
         videoScript[i].segmentsFromCurrentLast200 = last200;
@@ -113,7 +127,10 @@ if (typeof queueInName !== 'undefined') {
         let outputFileContent = fs.readFileSync(outputFile, 'utf8');
         alignedSubtitle = JSON.parse(outputFileContent);
         let aligned = getAlignedSubtitle(job, alignedSubtitle);
-        await queueOut.add(aligned);
+        await queueOut.add({
+            ...jobData,
+            videoScript: aligned,
+        });
 
         return aligned;
     });
