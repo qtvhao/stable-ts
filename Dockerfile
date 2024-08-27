@@ -1,6 +1,7 @@
 FROM ghcr.io/qtvhao/torch:main
 
 RUN pip install -U stable-ts
+RUN apt-get update && apt-get install -y ffmpeg
 
 COPY in.wav .
 COPY output/all.txt .
@@ -13,3 +14,4 @@ RUN yarn install
 COPY audio.json .
 COPY alignment.js .
 RUN node /workspace/alignment.js
+
