@@ -110,6 +110,8 @@ if (typeof queueInName !== 'undefined') {
         job.log('executedFileSync', executedFileSync.toString());
         
         // stable-ts in.wav --model tiny --language vi --align all.txt --overwrite --output ni.json
+        let outputFileContent = fs.readFileSync(outputFile, 'utf8');
+        alignedSubtitle = JSON.parse(outputFileContent);
         let aligned = getAlignedSubtitle(job, alignedSubtitle);
         await queueOut.add(aligned);
 
