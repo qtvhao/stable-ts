@@ -61,6 +61,13 @@ function getAlignedSubtitle(audio, alignedSubtitle) {
 
     return videoScript;
 }
+function djb2(str) {
+    let hash = 5381;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    }
+    return hash;
+}
 if (typeof queueInName !== 'undefined') {
     console.log('queueName', queueInName);
     let password = process.env.REDIS_PASSWORD
