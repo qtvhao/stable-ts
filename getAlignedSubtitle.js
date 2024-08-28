@@ -10,24 +10,20 @@ let getAlignedSubtitle = function (audio, alignedSubtitle) {
     });
     for (let i = 0; i < videoScript.length; i++) {
         let translated = videoScript[i].translated;
-        // find the segment that contains the translated text, use levenshtein to find the best match
-        // lower the distance, the better match
         let bestMatch = 100000;
-        // let bestMatchIndex = 0;
-        // let segmentsFromCurrent // this is the text from the current segment to the best match segment
         let aligned
         let last200
         let alignedAt
 
         for (let j = currentSegment; j < segments.length; j++) {
             let segmentsFromCurrent = segments.slice(currentSegment, j);
+            // if (i === videoScript.length - 1) {
+            //     segmentsFromCurrent = segments.slice(currentSegment);
+            // }
             let segmentsFromCurrentText = segmentsFromCurrent.map(x => x.text).join('');
             let translatedLast200 = translated.slice(-200);
             let segmentsFromCurrentLast200 = segmentsFromCurrentText.slice(-200);
-            // console.log('segmentsFromCurrentLast200', segmentsFromCurrentLast200);
             let distance = levenshtein.get(translatedLast200, segmentsFromCurrentLast200);
-            // console.log('distance', distance);
-            // console.log('segmentsFromCurrent', segmentsFromCurrent);
             if (distance < bestMatch) {
                 bestMatch = distance;
                 alignedAt = j;
@@ -52,6 +48,7 @@ let getAlignedSubtitle = function (audio, alignedSubtitle) {
             };
         });
         currentSegment = alignedAt;
+        // aligned.sort((a, b) => a.start - b.start);
         videoScript[i].aligned = aligned;
         videoScript[i].segmentsFromCurrentLast200 = last200;
         // console.log('bestMatch', bestMatch);

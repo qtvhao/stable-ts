@@ -2,9 +2,7 @@ let { getAlignedSubtitle } = require('./getAlignedSubtitle.js');
 let child_process = require('child_process');
 let fs = require('fs');
 
-test('test alignment', () => {
-    let audioFile = '/app/storage/audio/synthesize-result-1484178056.mp3';
-    let alignFile = '/align-input/align-1484178056.json';
+function getInput(alignFile) {
     let alignFileContent = fs.readFileSync(alignFile, 'utf8');
     let alignFileParsed = JSON.parse(alignFileContent);
     let texts = alignFileParsed.data.videoScript.map(x => x.text).join('.\n');
@@ -12,20 +10,50 @@ test('test alignment', () => {
     let alignFileTxt = '/tmp/align-1484178056.txt';
     fs.writeFileSync(alignFileTxt, texts);
     let outputFile = '/tmp/output-1484178056.json';
-    let model = 'tiny';
-    let language = 'vi';
-    let executedFileSync = child_process.execFileSync('stable-ts', [
+
+    return {
+        alignFileTxt,
+        outputFile,
+        audio: alignFileParsed,
+    };
+}
+let model = 'tiny';
+let language = 'vi';
+test('test alignment', () => {
+    let {
+        alignFileTxt,
+        outputFile,
+        audio,
+    } = getInput('/align-input/align-1484178056.json');
+    let audioFile = '/app/storage/audio/synthesize-result-1484178056.mp3';
+    child_process.execFileSync('stable-ts', [
         audioFile, 
         '--model', model, 
         '--language', language, 
         '--align', alignFileTxt, 
         '--overwrite', 
         '--output', outputFile
-    ]);
-    console.log('executedFileSync', executedFileSync.toString());   
-    let audio = require('./audio.json');
-    let alignedSubtitle = require('./ni.json');
+    ], {
+        stdio: 'inherit',
+    });
+
+    let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
     let aligned = getAlignedSubtitle(audio, alignedSubtitle);
     console.log('aligned', aligned);
-    expect(aligned).toBeDefined();
+    for (let i = 0; i < aligned.length; i++) {
+        let alignedItem = aligned[i];
+        expect(alignedItem.aligned).toBeDefined();
+        // 
+        // console.log('alignedItem', alignedItem.aligned);
+        let firstAligned = alignedItem.aligned[0];
+        let lastAligned = alignedItem.aligned[alignedItem.aligned.length - 1];
+        console.log('firstAligned', firstAligned.start, 'lastAligned', lastAligned.end);
+        let firstAlignedStart = firstAligned.start;
+        let lastAlignedEnd = lastAligned.end;
+        if (firstAlignedStart === lastAlignedEnd && i !== aligned.length - 1) {
+            console.log('firstAlignedStart === lastAlignedEnd', firstAlignedStart, lastAlignedEnd);
+            throw new Error('firstAlignedStart === lastAlignedEnd on ' + i + ' / ' + aligned.length);
+        }
+    }
+    // expect(aligned).toBeDefined();
 });
