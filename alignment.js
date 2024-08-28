@@ -1,6 +1,7 @@
 let Queue = require('bull');
 let child_process = require('child_process');
 let fs = require('fs');
+let removeMd = require('remove-markdown');
 
 console.log('='.repeat(350));
 let queueInName = process.env.QUEUE_IN_NAME;
@@ -32,7 +33,7 @@ if (typeof queueInName !== 'undefined') {
         let jobData = job.data;
         let videoScript = jobData.videoScript;
         let audioFile = jobData.audioFile;
-        let texts = videoScript.map(x => x.text);
+        let texts = videoScript.map(x => removeMd(x.text));
         let joinedText = texts.join('.\n');
 
         // 

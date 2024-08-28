@@ -17,9 +17,9 @@ let getAlignedSubtitle = function (audio, alignedSubtitle) {
 
         for (let j = currentSegment; j < segments.length; j++) {
             let segmentsFromCurrent = segments.slice(currentSegment, j);
-            // if (i === videoScript.length - 1) {
-            //     segmentsFromCurrent = segments.slice(currentSegment);
-            // }
+            if (i === videoScript.length - 1) {
+                segmentsFromCurrent = segments.slice(currentSegment);
+            }
             let segmentsFromCurrentText = segmentsFromCurrent.map(x => x.text).join('');
             let translatedLast200 = translated.slice(-200);
             let segmentsFromCurrentLast200 = segmentsFromCurrentText.slice(-200);
@@ -48,7 +48,13 @@ let getAlignedSubtitle = function (audio, alignedSubtitle) {
             };
         });
         currentSegment = alignedAt;
-        // aligned.sort((a, b) => a.start - b.start);
+        aligned.sort((a, b) => a.start - b.start);
+        let alignedStart = aligned[0].start;
+        let alignedEnd = aligned[aligned.length - 1].end;
+        if (alignedStart === alignedEnd) {
+            console.log('alignedStart === alignedEnd', alignedStart, alignedEnd);
+            throw new Error('alignedStart === alignedEnd');
+        }
         videoScript[i].aligned = aligned;
         videoScript[i].segmentsFromCurrentLast200 = last200;
         // console.log('bestMatch', bestMatch);

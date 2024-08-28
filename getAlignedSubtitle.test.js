@@ -43,7 +43,7 @@ function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
         // 
         let firstAligned = alignedItem.aligned[0];
         let lastAligned = alignedItem.aligned[alignedItem.aligned.length - 1];
-        // console.log('firstAligned', firstAligned, 'lastAligned', lastAligned);
+        console.log('firstAligned', firstAligned, 'lastAligned', lastAligned);
         let firstAlignedStart = firstAligned.start;
         let lastAlignedEnd = lastAligned.end;
         if (firstAlignedStart === lastAlignedEnd) {
@@ -61,4 +61,13 @@ test('test alignment', () => {
     let audioFile = '/align-input/synthesize-result-1484178056.mp3';
     checkAligned(alignFileTxt, outputFile, audio, audioFile)
     // expect(aligned).toBeDefined();
+});
+test('test alignment 2', () => {
+    let {
+        alignFileTxt,
+        outputFile,
+        audio,
+    } = getInput('/align-input/align-2544651730.json');
+    let audioFile = '/align-input/synthesize-result-2544651730.aac';
+    checkAligned(alignFileTxt, outputFile, audio, audioFile)
 });
