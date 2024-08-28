@@ -7,6 +7,9 @@ console.log('='.repeat(350));
 let queueInName = process.env.QUEUE_IN_NAME;
 let queueOutName = process.env.QUEUE_OUT_NAME;
 let {getAlignedSubtitle} = require('./getAlignedSubtitle.js');
+function removePunctuation(text) {
+    return text.replace(/[-,\?,\!,\:,\;,\n*]/g, ' ').replace(/\s+/g, ' ');
+}
 
 function djb2(str) {
     let hash = 5381;
@@ -35,6 +38,7 @@ if (typeof queueInName !== 'undefined') {
         let audioFile = jobData.audioFile;
         let texts = videoScript.map(x => removeMd(x.text));
         let joinedText = texts.join('.\n');
+        joinedText = removePunctuation(joinedText);
 
         // 
         let djb2_id = djb2(joinedText);

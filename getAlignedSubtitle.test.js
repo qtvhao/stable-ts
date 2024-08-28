@@ -5,11 +5,15 @@ let fs = require('fs');
 let path = require('path');
 console.log('='.repeat(300));
 
+function removePunctuation(text) {
+    return text.replace(/[-,\?,\!,\:,\;,\n*]/g, ' ').replace(/\s+/g, ' ');
+}
 function getInput(alignFile) {
     let alignFilename = path.basename(alignFile);
     let alignFileContent = fs.readFileSync(alignFile, 'utf8');
     let alignFileParsed = JSON.parse(alignFileContent);
     let texts = alignFileParsed.data.videoScript.map(x => removeMd(x.text)).join('.\n');
+    texts = removePunctuation(texts);
     let alignFileTxt = '/align-input/' + alignFilename + '.txt';
     fs.writeFileSync(alignFileTxt, texts);
     let outputFile = '/tmp/output-' + alignFilename + '.json';

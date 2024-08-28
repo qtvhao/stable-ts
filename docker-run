@@ -13,4 +13,4 @@ docker run -it \
     -v /samba-claim0-apis-production/gen-audio-worker-storage/:/app/storage/audio/ \
     -v ./getAlignedSubtitle.test.js:/workspace/getAlignedSubtitle.test.js \
     -v ./getAlignedSubtitle.js:/workspace/getAlignedSubtitle.js \
-    alignment /bin/bash -c "jest getAlignedSubtitle.test.js"
+    alignment /bin/bash -c "jest -t 'test alignment 2'"
