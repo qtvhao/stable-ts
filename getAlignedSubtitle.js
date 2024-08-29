@@ -58,6 +58,20 @@ let getAlignedSubtitle = function (audio, alignedSubtitle) {
             console.log('alignedStart === alignedEnd', alignedStart, alignedEnd);
             throw new Error('alignedStart === alignedEnd');
         }
+        // 
+        let alignItemEnd;
+        for (let j = 0; j < aligned.length; j++) {
+            let alignedItem = aligned[j];
+            // 
+            if (alignedItem.start !== alignItemEnd) {
+                // throw new Error('alignedItem.start !== alignItemEnd');
+            }
+            if (alignItemEnd) {
+                alignedItem.start = alignItemEnd;
+            }
+            // 
+            alignItemEnd = alignedItem.end;
+        }
         videoScript[i].aligned = aligned;
         videoScript[i].segmentsFromCurrentLast200 = last200;
         // console.log('bestMatch', bestMatch);
