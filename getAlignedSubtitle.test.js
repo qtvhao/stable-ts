@@ -24,16 +24,17 @@ function getInput(alignFile) {
         audio: alignFileParsed,
     };
 }
-let model = 'tiny';
+let model = process.env.STABLE_TS_MODEL;
 let language = 'vi';
 function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
     child_process.execFileSync('stable-ts', [
-        audioFile, 
-        '--model', model, 
-        '--language', language, 
+        audioFile,
+        '--model', model,
+        '--language', language,
         '--align', alignFileTxt, 
         '--overwrite', 
-        '--output', outputFile
+        '--output', outputFile,
+        '-fw',
     ], {
         stdio: 'inherit',
     });

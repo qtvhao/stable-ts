@@ -31,6 +31,8 @@ if (typeof queueInName !== 'undefined') {
     };
     let queueIn = new Queue(queueInName, opts);
     let queueOut = new Queue(queueOutName, opts);
+    let model = process.env.STABLE_TS_MODEL;
+    let language = process.env.STABLE_TS_LANGUAGE;
     queueIn.process(async job => {
         let alignedSubtitle;
         let jobData = job.data;
@@ -44,8 +46,6 @@ if (typeof queueInName !== 'undefined') {
         let djb2_id = djb2(joinedText);
         let alignFile = `/tmp/align-${djb2_id}.txt`;
         let outputFile = `/tmp/output-${djb2_id}.json`;
-        let model = 'tiny';
-        let language = 'vi';
         //
         fs.writeFileSync(alignFile, joinedText);
         // child_process.execFileSync('stable-ts', ['in.wav', '--model', model, '--language', language, '--align', alignFile, '--overwrite', '--output', outputFile]);
