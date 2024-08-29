@@ -6,7 +6,7 @@ let path = require('path');
 console.log('='.repeat(300));
 
 function removePunctuation(text) {
-    return text.replace(/[-,\?,\!,\:,\;,\n*]/g, ' ').replace(/\s+/g, ' ');
+    return text.replace(/[\.,\),\(),\",\/,-,\?,\!,\:,\;,\n*]/g, ' ').replace(/\s+/g, ' ');
 }
 function getInput(alignFile) {
     let alignFilename = path.basename(alignFile);
@@ -16,7 +16,7 @@ function getInput(alignFile) {
     texts = removePunctuation(texts);
     let alignFileTxt = '/align-input/' + alignFilename + '.txt';
     fs.writeFileSync(alignFileTxt, texts);
-    let outputFile = '/tmp/output-' + alignFilename + '.json';
+    let outputFile = '/align-output/output-' + alignFilename + '.json';
 
     return {
         alignFileTxt,
@@ -31,8 +31,8 @@ function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
         audioFile,
         '--model', model,
         '--language', language,
-        '--align', alignFileTxt, 
-        '--overwrite', 
+        '--align', alignFileTxt,
+        '--overwrite',
         '--output', outputFile,
         '-fw',
     ], {
@@ -40,6 +40,7 @@ function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
     });
 
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
+    fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
     let aligned = getAlignedSubtitle(audio, alignedSubtitle);
     // console.log('aligned', aligned);
     for (let i = 0; i < aligned.length; i++) {
@@ -83,5 +84,15 @@ test('test alignment 3', () => {
         audio,
     } = getInput('/align-input/align-1925143408.json');
     let audioFile = '/align-input/synthesize-result-1925143408.aac';
+    checkAligned(alignFileTxt, outputFile, audio, audioFile)
+});
+
+test('test alignment 4', () => {
+    let {
+        alignFileTxt,
+        outputFile,
+        audio,
+    } = getInput('/align-input/align-2639383328.json');
+    let audioFile = '/align-input/synthesize-result-2639383328.aac';
     checkAligned(alignFileTxt, outputFile, audio, audioFile)
 });

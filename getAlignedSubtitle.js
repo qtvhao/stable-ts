@@ -8,6 +8,7 @@ let getAlignedSubtitle = function (audio, alignedSubtitle) {
         x.translated = removeMd(x.text);
         return x;
     });
+    let alignItemEnd;
     for (let i = 0; i < videoScript.length; i++) {
         let translated = videoScript[i].translated;
         let bestMatch = 100000;
@@ -33,6 +34,8 @@ let getAlignedSubtitle = function (audio, alignedSubtitle) {
                 // break;
             }
         }
+        console.log('='.repeat(300));
+        console.log('translated', translated);
         aligned = aligned.map(x => {
             return {
                 start: x.start,
@@ -49,6 +52,10 @@ let getAlignedSubtitle = function (audio, alignedSubtitle) {
         });
         currentSegment = alignedAt;
         aligned.sort((a, b) => a.start - b.start);
+        if (aligned.length === 0) {
+            console.log('aligned', aligned);
+            throw new Error('aligned.length === 0');
+        }
         let alignedStart = aligned[0].start;
         let alignedEnd = aligned[aligned.length - 1].end;
         if (alignedStart === alignedEnd) {
@@ -59,13 +66,9 @@ let getAlignedSubtitle = function (audio, alignedSubtitle) {
             throw new Error('alignedStart === alignedEnd');
         }
         // 
-        let alignItemEnd;
         for (let j = 0; j < aligned.length; j++) {
             let alignedItem = aligned[j];
             // 
-            if (alignedItem.start !== alignItemEnd) {
-                // throw new Error('alignedItem.start !== alignItemEnd');
-            }
             if (alignItemEnd) {
                 alignedItem.start = alignItemEnd;
             }
