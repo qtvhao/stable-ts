@@ -23,10 +23,15 @@ if (typeof queueInName !== 'undefined') {
     let password = process.env.REDIS_PASSWORD
     let redisHost = process.env.REDIS_HOST || 'redis'
     
+    let lockDuration = 20 * 60 * 1000; // 20 minutes
     let opts = {
         redis: {
             host: redisHost,
             password
+        },
+        settings: {
+            lockDuration,
+            stalledInterval: 0,
         },
     };
     let queueIn = new Queue(queueInName, opts);
