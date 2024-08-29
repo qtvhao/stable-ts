@@ -12,7 +12,7 @@ function getInput(alignFile) {
     let alignFilename = path.basename(alignFile);
     let alignFileContent = fs.readFileSync(alignFile, 'utf8');
     let alignFileParsed = JSON.parse(alignFileContent);
-    let texts = alignFileParsed.data.videoScript.map(x => removeMd(x.text)).join('.\n');
+    let texts = alignFileParsed.data.videoScript.map(x => removeMd(x.text)).join('\n');
     texts = removePunctuation(texts);
     let alignFileTxt = '/align-input/' + alignFilename + '.txt';
     fs.writeFileSync(alignFileTxt, texts);
@@ -73,5 +73,14 @@ test('test alignment 2', () => {
         audio,
     } = getInput('/align-input/align-2544651730.json');
     let audioFile = '/align-input/synthesize-result-2544651730.aac';
+    checkAligned(alignFileTxt, outputFile, audio, audioFile)
+});
+test('test alignment 3', () => {
+    let {
+        alignFileTxt,
+        outputFile,
+        audio,
+    } = getInput('/align-input/align-1925143408.json');
+    let audioFile = '/align-input/synthesize-result-1925143408.aac';
     checkAligned(alignFileTxt, outputFile, audio, audioFile)
 });

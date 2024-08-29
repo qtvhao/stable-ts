@@ -52,6 +52,8 @@ let getAlignedSubtitle = function (audio, alignedSubtitle) {
         let alignedStart = aligned[0].start;
         let alignedEnd = aligned[aligned.length - 1].end;
         if (alignedStart === alignedEnd) {
+            // 
+            console.log('aligned', aligned);
             console.log('i', i, '/', videoScript.length, 'aligned', aligned.map(x => x.words.map(y => y.word).join(' ')).join(' '));
             console.log('alignedStart === alignedEnd', alignedStart, alignedEnd);
             throw new Error('alignedStart === alignedEnd');
