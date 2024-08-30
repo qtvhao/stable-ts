@@ -126,8 +126,36 @@ function alignPartsWithAlignFileTxt(alignFileTxt, outputFilePart1, outputFilePar
     }
     console.log('shortestDistance', shortestDistance);
     console.log('shortestDistanceAlignFileTxt', shortestDistanceAlignFileTxt);
+    let txt1File = '/align-output/' + djb2(outputFilePart1) + '-txt1.txt';
+    let txt2File = '/align-output/' + djb2(outputFilePart2) + '-txt2.txt';
+    fs.writeFileSync(txt1File, shortestDistanceAlignFileTxt[0]);
+    fs.writeFileSync(txt2File, shortestDistanceAlignFileTxt[1]);
 
-    return shortestDistanceAlignFileTxt;
+    return [
+        ...shortestDistanceAlignFileTxt,
+        txt1File,
+        txt2File,
+    ]
+}
+function alignWithAlignFileTxt(audioFile, alignFileTxt, outputFile) {
+    child_process.execFileSync('stable-ts', [
+        audioFile,
+        '--model', model,
+        '--language', language,
+        '--align', alignFileTxt,
+        '--overwrite',
+        '--output', outputFile,
+        '-fw',
+    ], {
+        stdio: 'inherit',
+    });
+
+    let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
+    fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
+    let audio = fs.readFileSync(alignFileTxt, 'utf8');
+    let aligned = getAlignedSubtitle(audio, alignedSubtitle);
+
+    return aligned;
 }
 function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
     let {
@@ -144,26 +172,13 @@ function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
     let outputFilePart2Parsed = JSON.parse(outputFilePart2Content);
     let alignFileTxtContent = fs.readFileSync(alignFileTxt, 'utf8');
 
-    // console.log('outputFilePart1', outputFilePart1.text);
-    // console.log('outputFilePart2', outputFilePart2.text);
-    let alignedWithAlignFileTxt = alignPartsWithAlignFileTxt(alignFileTxtContent, outputFilePart1Parsed.text, outputFilePart2Parsed.text);
-    // console.log('alignedWithAlignFileTxt', alignedWithAlignFileTxt);
+    let [txt1, txt2, txt1File, txt2File] = alignPartsWithAlignFileTxt(alignFileTxtContent, outputFilePart1Parsed.text, outputFilePart2Parsed.text);
+    let aligned1 = alignWithAlignFileTxt(audioFilePart1, txt1File, '/align-output/' + djb2(audioFilePart1) + '-aligned.json');
+    let aligned2 = alignWithAlignFileTxt(audioFilePart2, txt2File, '/align-output/' + djb2(audioFilePart2) + '-aligned.json');
+    console.log('aligned1', aligned1);
+    console.log('aligned2', aligned2);
+    // let aligned = aligned1.concat(aligned2);
     process.exit(0);
-    child_process.execFileSync('stable-ts', [
-        audioFile,
-        '--model', model,
-        '--language', language,
-        '--align', alignFileTxt,
-        '--overwrite',
-        '--output', outputFile,
-        '-fw',
-    ], {
-        stdio: 'inherit',
-    });
-
-    let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
-    fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
-    let aligned = getAlignedSubtitle(audio, alignedSubtitle);
     // console.log('aligned', aligned);
     for (let i = 0; i < aligned.length; i++) {
         let alignedItem = aligned[i];
