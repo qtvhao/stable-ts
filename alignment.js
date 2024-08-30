@@ -51,7 +51,7 @@ if (typeof queueInName !== 'undefined') {
         // 
         let djb2_id = djb2(joinedText);
         let alignFile = `/tmp/align-${djb2_id}.txt`;
-        let outputFile = `/align-output/output-x-${djb2_id}.json`;
+        let outputFile = `/align-output/output-x2-${djb2_id}.json`;
         fs.writeFileSync(alignFile, joinedText);
 
         job.log('outputFile: ' + outputFile);
