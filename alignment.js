@@ -7,6 +7,7 @@ console.log('='.repeat(350));
 let queueInName = process.env.QUEUE_IN_NAME;
 let queueOutName = process.env.QUEUE_OUT_NAME;
 let {getAlignedSubtitle} = require('./getAlignedSubtitle.js');
+const path = require('path');
 function removePunctuation(text) {
     return text.replace(/[-,\?,\!,\:,\;,\n*]/g, ' ').replace(/\s+/g, ' ');
 }
@@ -50,15 +51,17 @@ if (typeof queueInName !== 'undefined') {
         // 
         let djb2_id = djb2(joinedText);
         let alignFile = `/tmp/align-${djb2_id}.txt`;
-        let outputFile = `/align-output/output-${djb2_id}.json`;
+        let outputFile = `/align-output/output-x-${djb2_id}.json`;
         fs.writeFileSync(alignFile, joinedText);
 
         if (fs.existsSync(outputFile)) {
             console.log('outputFile already exists', outputFile);
             job.log('outputFile already exists: ' + outputFile);
         }else{
+            let tmpAudioFile = '/tmp/' + path.basename(audioFile);
+            fs.copyFileSync(audioFile, tmpAudioFile);
             let executedFileSync = child_process.execFileSync('stable-ts', [
-                audioFile, 
+                tmpAudioFile, 
                 '--model', model, 
                 '--language', language, 
                 '--align', alignFile, 
