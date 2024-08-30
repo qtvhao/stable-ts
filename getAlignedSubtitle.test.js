@@ -3,6 +3,8 @@ let child_process = require('child_process');
 let removeMd = require('remove-markdown');
 let fs = require('fs');
 let path = require('path');
+var levenshtein = require('fast-levenshtein');
+
 console.log('='.repeat(300));
 
 function removePunctuation(text) {
@@ -79,10 +81,24 @@ function transcribeAudio(audioFile, outputFile) {
         // pipe mean output to parent process
     });
 }
+function djb2(str) {
+    let hash = 5381;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+}
 function transcribeAudioParts(audioFilePart1, audioFilePart2) {
-    let outputFilePart1 = '/align-output/output-part1.json';
+    let outputFilePart1 = '/align-output/' + djb2(audioFilePart1) + '.json';
+    let outputFilePart2 = '/align-output/' + djb2(audioFilePart2) + '.json';
+    if (fs.existsSync(outputFilePart1) && fs.existsSync(outputFilePart2)) {
+        return {
+            outputFilePart1,
+            outputFilePart2,
+        };
+    }
     transcribeAudio(audioFilePart1, outputFilePart1);
-    let outputFilePart2 = '/align-output/output-part2.json';
     transcribeAudio(audioFilePart2, outputFilePart2);
 
     return {
@@ -93,6 +109,25 @@ function transcribeAudioParts(audioFilePart1, audioFilePart2) {
 function alignPartsWithAlignFileTxt(alignFileTxt, outputFilePart1, outputFilePart2) {
     console.log('outputFilePart1', outputFilePart1);
     console.log('outputFilePart2', outputFilePart2);
+    // split alignFileTxt by 2, then compare with outputFilePart1 and outputFilePart2 use levenshtein distance
+    let shortestDistance = 100000;
+    let shortestDistanceAlignFileTxt = '';
+    let words = alignFileTxt.split(' ');
+    for (let i = 0; i < words.length; i++) {
+        let alignFileTxtPart1 = words.slice(0, i).join(' ');
+        let alignFileTxtPart2 = words.slice(i).join(' ');
+        let distance1 = levenshtein.get(alignFileTxtPart1, outputFilePart1);
+        let distance2 = levenshtein.get(alignFileTxtPart2, outputFilePart2);
+        let totalDistance = distance1 + distance2;
+        if (totalDistance < shortestDistance) {
+            shortestDistance = totalDistance;
+            shortestDistanceAlignFileTxt = [alignFileTxtPart1, alignFileTxtPart2];
+        }
+    }
+    console.log('shortestDistance', shortestDistance);
+    console.log('shortestDistanceAlignFileTxt', shortestDistanceAlignFileTxt);
+
+    return shortestDistanceAlignFileTxt;
 }
 function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
     let {
@@ -107,10 +142,11 @@ function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
     let outputFilePart2Content = fs.readFileSync(outputFilePart2, 'utf8');
     let outputFilePart1Parsed = JSON.parse(outputFilePart1Content);
     let outputFilePart2Parsed = JSON.parse(outputFilePart2Content);
+    let alignFileTxtContent = fs.readFileSync(alignFileTxt, 'utf8');
 
     // console.log('outputFilePart1', outputFilePart1.text);
     // console.log('outputFilePart2', outputFilePart2.text);
-    let alignedWithAlignFileTxt = alignPartsWithAlignFileTxt(alignFileTxt, outputFilePart1Parsed.text, outputFilePart2Parsed.text);
+    let alignedWithAlignFileTxt = alignPartsWithAlignFileTxt(alignFileTxtContent, outputFilePart1Parsed.text, outputFilePart2Parsed.text);
     // console.log('alignedWithAlignFileTxt', alignedWithAlignFileTxt);
     process.exit(0);
     child_process.execFileSync('stable-ts', [
