@@ -64,27 +64,54 @@ function cutAudioByLongestSilence(audioFile) {
         audioFilePart2,
     };
 }
-function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
-
-    let {
-        audioFilePart1,
-        audioFilePart2,
-    } = cutAudioByLongestSilence(audioFile);
-    let outputFilePart1 = '/align-output/output-part1.json';
-    // let outputFilePart2 = '/align-output/output-part2.json';
+function transcribeAudio(audioFile, outputFile) {
     child_process.execFileSync('stable-ts', [
-        audioFilePart1,
+        audioFile,
         '--model', model,
         '--language', language,
         // '--align', alignFileTxt,
         '--overwrite',
-        '--output', outputFilePart1,
+        '--output', outputFile,
         '-fw',
     ], {
-        stdio: 'inherit',
+        stdio: 'pipe',
+        // inherit mean output to console
+        // pipe mean output to parent process
     });
-    console.log('done 1');
+}
+function transcribeAudioParts(audioFilePart1, audioFilePart2) {
+    let outputFilePart1 = '/align-output/output-part1.json';
+    transcribeAudio(audioFilePart1, outputFilePart1);
+    let outputFilePart2 = '/align-output/output-part2.json';
+    transcribeAudio(audioFilePart2, outputFilePart2);
 
+    return {
+        outputFilePart1,
+        outputFilePart2,
+    };
+}
+function alignPartsWithAlignFileTxt(alignFileTxt, outputFilePart1, outputFilePart2) {
+    console.log('outputFilePart1', outputFilePart1);
+    console.log('outputFilePart2', outputFilePart2);
+}
+function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
+    let {
+        audioFilePart1,
+        audioFilePart2,
+    } = cutAudioByLongestSilence(audioFile);
+    let {
+        outputFilePart1,
+        outputFilePart2,
+    } = transcribeAudioParts(audioFilePart1, audioFilePart2);
+    let outputFilePart1Content = fs.readFileSync(outputFilePart1, 'utf8');
+    let outputFilePart2Content = fs.readFileSync(outputFilePart2, 'utf8');
+    let outputFilePart1Parsed = JSON.parse(outputFilePart1Content);
+    let outputFilePart2Parsed = JSON.parse(outputFilePart2Content);
+
+    // console.log('outputFilePart1', outputFilePart1.text);
+    // console.log('outputFilePart2', outputFilePart2.text);
+    let alignedWithAlignFileTxt = alignPartsWithAlignFileTxt(alignFileTxt, outputFilePart1Parsed.text, outputFilePart2Parsed.text);
+    // console.log('alignedWithAlignFileTxt', alignedWithAlignFileTxt);
     process.exit(0);
     child_process.execFileSync('stable-ts', [
         audioFile,
