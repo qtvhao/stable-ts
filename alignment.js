@@ -50,20 +50,24 @@ if (typeof queueInName !== 'undefined') {
         // 
         let djb2_id = djb2(joinedText);
         let alignFile = `/tmp/align-${djb2_id}.txt`;
-        let outputFile = `/tmp/output-${djb2_id}.json`;
-        //
+        let outputFile = `/align-output/output-${djb2_id}.json`;
         fs.writeFileSync(alignFile, joinedText);
-        // child_process.execFileSync('stable-ts', ['in.wav', '--model', model, '--language', language, '--align', alignFile, '--overwrite', '--output', outputFile]);
-        let executedFileSync = child_process.execFileSync('stable-ts', [
-            audioFile, 
-            '--model', model, 
-            '--language', language, 
-            '--align', alignFile, 
-            '--overwrite', 
-            '--output', outputFile
-        ]);
-        console.log('executedFileSync', executedFileSync.toString());
-        job.log('executedFileSync', executedFileSync.toString());
+
+        if (fs.existsSync(outputFile)) {
+            console.log('outputFile already exists', outputFile);
+            job.log('outputFile already exists: ' + outputFile);
+        }else{
+            let executedFileSync = child_process.execFileSync('stable-ts', [
+                audioFile, 
+                '--model', model, 
+                '--language', language, 
+                '--align', alignFile, 
+                '--overwrite',
+                '--output', outputFile
+            ]); 
+            console.log('executedFileSync', executedFileSync.toString());
+            job.log('executedFileSync:' + executedFileSync.toString());
+        }
         
         // stable-ts in.wav --model tiny --language vi --align all.txt --overwrite --output ni.json
         let outputFileContent = fs.readFileSync(outputFile, 'utf8');
