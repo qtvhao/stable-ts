@@ -92,6 +92,13 @@ if (typeof queueInName !== 'undefined') {
                 child.stderr.on('data', (data) => {
                     console.error('stable-ts stderr:', data.toString());
                     job.log('stable-ts stderr:' + data.toString());
+                    // 
+                    // find percentage
+                    let percentage = data.toString().match(/(\d+)%/);
+                    if (percentage) {
+                        let percentageValue = parseFloat(percentage[1]);
+                        job.progress(percentageValue);
+                    }
                 });
             }); 
             // console.log('executedFileSync', executedFileSync.toString());
