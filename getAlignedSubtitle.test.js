@@ -106,38 +106,35 @@ function transcribeAudioParts(audioFilePart1, audioFilePart2) {
         outputFilePart2,
     };
 }
-function alignPartsWithAlignFileTxt(alignFileTxt, outputFilePart1, outputFilePart2) {
+function alignPartsWithAlignFileTxt(job, outputFilePart1, outputFilePart2) {
     console.log('outputFilePart1', outputFilePart1);
     console.log('outputFilePart2', outputFilePart2);
     // split alignFileTxt by 2, then compare with outputFilePart1 and outputFilePart2 use levenshtein distance
     let shortestDistance = 100000;
     let shortestDistanceAlignFileTxt = '';
-    let words = alignFileTxt.split(' ');
-    for (let i = 0; i < words.length; i++) {
-        let alignFileTxtPart1 = words.slice(0, i).join(' ');
-        let alignFileTxtPart2 = words.slice(i).join(' ');
+    let videoScript = job.data.videoScript;
+    for (let i = 0; i < videoScript.length; i++) {
+        let sliceFrom = videoScript.slice(0, i);
+        let sliceTo = videoScript.slice(i);
+        let alignFileTxtPart1 = sliceFrom.map(x => x.text).join(' ');
+        let alignFileTxtPart2 = sliceTo.map(x => x.text).join(' ');
         let distance1 = levenshtein.get(alignFileTxtPart1, outputFilePart1);
         let distance2 = levenshtein.get(alignFileTxtPart2, outputFilePart2);
         let totalDistance = distance1 + distance2;
         if (totalDistance < shortestDistance) {
             shortestDistance = totalDistance;
-            shortestDistanceAlignFileTxt = [alignFileTxtPart1, alignFileTxtPart2];
+            shortestDistanceAlignFileTxt = [
+                sliceFrom,
+                sliceTo,
+            ];
         }
     }
-    console.log('shortestDistance', shortestDistance);
-    console.log('shortestDistanceAlignFileTxt', shortestDistanceAlignFileTxt);
-    let txt1File = '/align-output/' + djb2(outputFilePart1) + '-txt1.txt';
-    let txt2File = '/align-output/' + djb2(outputFilePart2) + '-txt2.txt';
-    fs.writeFileSync(txt1File, shortestDistanceAlignFileTxt[0]);
-    fs.writeFileSync(txt2File, shortestDistanceAlignFileTxt[1]);
 
-    return [
-        ...shortestDistanceAlignFileTxt,
-        txt1File,
-        txt2File,
-    ]
+    return shortestDistanceAlignFileTxt;
 }
-function alignWithAlignFileTxt(audioFile, alignFileTxt, outputFile) {
+function alignWithAlignFileTxt(audioFile, segment, outputFile, job) {
+    let alignFileTxt = '/align-output/segment.txt';
+    fs.writeFileSync(alignFileTxt, segment.map(x => x.text).join('\n'));
     child_process.execFileSync('stable-ts', [
         audioFile,
         '--model', model,
@@ -152,12 +149,12 @@ function alignWithAlignFileTxt(audioFile, alignFileTxt, outputFile) {
 
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
     fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
-    let audio = fs.readFileSync(alignFileTxt, 'utf8');
-    let aligned = getAlignedSubtitle(audio, alignedSubtitle);
+    // let audio = fs.readFileSync(alignFileTxt, 'utf8');
+    let aligned = getAlignedSubtitle(job, alignedSubtitle);
 
     return aligned;
 }
-function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
+function checkAligned(alignFileTxt, outputFile, job, audioFile) {
     let {
         audioFilePart1,
         audioFilePart2,
@@ -170,11 +167,15 @@ function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
     let outputFilePart2Content = fs.readFileSync(outputFilePart2, 'utf8');
     let outputFilePart1Parsed = JSON.parse(outputFilePart1Content);
     let outputFilePart2Parsed = JSON.parse(outputFilePart2Content);
-    let alignFileTxtContent = fs.readFileSync(alignFileTxt, 'utf8');
+    // let alignFileTxtContent = fs.readFileSync(alignFileTxt, 'utf8');
 
-    let [txt1, txt2, txt1File, txt2File] = alignPartsWithAlignFileTxt(alignFileTxtContent, outputFilePart1Parsed.text, outputFilePart2Parsed.text);
-    let aligned1 = alignWithAlignFileTxt(audioFilePart1, txt1File, '/align-output/' + djb2(audioFilePart1) + '-aligned.json');
-    let aligned2 = alignWithAlignFileTxt(audioFilePart2, txt2File, '/align-output/' + djb2(audioFilePart2) + '-aligned.json');
+    let [
+        segment1,
+        segment2,
+    ] = alignPartsWithAlignFileTxt(job, outputFilePart1Parsed.text, outputFilePart2Parsed.text);
+    
+    let aligned1 = alignWithAlignFileTxt(audioFilePart1, segment1, '/align-output/' + djb2(audioFilePart1) + '-aligned.json', job);
+    let aligned2 = alignWithAlignFileTxt(audioFilePart2, segment2, '/align-output/' + djb2(audioFilePart2) + '-aligned.json', job);
     console.log('aligned1', aligned1);
     console.log('aligned2', aligned2);
     // let aligned = aligned1.concat(aligned2);
