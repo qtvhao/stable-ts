@@ -54,22 +54,48 @@ if (typeof queueInName !== 'undefined') {
         let outputFile = `/align-output/output-x-${djb2_id}.json`;
         fs.writeFileSync(alignFile, joinedText);
 
+        job.log('outputFile: ' + outputFile);
         if (fs.existsSync(outputFile)) {
             console.log('outputFile already exists', outputFile);
             job.log('outputFile already exists: ' + outputFile);
         }else{
             let tmpAudioFile = '/tmp/' + path.basename(audioFile);
             fs.copyFileSync(audioFile, tmpAudioFile);
-            let executedFileSync = child_process.execFileSync('stable-ts', [
-                tmpAudioFile, 
-                '--model', model, 
-                '--language', language, 
-                '--align', alignFile, 
-                '--overwrite',
-                '--output', outputFile
-            ]); 
-            console.log('executedFileSync', executedFileSync.toString());
-            job.log('executedFileSync:' + executedFileSync.toString());
+            await new Promise(function(resolve, reject){
+                let child = child_process.execFile('stable-ts', [
+                    tmpAudioFile, 
+                    '--model', model, 
+                    '--language', language, 
+                    '--align', alignFile, 
+                    '--overwrite',
+                    '--output', outputFile
+                ]);
+                child.on('close', (code) => {
+                    if (code === 0) {
+                        resolve();
+                    } else {
+                        reject(new Error('stable-ts exited with code ' + code));
+                    }
+                });
+                child.on('error', (err) => {
+                    reject(err);
+                });
+                child.on('exit', (code) => {
+                    if (code !== 0) {
+                        reject(new Error('stable-ts exited with code ' + code));
+                    }
+                });
+                child.stdout.on('data', (data) => {
+                    console.log('stable-ts stdout:', data.toString());
+                    job.log('stable-ts stdout:' + data.toString());
+                });
+                child.stderr.on('data', (data) => {
+                    console.error('stable-ts stderr:', data.toString());
+                    job.log('stable-ts stderr:' + data.toString());
+                });
+            }); 
+            // console.log('executedFileSync', executedFileSync.toString());
+            // job.log('executedFileSync:' + executedFileSync.toString());
         }
         
         // stable-ts in.wav --model tiny --language vi --align all.txt --overwrite --output ni.json
