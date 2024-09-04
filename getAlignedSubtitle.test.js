@@ -57,34 +57,58 @@ function synthesizeAudio(audioFile, videoScript) {
     ], {
         stdio: 'inherit',
     });
+    let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
+    // alignedSubtitle.segments = alignedSubtitle.segments.map(x => {
+    //     return {
+    //         ...x,
+    //         start: x.start.toFixed(2),
+    //         end: x.end.toFixed(2),
+    //     }
+    // });
+    fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
 
     return outputFile;
 }
-function getAlignedVideoScriptItem(videoScript, segmentsEnd, videoScriptIndex) {
+function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
     let videoScriptItem = videoScript[videoScriptIndex];
-    console.log('videoScriptItem', videoScriptItem.text);
+    // console.log('videoScriptItem', videoScriptItem.text);
 
     let bestMatch = 100000;
     let alignedVideoScriptItem;
-    for (let i = 0; i < segments.length; i++) {
+    let segmentTextLast200_a;
+    let videoScriptTextLast200_b;
+    for (let i = 1; i < segments.length; i++) {
         let segmentFromStart = segments.slice(0, i);
+        // 
+        // let lastSegmentFromStart = segmentFromStart[segmentFromStart.length - 1];
+        // let lastSegmentFromStart_Duration = lastSegmentFromStart.end - lastSegmentFromStart.start;
+        // if (lastSegmentFromStart_Duration > 2) {
+        //     continue;
+        // }
+        // 
         let segmentFromStartText = segmentFromStart.map(x => x.text).join('').trim();
         let videoScriptText = videoScriptItem.text;
+        // 
         let segmentTextLast200 = segmentFromStartText.slice(-200);
         let videoScriptTextLast200 = videoScriptText.slice(-200);
         // 
-        let levenshteinDistance = levenshtein.get(segmentTextLast200, videoScriptTextLast200);
-        console.log('levenshteinDistance', levenshteinDistance);
+        let levenshteinDistance = levenshtein.get(segmentTextLast200, videoScriptTextLast200) // + levenshtein.get(videoScriptTextLast200, segmentTextLast200);
+
         if (levenshteinDistance < bestMatch) {
             bestMatch = levenshteinDistance;
             alignedVideoScriptItem = segmentFromStart;
+            segmentTextLast200_a = segmentTextLast200;
+            videoScriptTextLast200_b = videoScriptTextLast200;
         }
     }
+    console.log('segmentTextLast200_a', segmentTextLast200_a);
+    console.log('videoScriptTextLast200_b', videoScriptTextLast200_b);
 
     return alignedVideoScriptItem;
 }
 function getCorrectedVideoScriptIndex(videoScript, segments) {
     let correctedVideoScript = [];
+    // console.log('segments', segments);    process.exit(0);
     for (let i = 0; i < videoScript.length; i++) {
         let alignedVideoScriptItem = getAlignedVideoScriptItem(videoScript, segments, i);
         let alignedStart = alignedVideoScriptItem[0].start;
@@ -176,7 +200,6 @@ function getTimestampForFFMpeg(seconds) {
 function alignVideoScript(videoScript, audioFile) {
     let outputFile = synthesizeAudio(audioFile, videoScript);
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
-    fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
     // 
     let segments = alignedSubtitle.segments;
 
