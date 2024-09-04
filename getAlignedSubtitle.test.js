@@ -81,12 +81,10 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
             if (endsWithColonOrComma) {
                 continue;
             }
-            // console.log('lastSegmentFromCurrentText', segmentsFromCurrent[segmentsFromCurrent.length - 1]);
             let lastSegmentFromCurrent = segmentsFromCurrent[segmentsFromCurrent.length - 1];
             let lastSegmentFromCurrentDuration = lastSegmentFromCurrent.end - lastSegmentFromCurrent.start;
             if (lastSegmentFromCurrentDuration < 0.5) {
                 continue;
-                // console.log('lastSegmentFromCurrentDuration < 0.5', lastSegmentFromCurrentDuration);
             }
             // 
             let levenshteinDistance = levenshtein.get(segmentsFromCurrentText, videoScript[i].text);
@@ -100,7 +98,6 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
             throw new Error('alignedVideoScriptItem is undefined');
         }
         alignedVideoScriptItem = alignedVideoScriptItem.map(x => {
-            console.log('x', x);
             return {
                 start: x.start,
                 end: x.end,
@@ -114,21 +111,28 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
                 }),
             };
         });
-        // let last200 = alignedVideoScriptItem.map(x => x.text).join(' ').slice(-200);
         let alignedStart = alignedVideoScriptItem[0].start;
         let alignedEnd = alignedVideoScriptItem[alignedVideoScriptItem.length - 1].end;
         if (alignedStart === alignedEnd) {
-            // console.log('last200', last200);
             return correctedVideoScript;
         }
-        alignedVideoScriptItem.start = alignedStart;
-        alignedVideoScriptItem.end = alignedEnd;
         correctedVideoScript.push(alignedVideoScriptItem);
         currentSegment = j;
     }
     console.log('all of correctedVideoScript has alignedStart !== alignedEnd');
 
     return correctedVideoScript;
+}
+function getTimestampForFFMpeg(seconds) {
+    // let hours = Math.floor(seconds / 3600);
+    let minutes = Math.floor((seconds % 3600) / 60);
+    let seconds1 = Math.floor(seconds % 60);
+    let miliseconds = Math.floor((seconds % 1) * 1000);
+    // pad it
+    minutes = minutes.toString().padStart(2, '0');
+    seconds1 = seconds1.toString().padStart(2, '0');
+    miliseconds = miliseconds.toString().padStart(3, '0');
+    return `${minutes}:${seconds1}.${miliseconds}`;
 }
 function alignVideoScript(videoScript, audioFile) {
     let outputFile = synthesizeAudio(audioFile, videoScript);
@@ -147,6 +151,22 @@ function alignVideoScript(videoScript, audioFile) {
     if (uncorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length) {
         throw new Error('uncorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
     }
+    // 
+    let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1];
+    let lastCorrectedSegment = lastCorrectedVideoScriptItem[lastCorrectedVideoScriptItem.length - 1];
+    let lastCorrectedSegmentEnd = lastCorrectedSegment.end;
+    let cutAudioFile = '/align-output/cut-audio-' + lastCorrectedSegmentEnd + '.mp3';
+    let timestamp = getTimestampForFFMpeg(lastCorrectedSegmentEnd);
+    child_process.execFileSync('ffmpeg', [
+        '-i', audioFile,
+        '-ss', timestamp,
+        '-c', 'copy',
+        '-y',
+        cutAudioFile,
+    ]);
+    console.log('timestamp', timestamp);
+    process.exit(0);
+    throw new Error('uncorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
 
     return [
         ...correctedVideoScriptItems,
@@ -155,6 +175,16 @@ function alignVideoScript(videoScript, audioFile) {
 }
 function checkAligned(job, audioFile) {
     let videoScript = job.data.videoScript;
+    // convert to mp3
+    let audioFileMp3 = audioFile.replace('.aac', '.mp3');
+    child_process.execFileSync('ffmpeg', [
+        '-i', audioFile,
+        '-c:a', 'libmp3lame',
+        '-b:a', '192k',
+        '-y',
+        audioFileMp3,
+    ]);
+    audioFile = audioFileMp3;
 
     videoScript = alignVideoScript(videoScript, audioFile);
     job.data.videoScript = videoScript;
@@ -169,6 +199,9 @@ function checkAligned(job, audioFile) {
         throw new Error('lastVideoScriptItemStart === lastVideoScriptItemEnd ' + lastVideoScriptItemStart + ' === ' + lastVideoScriptItemEnd + ' , segment index: ' + (videoScript.length - 1));
     } else {
         console.log('All aligned');
+        console.log('videoScript', videoScript.map(x => {
+            return x.map(x => x.text).join('');
+        })[0])
     }
 
     return job;
