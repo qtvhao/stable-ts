@@ -22,7 +22,7 @@ function djb2(str) {
     return hash;
 }
 let model = process.env.STABLE_TS_MODEL;
-let language = 'vi';
+let language = process.env.STABLE_TS_LANGUAGE;
 let alignOutputDir = '/align-output/';
 
 function synthesizeAudio(audioFile, videoScript) {
