@@ -211,7 +211,6 @@ function alignVideoScript(videoScript, audioFile) {
 
     let correctedVideoScriptItems = getCorrectedVideoScriptIndex(videoScript, segments);
     console.log('correctedVideoScriptItems', correctedVideoScriptItems.length, videoScript.length);
-    process.exit(0);
     if (correctedVideoScriptItems.length === videoScript.length) {
         return correctedVideoScriptItems;
     }
@@ -222,11 +221,11 @@ function alignVideoScript(videoScript, audioFile) {
         throw new Error('uncorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
     }
     // 
-    let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1];
-    console.log('lastCorrectedVideoScriptItem', lastCorrectedVideoScriptItem.map(x => x.text));
-    process.exit(0);
+    let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1].aligned;
     let lastCorrectedSegment = lastCorrectedVideoScriptItem[lastCorrectedVideoScriptItem.length - 1];
     let lastCorrectedSegmentEnd = lastCorrectedSegment.end;
+    console.log('lastCorrectedSegmentEnd', lastCorrectedSegmentEnd);
+    process.exit(0);
     let cutAudioFile = '/align-output/cut-audio-' + lastCorrectedSegmentEnd + '.mp3';
     let timestamp = getTimestampForFFMpeg(lastCorrectedSegmentEnd);
     child_process.execFileSync('ffmpeg', [
