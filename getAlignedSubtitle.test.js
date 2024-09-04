@@ -75,29 +75,53 @@ function synthesizeAudio(audioFile, videoScript) {
     return outputFile;
 }
 function removeSpecialCharacters(text) {
-    return text.replace(/[^\w\s]/gi, '')
-    .replace(/-/g, ' ')
-    .replace(/\n/g, ' ')
-    .replace(/\s+/g, ' ');
+    return removeMd(text)
+        .replace(/[:,\'\"\?\!\;\.\(\)\[\]\{\}\n]/g, ' ')
+        .replace(/#+/g, ' ')
+        .replace(/-/g, ' ')
+        .replace(/\n/g, ' ')
+        .replace(/\s+/g, ' ');
 }
 function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
-    let videoScriptItem = videoScript[videoScriptIndex];
+    // let videoScriptItem = videoScript[videoScriptIndex];
+    // let bestMatch = 100000;
+    // let alignedVideoScriptItem;
+    // let segmentFromStartText;
+    // let videoScriptText;
+    // for (let i = 1; i < segments.length; i++) {
+    //     let segmentFromStart = segments.slice(0, i);
+    //     // 
+    //     segmentFromStartText = removeSpecialCharacters(segmentFromStart.map(x => x.text).join('').trim()).slice(-200);
+    //     videoScriptText = removeSpecialCharacters(videoScriptItem.text).slice(-200);
+    //     // 
+    //     let levenshteinDistance = levenshtein.get(segmentFromStartText, videoScriptText) // + levenshtein.get(videoScriptTextLast200, segmentTextLast200);
 
-    let bestMatch = 100000;
-    let alignedVideoScriptItem;
-    for (let i = 1; i < segments.length; i++) {
-        let segmentFromStart = segments.slice(0, i);
+    //     if (levenshteinDistance < bestMatch) {
+    //         bestMatch = levenshteinDistance; // find the best match, best match is the lowest levenshtein distance
+    //         alignedVideoScriptItem = segmentFromStart;
+    //     }
+    // }
+    // 
+    // console.log('segmentFromStartText', segmentFromStartText);
+    // console.log('videoScriptText', videoScriptText);
+    let segmentsWithTextFromStart = segments.map((_segment, i, self) => {
+        let segmentFromStart = self.slice(0, i);
         // 
-        let segmentFromStartText = removeSpecialCharacters(segmentFromStart.slice(-20).map(x => x.text).join('').trim());
-        let videoScriptText = (removeSpecialCharacters(videoScriptItem.text).slice(segmentFromStartText.length));
+        let segmentsFromStartText = removeSpecialCharacters(segmentFromStart.map(x => x.text).join('').trim()).slice(-200);
+        let videoScriptItemText = removeSpecialCharacters(videoScript[videoScriptIndex].text).slice(-200);
+        let levenshteinDistance = levenshtein.get(segmentsFromStartText, videoScriptItemText);
         // 
-        let levenshteinDistance = levenshtein.get(segmentFromStartText, videoScriptText) // + levenshtein.get(videoScriptTextLast200, segmentTextLast200);
-
-        if (levenshteinDistance < bestMatch) {
-            bestMatch = levenshteinDistance;
-            alignedVideoScriptItem = segmentFromStart;
-        }
-    }
+        return {
+            levenshteinDistance,
+            segmentFromStart,
+        };
+    });
+    let bestMatch = segmentsWithTextFromStart.reduce((best, current) => {
+        return best.levenshteinDistance < current.levenshteinDistance ? best : current;
+    });
+    console.log('videoScript[videoScriptIndex].text', videoScript[videoScriptIndex].text);
+    console.log('bestMatch', bestMatch.segmentFromStart.map(x => x.text));
+    process.exit(0);
 
     return alignedVideoScriptItem;
 }
