@@ -23,7 +23,7 @@ COPY yarn.lock package.json ./
 RUN yarn install
 RUN which jest || npm install -g jest
 
-COPY src/ .
+COPY src/ src/
 COPY audio.json .
 COPY alignment.js .
 COPY getAlignedSubtitle.js .
