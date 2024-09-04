@@ -182,6 +182,8 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
         }
         correctedVideoScript.push({
             ...videoScript[i],
+            start: alignedStart,
+            end: alignedEnd,
             aligned: alignedVideoScriptItem,
         });
     }
@@ -204,17 +206,8 @@ function alignVideoScript(videoScript, audioFile) {
     // 
     let segments = alignedSubtitle.segments;
 
-    // console.log('videoScript', videoScript.map(x => x.text));
     let correctedVideoScriptItems = getCorrectedVideoScriptIndex(videoScript, segments);
-    // for (let i = 0; i < correctedVideoScriptItems.length; i++) {
-        // let correctedVideoScriptItem = correctedVideoScriptItems[i];
-        // let aligned = correctedVideoScriptItem.aligned;
-        // let lastAligned = aligned[aligned.length - 1];
-        // console.log('aligned', aligned.map(x => x.text).join(''));
-        // console.log('correctedVideoScriptItem', correctedVideoScriptItem.text);
-        // 
-    // }
-    console.log('correctedVideoScriptItems', correctedVideoScriptItems.length, videoScript.length);
+
     if (correctedVideoScriptItems.length === videoScript.length) {
         return correctedVideoScriptItems;
     }
@@ -240,8 +233,6 @@ function alignVideoScript(videoScript, audioFile) {
         cutAudioFile,
     ]);
     console.log('timestamp', uncorrectedVideoScriptItems);
-    // process.exit(0);
-    // throw new Error('uncorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
 
     return [
         ...correctedVideoScriptItems,
@@ -270,6 +261,7 @@ function checkAligned(job, audioFile) {
     let lastVideoScriptItemEnd = lastVideoScriptItem.end;
     let lastVideoScriptItemStart = lastVideoScriptItem.start;
     if (typeof lastVideoScriptItemStart === 'undefined' || typeof lastVideoScriptItemEnd === 'undefined') {
+        console.log('lastVideoScriptItem', lastVideoScriptItem.aligned);
         throw new Error('lastVideoScriptItemStart or lastVideoScriptItemEnd is undefined');
     }
 
@@ -278,8 +270,8 @@ function checkAligned(job, audioFile) {
     } else {
         console.log('All aligned');
         console.log('videoScript', videoScript.map(x => {
-            return x.map(x => x.text).join('');
-        })[0])
+            return x.aligned.map(x => x.text).join('');
+        }))
     }
 
     return job;
