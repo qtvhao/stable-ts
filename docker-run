@@ -7,6 +7,7 @@ docker run -it \
     --name alignment \
     -v ./data:/data \
     -v ./output:/output \
+    -v ./src/:/workspace/src/ \
     -v ./audio.json:/workspace/audio.json \
     -v ./alignment.js:/workspace/alignment.js \
     -v ./align-input/:/align-input/ \
