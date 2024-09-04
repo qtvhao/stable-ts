@@ -60,66 +60,105 @@ function synthesizeAudio(audioFile, videoScript) {
 
     return outputFile;
 }
+function getAlignedVideoScriptItem(videoScript, segmentsEnd, videoScriptIndex) {
+    let videoScriptItem = videoScript[videoScriptIndex];
+    console.log('videoScriptItem', videoScriptItem.text);
+
+    let bestMatch = 100000;
+    let alignedVideoScriptItem;
+    for (let i = 0; i < segments.length; i++) {
+        let segmentFromStart = segments.slice(0, i);
+        let segmentFromStartText = segmentFromStart.map(x => x.text).join('').trim();
+        let videoScriptText = videoScriptItem.text;
+        let segmentTextLast200 = segmentFromStartText.slice(-200);
+        let videoScriptTextLast200 = videoScriptText.slice(-200);
+        // 
+        let levenshteinDistance = levenshtein.get(segmentTextLast200, videoScriptTextLast200);
+        console.log('levenshteinDistance', levenshteinDistance);
+        if (levenshteinDistance < bestMatch) {
+            bestMatch = levenshteinDistance;
+            alignedVideoScriptItem = segmentFromStart;
+        }
+    }
+
+    return alignedVideoScriptItem;
+}
 function getCorrectedVideoScriptIndex(videoScript, segments) {
-    let currentSegment = 0;
     let correctedVideoScript = [];
     for (let i = 0; i < videoScript.length; i++) {
-        let bestMatch = 100000;
-        let alignedVideoScriptItem = segments.slice(currentSegment, currentSegment + 1);
-        if (typeof alignedVideoScriptItem[0] === 'undefined') {
-            return correctedVideoScript;
-        }
-        let j = currentSegment + 1;
-        for (; j < segments.length; j++) {
-            let segmentsFromCurrent;
-            segmentsFromCurrent = segments.slice(currentSegment, j);
-            if (segmentsFromCurrent.length === 0) {
-                throw new Error('segmentsFromCurrent.length === 0, i: ' + i + ', j: ' + j + ', segments: ' + segments.length);
-            }
-            let segmentsFromCurrentText = segmentsFromCurrent.map(x => x.text).join('').trim();
-            let endsWithColonOrComma = segmentsFromCurrentText.endsWith(',') || segmentsFromCurrentText.endsWith(':');
-            if (endsWithColonOrComma) {
-                continue;
-            }
-            let lastSegmentFromCurrent = segmentsFromCurrent[segmentsFromCurrent.length - 1];
-            let lastSegmentFromCurrentDuration = lastSegmentFromCurrent.end - lastSegmentFromCurrent.start;
-            if (lastSegmentFromCurrentDuration < 0.5) {
-                continue;
-            }
-            // 
-            let levenshteinDistance = levenshtein.get(segmentsFromCurrentText, videoScript[i].text);
-            if (levenshteinDistance < bestMatch) {
-                bestMatch = levenshteinDistance;
-                alignedVideoScriptItem = segmentsFromCurrent;
-            }
-        }
-        if (typeof alignedVideoScriptItem[0] === 'undefined') {
-            console.log('alignedVideoScriptItem is undefined', i);
-            throw new Error('alignedVideoScriptItem is undefined');
-        }
-        alignedVideoScriptItem = alignedVideoScriptItem.map(x => {
-            return {
-                start: x.start,
-                end: x.end,
-                text: x.text,
-                words: x.words.map(y => {
-                    return {
-                        word: y.word,
-                        start: y.start,
-                        end: y.end,
-                    };
-                }),
-            };
-        });
+        let alignedVideoScriptItem = getAlignedVideoScriptItem(videoScript, segments, i);
         let alignedStart = alignedVideoScriptItem[0].start;
         let alignedEnd = alignedVideoScriptItem[alignedVideoScriptItem.length - 1].end;
         if (alignedStart === alignedEnd) {
             return correctedVideoScript;
         }
-        correctedVideoScript.push(alignedVideoScriptItem);
-        currentSegment = j;
+        correctedVideoScript.push({
+            ...videoScript[i],
+            aligned: alignedVideoScriptItem,
+        });
+        // if (i === 3) {
+        //     break;
+        // }
+        // let bestMatch = 100000;
+        // let alignedVideoScriptItem = segments.slice(currentSegment, currentSegment + 1);
+        // // if (typeof alignedVideoScriptItem[0] === 'undefined') {
+        // //     throw new Error('alignedVideoScriptItem[0] is undefined, i: ' + i + ', currentSegment: ' + currentSegment);
+        // // }
+
+        // for (let j = currentSegment; j < segments.length; j++) {
+        //     let segmentsFromCurrent;
+        //     segmentsFromCurrent = segments.slice(currentSegment, j);
+        //     if (segmentsFromCurrent.length === 0) {
+        //         throw new Error('segmentsFromCurrent.length === 0, i: ' + i + ', j: ' + j + ', segments: ' + segments.length);
+        //     }
+        //     let segmentsFromCurrentText = segmentsFromCurrent.map(x => x.text).join('').trim();
+        //     let endsWithColonOrComma = segmentsFromCurrentText.endsWith(',') || segmentsFromCurrentText.endsWith(':');
+        //     if (endsWithColonOrComma) {
+        //         continue;
+        //     }
+        //     let lastSegmentFromCurrent = segmentsFromCurrent[segmentsFromCurrent.length - 1];
+        //     let lastSegmentFromCurrentDuration = lastSegmentFromCurrent.end - lastSegmentFromCurrent.start;
+        //     if (lastSegmentFromCurrentDuration < 0.5) {
+        //         continue;
+        //     }
+        //     // 
+        //     let levenshteinDistance = levenshtein.get(segmentsFromCurrentText, videoScript[i].text);
+        //     if (levenshteinDistance < bestMatch) {
+        //         bestMatch = levenshteinDistance;
+        //         alignedVideoScriptItem = segmentsFromCurrent;
+        //     }
+        // }
+        // if (typeof alignedVideoScriptItem[0] === 'undefined') {
+        //     console.log('alignedVideoScriptItem is undefined', i);
+        //     throw new Error('alignedVideoScriptItem is undefined');
+        // }
+        // alignedVideoScriptItem = alignedVideoScriptItem.map(x => {
+        //     return {
+        //         start: x.start,
+        //         end: x.end,
+        //         text: x.text,
+        //         words: x.words.map(y => {
+        //             return {
+        //                 word: y.word,
+        //                 start: y.start,
+        //                 end: y.end,
+        //             };
+        //         }),
+        //     };
+        // });
+        // let alignedStart = alignedVideoScriptItem[0].start;
+        // let alignedEnd = alignedVideoScriptItem[alignedVideoScriptItem.length - 1].end;
+        // if (alignedStart === alignedEnd) {
+        //     throw new Error('alignedStart === alignedEnd ' + alignedStart + ' === ' + alignedEnd + ' , segment index: ' + i);
+        //     return correctedVideoScript;
+        // }
+        // correctedVideoScript.push({
+        //     ...videoScript[i],
+        //     aligned: alignedVideoScriptItem,
+        // });
+        // currentSegment = j;
     }
-    console.log('all of correctedVideoScript has alignedStart !== alignedEnd');
+    // console.log('all of correctedVideoScript has alignedStart !== alignedEnd');
 
     return correctedVideoScript;
 }
@@ -142,6 +181,8 @@ function alignVideoScript(videoScript, audioFile) {
     let segments = alignedSubtitle.segments;
 
     let correctedVideoScriptItems = getCorrectedVideoScriptIndex(videoScript, segments);
+    console.log('correctedVideoScriptItems', correctedVideoScriptItems.length, videoScript.length);
+    process.exit(0);
     if (correctedVideoScriptItems.length === videoScript.length) {
         return correctedVideoScriptItems;
     }
@@ -153,6 +194,8 @@ function alignVideoScript(videoScript, audioFile) {
     }
     // 
     let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1];
+    console.log('lastCorrectedVideoScriptItem', lastCorrectedVideoScriptItem.map(x => x.text));
+    process.exit(0);
     let lastCorrectedSegment = lastCorrectedVideoScriptItem[lastCorrectedVideoScriptItem.length - 1];
     let lastCorrectedSegmentEnd = lastCorrectedSegment.end;
     let cutAudioFile = '/align-output/cut-audio-' + lastCorrectedSegmentEnd + '.mp3';
