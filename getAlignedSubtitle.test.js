@@ -27,11 +27,21 @@ function getInput(alignFile) {
 let model = process.env.STABLE_TS_MODEL;
 let language = 'vi';
 let alignOutputDir = '/align-output/';
-function alignVideoScript(videoScript, audioFile) {
-    let alignFileTxt = path.join(alignOutputDir, 'output-' + path.basename(audioFile) + '.txt');
-    let outputFile = path.join(alignOutputDir, 'output-' + path.basename(audioFile) + '.json');
+function djb2(str) {
+    let hash = 5381;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+}
+function synthesizeAudio(audioFile, videoScript) {
     let alignTxtContent = videoScript.map(x => x.text).join('\n');
+    let djb2Hash = djb2(alignTxtContent);
+    let outputFile = path.join(alignOutputDir, 'output-' + djb2Hash + '.json');
+    let alignFileTxt = path.join(alignOutputDir, 'output-' + djb2Hash + '.txt');
     fs.writeFileSync(alignFileTxt, alignTxtContent);
+
     child_process.execFileSync('stable-ts', [
         audioFile,
         '--model', model,
@@ -43,6 +53,11 @@ function alignVideoScript(videoScript, audioFile) {
     ], {
         stdio: 'inherit',
     });
+
+    return outputFile;
+}
+function alignVideoScript(videoScript, audioFile) {
+    let outputFile = synthesizeAudio(audioFile, videoScript);
 
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
     console.log('alignedSubtitle', alignedSubtitle);
@@ -59,7 +74,7 @@ function alignVideoScript(videoScript, audioFile) {
         let floatEnd = parseFloat(end);
         if (floatStart === floatEnd) {
             console.log('floatStart === floatEnd', floatStart, floatEnd);
-            let incorrectSegmentIndex = i;
+            let incorrectSegmentIndex = i - 1;
             let correctedSegments = segments.slice(0, incorrectSegmentIndex);
             if (correctedSegments[correctedSegments.length - 1].end === segments[incorrectSegmentIndex].start) {
                 throw new Error('correctedSegments[correctedSegments.length - 1].end === segments[incorrectSegmentIndex].start');
