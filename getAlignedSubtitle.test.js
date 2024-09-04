@@ -3,6 +3,7 @@ let child_process = require('child_process');
 let removeMd = require('remove-markdown');
 let fs = require('fs');
 let path = require('path');
+var levenshtein = require('fast-levenshtein');
 console.log('='.repeat(300));
 
 function removePunctuation(text) {
@@ -59,6 +60,47 @@ function synthesizeAudio(audioFile, videoScript) {
 
     return outputFile;
 }
+function getCorrectedVideoScriptIndex(videoScript, segments) {
+    let currentSegment = 0;
+    let correctedVideoScript = [];
+    for (let i = 0; i < videoScript.length; i++) {
+        let bestMatch = 100000;
+        let alignedVideoScriptItem;
+        for (let j = currentSegment; j < segments.length; j++) {
+            let segmentsFromCurrent = segments.slice(currentSegment, j);
+            let segmentsFromCurrentText = segmentsFromCurrent.map(x => x.text).join(' ');
+            let levenshteinDistance = levenshtein.get(segmentsFromCurrentText, videoScript[i].text);
+            if (levenshteinDistance < bestMatch) {
+                bestMatch = levenshteinDistance;
+                alignedVideoScriptItem = segmentsFromCurrent;
+            }
+        }
+        alignedVideoScriptItem = alignedVideoScriptItem.map(x => {
+            return {
+                start: x.start,
+                end: x.end,
+                text: x.text,
+                words: x.words.map(y => {
+                    return {
+                        word: y.word,
+                        start: y.start,
+                        end: y.end,
+                    };
+                }),
+            };
+        });
+        correctedVideoScript.push(alignedVideoScriptItem);
+        currentSegment = i;
+        // 
+        let alignedStart = alignedVideoScriptItem[0].start;
+        let alignedEnd = alignedVideoScriptItem[alignedVideoScriptItem.length - 1].end;
+        if (alignedStart === alignedEnd) {
+            return correctedVideoScript;
+        }
+    }
+    // throw new Error('Not found correctedVideoScript');
+    return correctedVideoScript;
+}
 function alignVideoScript(videoScript, audioFile) {
     let outputFile = synthesizeAudio(audioFile, videoScript);
 
@@ -81,8 +123,11 @@ function alignVideoScript(videoScript, audioFile) {
             let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1];
             let lastCorrectedVideoScriptItemEnd = lastCorrectedVideoScriptItem.end;
             let lastCorrectedVideoScriptItemStart = lastCorrectedVideoScriptItem.start;
+            if (lastCorrectedVideoScriptItem.length === 1) {
+                return videoScript;
+            }
             if (lastCorrectedVideoScriptItemStart === lastCorrectedVideoScriptItemEnd) {
-                throw new Error('lastCorrectedVideoScriptItemStart === lastCorrectedVideoScriptItemEnd, segment');
+                throw new Error('lastCorrectedVideoScriptItemStart === lastCorrectedVideoScriptItemEnd, segment index: ');
             }
             let uncorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
             return [
