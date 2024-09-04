@@ -138,13 +138,14 @@ function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
         // 
         let lastSegment = segmentFromStart[segmentFromStart.length - 1];
         // eg: next 0.32 and previous 2.88, ratio is 0.11
+        console.log('lastSegment.previousToNextRatio', lastSegment)
         if (lastSegment.previousToNextRatio < 0.15) {
             // this segment is close to the next segment
             console.log('this segment is close to the next segment');
-            return {
-                levenshteinDistance: 100000,
-                segmentFromStart,
-            }
+            // return {
+            //     levenshteinDistance: 100000,
+            //     segmentFromStart,
+            // }
         } else {
             console.log('this segment is close to the previous segment');
             // this segment is close to the previous segment
@@ -162,9 +163,6 @@ function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
     let bestMatch = segmentsWithTextFromStart.reduce((best, current) => {
         return best.levenshteinDistance < current.levenshteinDistance ? best : current;
     });
-    // console.log('videoScript[videoScriptIndex].text', videoScript[videoScriptIndex].text);
-    // console.log('bestMatch', bestMatch.segmentFromStart.map(x => x));
-    // process.exit(0);
 
     return bestMatch.segmentFromStart;
 }
@@ -271,7 +269,7 @@ function checkAligned(job, audioFile) {
         console.log('All aligned');
         console.log('videoScript', videoScript.map(x => {
             return x.aligned.map(x => x.text).join('');
-        }))
+        }).join('\n'.repeat(5)))
     }
 
     return job;
