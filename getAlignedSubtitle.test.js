@@ -138,13 +138,13 @@ function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
         // 
         let lastSegment = segmentFromStart[segmentFromStart.length - 1];
         // eg: next 0.32 and previous 2.88, ratio is 0.11
-        if (lastSegment.previousToNextRatio < 0.2) {
+        if (lastSegment.previousToNextRatio < 0.15) {
             // this segment is close to the next segment
             console.log('this segment is close to the next segment');
-            // return {
-            //     levenshteinDistance: 100000,
-            //     segmentFromStart,
-            // }
+            return {
+                levenshteinDistance: 100000,
+                segmentFromStart,
+            }
         } else {
             console.log('this segment is close to the previous segment');
             // this segment is close to the previous segment
@@ -162,11 +162,11 @@ function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
     let bestMatch = segmentsWithTextFromStart.reduce((best, current) => {
         return best.levenshteinDistance < current.levenshteinDistance ? best : current;
     });
-    console.log('videoScript[videoScriptIndex].text', videoScript[videoScriptIndex].text);
-    console.log('bestMatch', bestMatch.segmentFromStart.map(x => x));
-    process.exit(0);
+    // console.log('videoScript[videoScriptIndex].text', videoScript[videoScriptIndex].text);
+    // console.log('bestMatch', bestMatch.segmentFromStart.map(x => x));
+    // process.exit(0);
 
-    return alignedVideoScriptItem;
+    return bestMatch.segmentFromStart;
 }
 function getCorrectedVideoScriptIndex(videoScript, segments) {
     let correctedVideoScript = [];
@@ -184,78 +184,15 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
             ...videoScript[i],
             aligned: alignedVideoScriptItem,
         });
-        // if (i === 3) {
-        //     break;
-        // }
-        // let bestMatch = 100000;
-        // let alignedVideoScriptItem = segments.slice(currentSegment, currentSegment + 1);
-        // // if (typeof alignedVideoScriptItem[0] === 'undefined') {
-        // //     throw new Error('alignedVideoScriptItem[0] is undefined, i: ' + i + ', currentSegment: ' + currentSegment);
-        // // }
-
-        // for (let j = currentSegment; j < segments.length; j++) {
-        //     let segmentsFromCurrent;
-        //     segmentsFromCurrent = segments.slice(currentSegment, j);
-        //     if (segmentsFromCurrent.length === 0) {
-        //         throw new Error('segmentsFromCurrent.length === 0, i: ' + i + ', j: ' + j + ', segments: ' + segments.length);
-        //     }
-        //     let segmentsFromCurrentText = segmentsFromCurrent.map(x => x.text).join('').trim();
-        //     let endsWithColonOrComma = segmentsFromCurrentText.endsWith(',') || segmentsFromCurrentText.endsWith(':');
-        //     if (endsWithColonOrComma) {
-        //         continue;
-        //     }
-        //     let lastSegmentFromCurrent = segmentsFromCurrent[segmentsFromCurrent.length - 1];
-        //     let lastSegmentFromCurrentDuration = lastSegmentFromCurrent.end - lastSegmentFromCurrent.start;
-        //     if (lastSegmentFromCurrentDuration < 0.5) {
-        //         continue;
-        //     }
-        //     // 
-        //     let levenshteinDistance = levenshtein.get(segmentsFromCurrentText, videoScript[i].text);
-        //     if (levenshteinDistance < bestMatch) {
-        //         bestMatch = levenshteinDistance;
-        //         alignedVideoScriptItem = segmentsFromCurrent;
-        //     }
-        // }
-        // if (typeof alignedVideoScriptItem[0] === 'undefined') {
-        //     console.log('alignedVideoScriptItem is undefined', i);
-        //     throw new Error('alignedVideoScriptItem is undefined');
-        // }
-        // alignedVideoScriptItem = alignedVideoScriptItem.map(x => {
-        //     return {
-        //         start: x.start,
-        //         end: x.end,
-        //         text: x.text,
-        //         words: x.words.map(y => {
-        //             return {
-        //                 word: y.word,
-        //                 start: y.start,
-        //                 end: y.end,
-        //             };
-        //         }),
-        //     };
-        // });
-        // let alignedStart = alignedVideoScriptItem[0].start;
-        // let alignedEnd = alignedVideoScriptItem[alignedVideoScriptItem.length - 1].end;
-        // if (alignedStart === alignedEnd) {
-        //     throw new Error('alignedStart === alignedEnd ' + alignedStart + ' === ' + alignedEnd + ' , segment index: ' + i);
-        //     return correctedVideoScript;
-        // }
-        // correctedVideoScript.push({
-        //     ...videoScript[i],
-        //     aligned: alignedVideoScriptItem,
-        // });
-        // currentSegment = j;
     }
-    // console.log('all of correctedVideoScript has alignedStart !== alignedEnd');
 
     return correctedVideoScript;
 }
 function getTimestampForFFMpeg(seconds) {
-    // let hours = Math.floor(seconds / 3600);
     let minutes = Math.floor((seconds % 3600) / 60);
     let seconds1 = Math.floor(seconds % 60);
     let miliseconds = Math.floor((seconds % 1) * 1000);
-    // pad it
+
     minutes = minutes.toString().padStart(2, '0');
     seconds1 = seconds1.toString().padStart(2, '0');
     miliseconds = miliseconds.toString().padStart(3, '0');
@@ -273,8 +210,8 @@ function alignVideoScript(videoScript, audioFile) {
         let correctedVideoScriptItem = correctedVideoScriptItems[i];
         let aligned = correctedVideoScriptItem.aligned;
         // let lastAligned = aligned[aligned.length - 1];
-        console.log('aligned', aligned.map(x => x.text).join(''));
-        console.log('correctedVideoScriptItem', correctedVideoScriptItem.text);
+        // console.log('aligned', aligned.map(x => x.text).join(''));
+        // console.log('correctedVideoScriptItem', correctedVideoScriptItem.text);
         // 
     }
     process.exit(0);
