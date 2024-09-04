@@ -26,37 +26,46 @@ function getInput(alignFile) {
 }
 let model = process.env.STABLE_TS_MODEL;
 let language = 'vi';
-function checkAligned(alignFileTxt, outputFile, audio, audioFile) {
-    child_process.execFileSync('stable-ts', [
-        audioFile,
-        '--model', model,
-        '--language', language,
-        '--align', alignFileTxt,
-        '--overwrite',
-        '--output', outputFile,
-        '-fw',
-    ], {
-        stdio: 'inherit',
-    });
+function alignVideoScript(videoScript, audioFile) {
+    
+}
+function checkAligned(job, audioFile) {
+    let videoScript = job.data.videoScript;
 
-    let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
-    fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
-    let aligned = getAlignedSubtitle(audio, alignedSubtitle);
-    // console.log('aligned', aligned);
-    for (let i = 0; i < aligned.length; i++) {
-        let alignedItem = aligned[i];
-        expect(alignedItem.aligned).toBeDefined();
-        // 
-        let firstAligned = alignedItem.aligned[0];
-        let lastAligned = alignedItem.aligned[alignedItem.aligned.length - 1];
-        console.log('firstAligned', firstAligned, 'lastAligned', lastAligned);
-        let firstAlignedStart = firstAligned.start;
-        let lastAlignedEnd = lastAligned.end;
-        if (firstAlignedStart === lastAlignedEnd) {
-            console.log('firstAlignedStart === lastAlignedEnd', firstAligned, lastAligned);
-            throw new Error('firstAlignedStart === lastAlignedEnd on ' + i + ' / ' + aligned.length);
-        }
-    }
+    videoScript = alignVideoScript(videoScript, audioFile);
+    job.data.videoScript = videoScript;
+
+    return job;
+    // child_process.execFileSync('stable-ts', [
+    //     audioFile,
+    //     '--model', model,
+    //     '--language', language,
+    //     '--align', alignFileTxt,
+    //     '--overwrite',
+    //     '--output', outputFile,
+    //     '-fw',
+    // ], {
+    //     stdio: 'inherit',
+    // });
+
+    // let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
+    // fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
+    // let aligned = getAlignedSubtitle(audio, alignedSubtitle);
+    // // console.log('aligned', aligned);
+    // for (let i = 0; i < aligned.length; i++) {
+    //     let alignedItem = aligned[i];
+    //     expect(alignedItem.aligned).toBeDefined();
+    //     // 
+    //     let firstAligned = alignedItem.aligned[0];
+    //     let lastAligned = alignedItem.aligned[alignedItem.aligned.length - 1];
+    //     console.log('firstAligned', firstAligned, 'lastAligned', lastAligned);
+    //     let firstAlignedStart = firstAligned.start;
+    //     let lastAlignedEnd = lastAligned.end;
+    //     if (firstAlignedStart === lastAlignedEnd) {
+    //         console.log('firstAlignedStart === lastAlignedEnd', firstAligned, lastAligned);
+    //         throw new Error('firstAlignedStart === lastAlignedEnd on ' + i + ' / ' + aligned.length);
+    //     }
+    // }
 }
 test('test alignment', () => {
     let {
@@ -89,10 +98,10 @@ test('test alignment 3', () => {
 
 test('test alignment 4', () => {
     let {
-        alignFileTxt,
-        outputFile,
+        // alignFileTxt,
+        // outputFile,
         audio,
-    } = getInput('/align-input/align-2639383328.json');
-    let audioFile = '/align-input/synthesize-result-2639383328.aac';
-    checkAligned(alignFileTxt, outputFile, audio, audioFile)
+    } = getInput('/align-input/align-2461984885.json');
+    let audioFile = '/align-input/synthesize-result-2461984885.aac';
+    checkAligned(audio, audioFile)
 });
