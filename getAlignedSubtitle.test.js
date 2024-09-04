@@ -99,6 +99,8 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
             console.log('last200', last200);
             return correctedVideoScript;
         }
+        alignedVideoScriptItem.start = alignedStart;
+        alignedVideoScriptItem.end = alignedEnd;
         correctedVideoScript.push(alignedVideoScriptItem);
         currentSegment = i;
     }
@@ -112,28 +114,19 @@ function alignVideoScript(videoScript, audioFile) {
     fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
     // 
     let segments = alignedSubtitle.segments;
-    for (let i = 0; i < segments.length; i++) {
-        let segment = segments[i];
-        let start = segment.start;
-        let end = segment.end;
-        // 
-        console.log('start', start, 'end', end);
-        let floatStart = parseFloat(start);
-        let floatEnd = parseFloat(end);
-        if (floatStart === floatEnd) {
-            console.log('floatStart === floatEnd', floatStart, floatEnd);
-            let correctedVideoScriptItems = getCorrectedVideoScriptIndex(videoScript, segments);
-            if (correctedVideoScriptItems.length === videoScript.length) {
-                return videoScript;
-            }
-            // 
-            let uncorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
-            return [
-                ...correctedVideoScriptItems,
-                ...alignVideoScript(uncorrectedVideoScriptItems, audioFile),
-            ];
-        }
+
+    let correctedVideoScriptItems = getCorrectedVideoScriptIndex(videoScript, segments);
+    if (correctedVideoScriptItems.length === videoScript.length) {
+        console.log('correctedVideoScriptItems.length === videoScript.length', correctedVideoScriptItems.length, videoScript.length);
+        return correctedVideoScriptItems;
     }
+
+    let uncorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
+
+    return [
+        ...correctedVideoScriptItems,
+        ...alignVideoScript(uncorrectedVideoScriptItems, audioFile),
+    ];
 }
 function checkAligned(job, audioFile) {
     let videoScript = job.data.videoScript;
@@ -143,11 +136,13 @@ function checkAligned(job, audioFile) {
     let lastVideoScriptItem = videoScript[videoScript.length - 1];
     let lastVideoScriptItemEnd = lastVideoScriptItem.end;
     let lastVideoScriptItemStart = lastVideoScriptItem.start;
-
-    if (lastVideoScriptItemStart === lastVideoScriptItemEnd) {
-        throw new Error('lastVideoScriptItemStart === lastVideoScriptItemEnd, segment index: ' + (videoScript.length - 1));
+    if (typeof lastVideoScriptItemStart === 'undefined' || typeof lastVideoScriptItemEnd === 'undefined') {
+        throw new Error('lastVideoScriptItemStart or lastVideoScriptItemEnd is undefined');
     }
 
+    if (lastVideoScriptItemStart === lastVideoScriptItemEnd) {
+        throw new Error('lastVideoScriptItemStart === lastVideoScriptItemEnd ' + lastVideoScriptItemStart + ' === ' + lastVideoScriptItemEnd + ' , segment index: ' + (videoScript.length - 1));
+    }
 
     return job;
     // let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
