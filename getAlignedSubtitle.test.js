@@ -88,24 +88,27 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
                     };
                 }),
             };
-        });
-        correctedVideoScript.push(alignedVideoScriptItem);
-        currentSegment = i;
-        // 
+        }).reduce((acc, x) => {
+            acc.push(x);
+            return acc;
+        }, []);
+        let last200 = alignedVideoScriptItem.map(x => x.text).join(' ').slice(-200);
         let alignedStart = alignedVideoScriptItem[0].start;
         let alignedEnd = alignedVideoScriptItem[alignedVideoScriptItem.length - 1].end;
         if (alignedStart === alignedEnd) {
+            console.log('last200', last200);
             return correctedVideoScript;
         }
+        correctedVideoScript.push(alignedVideoScriptItem);
+        currentSegment = i;
     }
-    // throw new Error('Not found correctedVideoScript');
+    console.log('all of correctedVideoScript has alignedStart !== alignedEnd');
+
     return correctedVideoScript;
 }
 function alignVideoScript(videoScript, audioFile) {
     let outputFile = synthesizeAudio(audioFile, videoScript);
-
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
-    // console.log('alignedSubtitle', alignedSubtitle);
     fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
     // 
     let segments = alignedSubtitle.segments;
@@ -120,15 +123,10 @@ function alignVideoScript(videoScript, audioFile) {
         if (floatStart === floatEnd) {
             console.log('floatStart === floatEnd', floatStart, floatEnd);
             let correctedVideoScriptItems = getCorrectedVideoScriptIndex(videoScript, segments);
-            let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1];
-            let lastCorrectedVideoScriptItemEnd = lastCorrectedVideoScriptItem.end;
-            let lastCorrectedVideoScriptItemStart = lastCorrectedVideoScriptItem.start;
-            if (lastCorrectedVideoScriptItem.length === 1) {
+            if (correctedVideoScriptItems.length === videoScript.length) {
                 return videoScript;
             }
-            if (lastCorrectedVideoScriptItemStart === lastCorrectedVideoScriptItemEnd) {
-                throw new Error('lastCorrectedVideoScriptItemStart === lastCorrectedVideoScriptItemEnd, segment index: ');
-            }
+            // 
             let uncorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
             return [
                 ...correctedVideoScriptItems,
@@ -136,13 +134,20 @@ function alignVideoScript(videoScript, audioFile) {
             ];
         }
     }
-    // return alignedSubtitle;
 }
 function checkAligned(job, audioFile) {
     let videoScript = job.data.videoScript;
 
     videoScript = alignVideoScript(videoScript, audioFile);
     job.data.videoScript = videoScript;
+    let lastVideoScriptItem = videoScript[videoScript.length - 1];
+    let lastVideoScriptItemEnd = lastVideoScriptItem.end;
+    let lastVideoScriptItemStart = lastVideoScriptItem.start;
+
+    if (lastVideoScriptItemStart === lastVideoScriptItemEnd) {
+        throw new Error('lastVideoScriptItemStart === lastVideoScriptItemEnd, segment index: ' + (videoScript.length - 1));
+    }
+
 
     return job;
     // let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
