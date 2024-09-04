@@ -67,8 +67,25 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
         let bestMatch = 100000;
         let alignedVideoScriptItem;
         for (let j = currentSegment; j < segments.length; j++) {
-            let segmentsFromCurrent = segments.slice(currentSegment, j);
-            let segmentsFromCurrentText = segmentsFromCurrent.map(x => x.text).join(' ');
+            let segmentsFromCurrent;
+            segmentsFromCurrent = segments.slice(currentSegment, j);
+            if (segmentsFromCurrent.length === 0) {
+                // throw new Error('segmentsFromCurrent.length === 0');
+            }
+            let segmentsFromCurrentText = segmentsFromCurrent.map(x => x.text).join('').trim();
+            let endsWithColonOrComma = segmentsFromCurrentText.endsWith(',') || segmentsFromCurrentText.endsWith(':');
+            if (endsWithColonOrComma) {
+                continue;
+                // console.log('endsWithColonOrComma', segmentsFromCurrentText);
+            }
+            // console.log('lastSegmentFromCurrentText', segmentsFromCurrent[segmentsFromCurrent.length - 1]);
+            let lastSegmentFromCurrent = segmentsFromCurrent[segmentsFromCurrent.length - 1];
+            // let lastSegmentFromCurrentDuration = lastSegmentFromCurrent.end - lastSegmentFromCurrent.start;
+            // if (lastSegmentFromCurrentDuration < 0.5) {
+                // continue;
+                // console.log('lastSegmentFromCurrentDuration < 0.5', lastSegmentFromCurrentDuration);
+            // }
+            // 
             let levenshteinDistance = levenshtein.get(segmentsFromCurrentText, videoScript[i].text);
             if (levenshteinDistance < bestMatch) {
                 bestMatch = levenshteinDistance;
