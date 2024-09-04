@@ -26,8 +26,52 @@ function getInput(alignFile) {
 }
 let model = process.env.STABLE_TS_MODEL;
 let language = 'vi';
+let alignOutputDir = '/align-output/';
 function alignVideoScript(videoScript, audioFile) {
-    
+    let alignFileTxt = path.join(alignOutputDir, 'output-' + path.basename(audioFile) + '.txt');
+    let outputFile = path.join(alignOutputDir, 'output-' + path.basename(audioFile) + '.json');
+    let alignTxtContent = videoScript.map(x => x.text).join('\n');
+    fs.writeFileSync(alignFileTxt, alignTxtContent);
+    child_process.execFileSync('stable-ts', [
+        audioFile,
+        '--model', model,
+        '--language', language,
+        '--align', alignFileTxt,
+        '--overwrite',
+        '--output', outputFile,
+        '-fw',
+    ], {
+        stdio: 'inherit',
+    });
+
+    let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
+    console.log('alignedSubtitle', alignedSubtitle);
+    fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
+    // 
+    let segments = alignedSubtitle.segments;
+    for (let i = 0; i < segments.length; i++) {
+        let segment = segments[i];
+        let start = segment.start;
+        let end = segment.end;
+        // 
+        console.log('start', start, 'end', end);
+        let floatStart = parseFloat(start);
+        let floatEnd = parseFloat(end);
+        if (floatStart === floatEnd) {
+            console.log('floatStart === floatEnd', floatStart, floatEnd);
+            let incorrectSegmentIndex = i;
+            let correctedSegments = segments.slice(0, incorrectSegmentIndex);
+            if (correctedSegments[correctedSegments.length - 1].end === segments[incorrectSegmentIndex].start) {
+                throw new Error('correctedSegments[correctedSegments.length - 1].end === segments[incorrectSegmentIndex].start');
+            }
+            let uncorrectedSegments = segments.slice(incorrectSegmentIndex + 1);
+            return [
+                ...correctedSegments,
+                ...alignVideoScript(uncorrectedSegments, audioFile),
+            ];
+        }
+    }
+    // return alignedSubtitle;
 }
 function checkAligned(job, audioFile) {
     let videoScript = job.data.videoScript;
@@ -36,18 +80,6 @@ function checkAligned(job, audioFile) {
     job.data.videoScript = videoScript;
 
     return job;
-    // child_process.execFileSync('stable-ts', [
-    //     audioFile,
-    //     '--model', model,
-    //     '--language', language,
-    //     '--align', alignFileTxt,
-    //     '--overwrite',
-    //     '--output', outputFile,
-    //     '-fw',
-    // ], {
-    //     stdio: 'inherit',
-    // });
-
     // let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
     // fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
     // let aligned = getAlignedSubtitle(audio, alignedSubtitle);
