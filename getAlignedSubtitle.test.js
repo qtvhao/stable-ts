@@ -206,15 +206,14 @@ function alignVideoScript(videoScript, audioFile) {
 
     // console.log('videoScript', videoScript.map(x => x.text));
     let correctedVideoScriptItems = getCorrectedVideoScriptIndex(videoScript, segments);
-    for (let i = 0; i < correctedVideoScriptItems.length; i++) {
-        let correctedVideoScriptItem = correctedVideoScriptItems[i];
-        let aligned = correctedVideoScriptItem.aligned;
+    // for (let i = 0; i < correctedVideoScriptItems.length; i++) {
+        // let correctedVideoScriptItem = correctedVideoScriptItems[i];
+        // let aligned = correctedVideoScriptItem.aligned;
         // let lastAligned = aligned[aligned.length - 1];
         // console.log('aligned', aligned.map(x => x.text).join(''));
         // console.log('correctedVideoScriptItem', correctedVideoScriptItem.text);
         // 
-    }
-    process.exit(0);
+    // }
     console.log('correctedVideoScriptItems', correctedVideoScriptItems.length, videoScript.length);
     if (correctedVideoScriptItems.length === videoScript.length) {
         return correctedVideoScriptItems;
@@ -230,7 +229,7 @@ function alignVideoScript(videoScript, audioFile) {
     let lastCorrectedSegment = lastCorrectedVideoScriptItem[lastCorrectedVideoScriptItem.length - 1];
     let lastCorrectedSegmentEnd = lastCorrectedSegment.end;
     console.log('lastCorrectedSegmentEnd', lastCorrectedSegmentEnd);
-    process.exit(0);
+
     let cutAudioFile = '/align-output/cut-audio-' + lastCorrectedSegmentEnd + '.mp3';
     let timestamp = getTimestampForFFMpeg(lastCorrectedSegmentEnd);
     child_process.execFileSync('ffmpeg', [
@@ -240,13 +239,13 @@ function alignVideoScript(videoScript, audioFile) {
         '-y',
         cutAudioFile,
     ]);
-    console.log('timestamp', timestamp);
-    process.exit(0);
-    throw new Error('uncorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
+    console.log('timestamp', uncorrectedVideoScriptItems);
+    // process.exit(0);
+    // throw new Error('uncorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
 
     return [
         ...correctedVideoScriptItems,
-        ...alignVideoScript(uncorrectedVideoScriptItems, audioFile),
+        ...alignVideoScript(uncorrectedVideoScriptItems, cutAudioFile),
     ];
 }
 function checkAligned(job, audioFile) {
