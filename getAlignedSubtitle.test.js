@@ -65,26 +65,29 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
     let correctedVideoScript = [];
     for (let i = 0; i < videoScript.length; i++) {
         let bestMatch = 100000;
-        let alignedVideoScriptItem;
-        for (let j = currentSegment; j < segments.length; j++) {
+        let alignedVideoScriptItem = segments.slice(currentSegment, currentSegment + 1);
+        if (typeof alignedVideoScriptItem[0] === 'undefined') {
+            return correctedVideoScript;
+        }
+        let j = currentSegment + 1;
+        for (; j < segments.length; j++) {
             let segmentsFromCurrent;
             segmentsFromCurrent = segments.slice(currentSegment, j);
             if (segmentsFromCurrent.length === 0) {
-                // throw new Error('segmentsFromCurrent.length === 0');
+                throw new Error('segmentsFromCurrent.length === 0, i: ' + i + ', j: ' + j + ', segments: ' + segments.length);
             }
             let segmentsFromCurrentText = segmentsFromCurrent.map(x => x.text).join('').trim();
             let endsWithColonOrComma = segmentsFromCurrentText.endsWith(',') || segmentsFromCurrentText.endsWith(':');
             if (endsWithColonOrComma) {
                 continue;
-                // console.log('endsWithColonOrComma', segmentsFromCurrentText);
             }
             // console.log('lastSegmentFromCurrentText', segmentsFromCurrent[segmentsFromCurrent.length - 1]);
             let lastSegmentFromCurrent = segmentsFromCurrent[segmentsFromCurrent.length - 1];
-            // let lastSegmentFromCurrentDuration = lastSegmentFromCurrent.end - lastSegmentFromCurrent.start;
-            // if (lastSegmentFromCurrentDuration < 0.5) {
-                // continue;
+            let lastSegmentFromCurrentDuration = lastSegmentFromCurrent.end - lastSegmentFromCurrent.start;
+            if (lastSegmentFromCurrentDuration < 0.5) {
+                continue;
                 // console.log('lastSegmentFromCurrentDuration < 0.5', lastSegmentFromCurrentDuration);
-            // }
+            }
             // 
             let levenshteinDistance = levenshtein.get(segmentsFromCurrentText, videoScript[i].text);
             if (levenshteinDistance < bestMatch) {
@@ -92,7 +95,12 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
                 alignedVideoScriptItem = segmentsFromCurrent;
             }
         }
+        if (typeof alignedVideoScriptItem[0] === 'undefined') {
+            console.log('alignedVideoScriptItem is undefined', i);
+            throw new Error('alignedVideoScriptItem is undefined');
+        }
         alignedVideoScriptItem = alignedVideoScriptItem.map(x => {
+            console.log('x', x);
             return {
                 start: x.start,
                 end: x.end,
@@ -105,21 +113,18 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
                     };
                 }),
             };
-        }).reduce((acc, x) => {
-            acc.push(x);
-            return acc;
-        }, []);
-        let last200 = alignedVideoScriptItem.map(x => x.text).join(' ').slice(-200);
+        });
+        // let last200 = alignedVideoScriptItem.map(x => x.text).join(' ').slice(-200);
         let alignedStart = alignedVideoScriptItem[0].start;
         let alignedEnd = alignedVideoScriptItem[alignedVideoScriptItem.length - 1].end;
         if (alignedStart === alignedEnd) {
-            console.log('last200', last200);
+            // console.log('last200', last200);
             return correctedVideoScript;
         }
         alignedVideoScriptItem.start = alignedStart;
         alignedVideoScriptItem.end = alignedEnd;
         correctedVideoScript.push(alignedVideoScriptItem);
-        currentSegment = i;
+        currentSegment = j;
     }
     console.log('all of correctedVideoScript has alignedStart !== alignedEnd');
 
@@ -134,11 +139,14 @@ function alignVideoScript(videoScript, audioFile) {
 
     let correctedVideoScriptItems = getCorrectedVideoScriptIndex(videoScript, segments);
     if (correctedVideoScriptItems.length === videoScript.length) {
-        console.log('correctedVideoScriptItems.length === videoScript.length', correctedVideoScriptItems.length, videoScript.length);
         return correctedVideoScriptItems;
     }
 
     let uncorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
+
+    if (uncorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length) {
+        throw new Error('uncorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
+    }
 
     return [
         ...correctedVideoScriptItems,
@@ -159,6 +167,8 @@ function checkAligned(job, audioFile) {
 
     if (lastVideoScriptItemStart === lastVideoScriptItemEnd) {
         throw new Error('lastVideoScriptItemStart === lastVideoScriptItemEnd ' + lastVideoScriptItemStart + ' === ' + lastVideoScriptItemEnd + ' , segment index: ' + (videoScript.length - 1));
+    } else {
+        console.log('All aligned');
     }
 
     return job;
