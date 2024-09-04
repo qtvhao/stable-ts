@@ -40,6 +40,12 @@ if (typeof queueInName !== 'undefined') {
     let model = process.env.STABLE_TS_MODEL;
     let language = process.env.STABLE_TS_LANGUAGE;
     queueIn.process(async job => {
+        let queueOutJobCounts = await queueOut.getJobCounts();
+        while (queueOutJobCounts.waiting > 10) {
+            console.log('queueOut is busy, wait 10 seconds');
+            await new Promise(resolve => setTimeout(resolve, 10_000));
+            queueOutJobCounts = await queueOut.getJobCounts();
+        }
         let alignedSubtitle;
         let jobData = job.data;
         let videoScript = jobData.videoScript;
