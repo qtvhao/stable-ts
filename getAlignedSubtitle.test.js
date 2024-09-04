@@ -63,7 +63,7 @@ function alignVideoScript(videoScript, audioFile) {
     let outputFile = synthesizeAudio(audioFile, videoScript);
 
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
-    console.log('alignedSubtitle', alignedSubtitle);
+    // console.log('alignedSubtitle', alignedSubtitle);
     fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
     // 
     let segments = alignedSubtitle.segments;
@@ -77,15 +77,17 @@ function alignVideoScript(videoScript, audioFile) {
         let floatEnd = parseFloat(end);
         if (floatStart === floatEnd) {
             console.log('floatStart === floatEnd', floatStart, floatEnd);
-            let incorrectSegmentIndex = i - 1;
-            let correctedSegments = segments.slice(0, incorrectSegmentIndex);
-            if (correctedSegments[correctedSegments.length - 1].end === segments[incorrectSegmentIndex].start) {
-                throw new Error('correctedSegments[correctedSegments.length - 1].end === segments[incorrectSegmentIndex].start');
+            let correctedVideoScriptItems = getCorrectedVideoScriptIndex(videoScript, segments);
+            let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1];
+            let lastCorrectedVideoScriptItemEnd = lastCorrectedVideoScriptItem.end;
+            let lastCorrectedVideoScriptItemStart = lastCorrectedVideoScriptItem.start;
+            if (lastCorrectedVideoScriptItemStart === lastCorrectedVideoScriptItemEnd) {
+                throw new Error('lastCorrectedVideoScriptItemStart === lastCorrectedVideoScriptItemEnd, segment');
             }
-            let uncorrectedSegments = segments.slice(incorrectSegmentIndex + 1);
+            let uncorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
             return [
-                ...correctedSegments,
-                ...alignVideoScript(uncorrectedSegments, audioFile),
+                ...correctedVideoScriptItems,
+                ...alignVideoScript(uncorrectedVideoScriptItems, audioFile),
             ];
         }
     }
