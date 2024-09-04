@@ -83,29 +83,72 @@ function removeSpecialCharacters(text) {
         .replace(/\s+/g, ' ');
 }
 function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
-    // let videoScriptItem = videoScript[videoScriptIndex];
-    // let bestMatch = 100000;
-    // let alignedVideoScriptItem;
-    // let segmentFromStartText;
-    // let videoScriptText;
-    // for (let i = 1; i < segments.length; i++) {
-    //     let segmentFromStart = segments.slice(0, i);
-    //     // 
-    //     segmentFromStartText = removeSpecialCharacters(segmentFromStart.map(x => x.text).join('').trim()).slice(-200);
-    //     videoScriptText = removeSpecialCharacters(videoScriptItem.text).slice(-200);
-    //     // 
-    //     let levenshteinDistance = levenshtein.get(segmentFromStartText, videoScriptText) // + levenshtein.get(videoScriptTextLast200, segmentTextLast200);
+    // set previous silence duration
+    segments = segments.map((segment, i, self) => {
+        if (i === 0) {
+            return {
+                start: segment.start,
+                end: segment.end,
+                text: segment.text,
+                previousSilenceDuration: 0,
+            }
+        }
+        return {
+            start: segment.start,
+            end: segment.end,
+            text: segment.text,
+            previousSilenceDuration: segment.start - self[i - 1].end,
+        };
+    });
+    // set next silence duration
+    segments = segments.map((segment, i, self) => {
+        if (i === self.length - 1) {
+            return segment;
+        }
+        return {
+            ...segment,
+            nextSilenceDuration: self[i + 1].start - segment.end,
+        };
+    });
+    // set duration
+    segments = segments.map((segment) => {
+        let previousSilenceDuration = segment.previousSilenceDuration || 0;
+        let nextSilenceDuration = segment.nextSilenceDuration || 0;
+        return {
+            ...segment,
+            duration: segment.end - segment.start,
+            previousToNextRatio: nextSilenceDuration / previousSilenceDuration,
+        };
+    });
 
-    //     if (levenshteinDistance < bestMatch) {
-    //         bestMatch = levenshteinDistance; // find the best match, best match is the lowest levenshtein distance
-    //         alignedVideoScriptItem = segmentFromStart;
-    //     }
-    // }
-    // 
-    // console.log('segmentFromStartText', segmentFromStartText);
-    // console.log('videoScriptText', videoScriptText);
+    segments = segments.map((segment, i, self) => {
+        if (i === 0) {
+            return segment;
+        }
+        return {
+            ...segment,
+            start: self[i - 1].end,
+        };
+    });
     let segmentsWithTextFromStart = segments.map((_segment, i, self) => {
         let segmentFromStart = self.slice(0, i);
+        if (i === 0) {
+            segmentFromStart = [self[0]];
+        }
+        // 
+        let lastSegment = segmentFromStart[segmentFromStart.length - 1];
+        // eg: next 0.32 and previous 2.88, ratio is 0.11
+        if (lastSegment.previousToNextRatio < 0.2) {
+            // this segment is close to the next segment
+            console.log('this segment is close to the next segment');
+            // return {
+            //     levenshteinDistance: 100000,
+            //     segmentFromStart,
+            // }
+        } else {
+            console.log('this segment is close to the previous segment');
+            // this segment is close to the previous segment
+        }
         // 
         let segmentsFromStartText = removeSpecialCharacters(segmentFromStart.map(x => x.text).join('').trim()).slice(-200);
         let videoScriptItemText = removeSpecialCharacters(videoScript[videoScriptIndex].text).slice(-200);
@@ -120,7 +163,7 @@ function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
         return best.levenshteinDistance < current.levenshteinDistance ? best : current;
     });
     console.log('videoScript[videoScriptIndex].text', videoScript[videoScriptIndex].text);
-    console.log('bestMatch', bestMatch.segmentFromStart.map(x => x.text));
+    console.log('bestMatch', bestMatch.segmentFromStart.map(x => x));
     process.exit(0);
 
     return alignedVideoScriptItem;
