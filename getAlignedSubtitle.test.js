@@ -37,7 +37,12 @@ function djb2(str) {
     return hash;
 }
 function synthesizeAudio(audioFile, videoScript) {
-    let alignTxtContent = videoScript.map(x => x.text).join('\n');
+    let alignTxtContent = videoScript.map(x => {
+        let text = x.text.trim();
+        text = text.replace(/\.$/, '') + '.';
+
+        return text;
+    }).join('\n\n');
     let djb2Hash = djb2(alignTxtContent);
     let outputFile = path.join(alignOutputDir, 'output-' + djb2Hash + '.json');
     if (fs.existsSync(outputFile)) {
@@ -69,25 +74,24 @@ function synthesizeAudio(audioFile, videoScript) {
 
     return outputFile;
 }
+function removeSpecialCharacters(text) {
+    return text.replace(/[^\w\s]/gi, '')
+    .replace(/-/g, ' ')
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ');
+}
 function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
     let videoScriptItem = videoScript[videoScriptIndex];
-    // console.log('videoScriptItem', videoScriptItem.text);
 
     let bestMatch = 100000;
     let alignedVideoScriptItem;
-    let segmentTextLast200_a;
-    let videoScriptTextLast200_b;
+    // let segmentTextLast200_a;
+    // let videoScriptTextLast200_b;
     for (let i = 1; i < segments.length; i++) {
         let segmentFromStart = segments.slice(0, i);
         // 
-        // let lastSegmentFromStart = segmentFromStart[segmentFromStart.length - 1];
-        // let lastSegmentFromStart_Duration = lastSegmentFromStart.end - lastSegmentFromStart.start;
-        // if (lastSegmentFromStart_Duration > 2) {
-        //     continue;
-        // }
-        // 
-        let segmentFromStartText = segmentFromStart.map(x => x.text).join('').trim();
-        let videoScriptText = videoScriptItem.text;
+        let segmentFromStartText = removeSpecialCharacters(segmentFromStart.slice(-20).map(x => x.text).join('').trim());
+        let videoScriptText = (removeSpecialCharacters(videoScriptItem.text).slice(segmentFromStartText.length));
         // 
         let segmentTextLast200 = segmentFromStartText.slice(-200);
         let videoScriptTextLast200 = videoScriptText.slice(-200);
@@ -97,19 +101,21 @@ function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
         if (levenshteinDistance < bestMatch) {
             bestMatch = levenshteinDistance;
             alignedVideoScriptItem = segmentFromStart;
-            segmentTextLast200_a = segmentTextLast200;
-            videoScriptTextLast200_b = videoScriptTextLast200;
+            // segmentTextLast200_a = segmentTextLast200;
+            // videoScriptTextLast200_b = videoScriptTextLast200;
         }
     }
-    console.log('segmentTextLast200_a', segmentTextLast200_a);
-    console.log('videoScriptTextLast200_b', videoScriptTextLast200_b);
+    // console.log('alignedVideoScriptItem', alignedVideoScriptItem.map(x => x.text).join('').slice(-200));
+    // console.log('videoScriptItem', videoScriptItem.text.slice(-200));
 
     return alignedVideoScriptItem;
 }
 function getCorrectedVideoScriptIndex(videoScript, segments) {
     let correctedVideoScript = [];
-    // console.log('segments', segments);    process.exit(0);
     for (let i = 0; i < videoScript.length; i++) {
+        if (i > 1) {
+            break;
+        }
         let alignedVideoScriptItem = getAlignedVideoScriptItem(videoScript, segments, i);
         let alignedStart = alignedVideoScriptItem[0].start;
         let alignedEnd = alignedVideoScriptItem[alignedVideoScriptItem.length - 1].end;
@@ -249,7 +255,9 @@ function checkAligned(job, audioFile) {
         '-b:a', '192k',
         '-y',
         audioFileMp3,
-    ]);
+    ], {
+        stdio: 'ignore', // 'inherit' or 'pipe' or 'ignore'
+    });
     audioFile = audioFileMp3;
 
     videoScript = alignVideoScript(videoScript, audioFile);
