@@ -1,6 +1,10 @@
 let path = require('path');
 let fs = require('fs');
 let child_process = require('child_process');
+if (!fs.existsSync('/align-input/')) {
+    fs.mkdirSync('/align-input/');
+}
+
 async function getAudioMp3Duration(audioMp3) {
     let stdout = await new Promise((resolve, reject) => {
         child_process.execFile('ffprobe', [
