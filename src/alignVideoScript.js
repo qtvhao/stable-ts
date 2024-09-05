@@ -113,13 +113,14 @@ async function cutAudioFileByTimestamp(audioFile, cutAudioFile, timestamp_a) {
         cutAudioFile,
     ]);
 }
-
+let cutIndex = 0;
 async function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems, audioFile) {
     let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1].aligned;
     let lastCorrectedSegment = lastCorrectedVideoScriptItem[lastCorrectedVideoScriptItem.length - 1];
     let lastCorrectedSegmentEnd = lastCorrectedSegment.end;
 
-    let cutAudioFile = '/align-output/cut-audio-' + lastCorrectedSegmentEnd + '.mp3';
+    cutIndex++;
+    let cutAudioFile = '/align-output/cut-audio-' + cutIndex + '.mp3';
     let beforeCutAudioDuration = await getAudioMp3Duration(audioFile);
     if (beforeCutAudioDuration < 95) {
         // return false;
@@ -161,8 +162,19 @@ async function alignVideoScript(videoScript, audioFile) {
     let others = [];
     if (cutAudioFile) {
         others = await alignVideoScript(incorrectedVideoScriptItems, cutAudioFile);
+        // we must matches timestamp with correctedVideoScriptItems, timestamp of others starts from 0
+        let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1];
+        let aligned = lastCorrectedVideoScriptItem.aligned;
+        let lastCorrectedSegment = aligned[aligned.length - 1];
+        let lastCorrectedSegmentEnd = lastCorrectedSegment.end;
+        others = others.map(x => {
+            return {
+                ...x,
+                start: x.start + lastCorrectedSegmentEnd,
+                end: x.end + lastCorrectedSegmentEnd,
+            }
+        });
     }
-    // console.log('correctedVideoScriptItems', correctedVideoScriptItems);
     return [
         ...correctedVideoScriptItems,
         ...others,

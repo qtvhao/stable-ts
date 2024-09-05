@@ -43,9 +43,10 @@ test('test alignment video script', async () => {
         videoScript,
         audioMp3
     );
-    // console.log('aligned', aligned);
+    fs.writeFileSync('/align-output/aligned.json', JSON.stringify(aligned, null, 2));
     // must be an array
     expect(Array.isArray(aligned)).toBe(true);
     //     Your test suite must contain at least one test.
     expect(aligned.length).toBe(videoScript.length);
-});
+    console.log('aligned', aligned);
+}, 180_000);
