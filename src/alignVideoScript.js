@@ -76,10 +76,10 @@ function alignVideoScript(videoScript, audioFile) {
         return correctedVideoScriptItems;
     }
 
-    let uncorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
+    let incorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
 
-    if (uncorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length) {
-        throw new Error('uncorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
+    if (incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length) {
+        throw new Error('incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
     }
     // 
     let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1].aligned;
@@ -96,11 +96,11 @@ function alignVideoScript(videoScript, audioFile) {
         '-y',
         cutAudioFile,
     ]);
-    console.log('timestamp', uncorrectedVideoScriptItems);
+    console.log('timestamp', incorrectedVideoScriptItems);
 
     return [
         ...correctedVideoScriptItems,
-        ...alignVideoScript(uncorrectedVideoScriptItems, cutAudioFile),
+        ...alignVideoScript(incorrectedVideoScriptItems, cutAudioFile),
     ];
 }
 
