@@ -124,7 +124,7 @@ async function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems
     let lastCorrectedSegmentEnd = lastCorrectedSegment.end;
 
     cutIndex++;
-    let cutAudioFile = '/align-output/cut-audio-' + cutIndex + '.mp3';
+    let cutAudioFile = '/tmp/cut-audio-' + cutIndex + '.mp3';
     let beforeCutAudioDuration = await getAudioMp3Duration(audioFile);
     if (beforeCutAudioDuration < 95) {
         // return false;
