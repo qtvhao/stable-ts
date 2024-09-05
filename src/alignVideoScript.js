@@ -93,7 +93,8 @@ function synthesizeAudio(audioFile, videoScript) {
 
     return outputFile;
 }
-function cutAudioFileByTimestamp(audioFile, cutAudioFile, timestamp_a) {
+async function cutAudioFileByTimestamp(audioFile, cutAudioFile, timestamp_a) {
+    fs.appendFileSync('/align-input/logs.txt', "   - Cut from " + timestamp_a + "s\n");
     let timestamp = getTimestampForFFMpeg(timestamp_a);
     child_process.execFileSync('ffmpeg', [
         '-i', audioFile,
@@ -104,13 +105,13 @@ function cutAudioFileByTimestamp(audioFile, cutAudioFile, timestamp_a) {
     ]);
 }
 
-function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems, audioFile) {
+async function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems, audioFile) {
     let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1].aligned;
     let lastCorrectedSegment = lastCorrectedVideoScriptItem[lastCorrectedVideoScriptItem.length - 1];
     let lastCorrectedSegmentEnd = lastCorrectedSegment.end;
 
     let cutAudioFile = '/align-output/cut-audio-' + lastCorrectedSegmentEnd + '.mp3';
-    cutAudioFileByTimestamp(audioFile, cutAudioFile, lastCorrectedSegmentEnd);
+    await cutAudioFileByTimestamp(audioFile, cutAudioFile, lastCorrectedSegmentEnd);
     console.log('timestamp', lastCorrectedSegmentEnd);
 
     return cutAudioFile;
@@ -138,8 +139,9 @@ async function alignVideoScript(videoScript, audioFile) {
         throw new Error('incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
     }
     // 
-    console.log('correctedVideoScriptItems', correctedVideoScriptItems);
-    let cutAudioFile = cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems, audioFile)
+    // console.log('correctedVideoScriptItems', correctedVideoScriptItems);
+    let cutAudioFile = await cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems, audioFile)
+    fs.appendFileSync('/align-input/logs.txt', "   - After cut, audio mp3 duration: " + (await getAudioMp3Duration(cutAudioFile)) + "s\n");
     // 
     // Có 10 items, đã correct 5 items, còn 5 items incorrected
     // 5 items corrected end ở timestamp 110s
