@@ -97,6 +97,9 @@ function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
     });
     let bestMatch = segmentsWithTextFromStart.reduce((best, current) => {
         return best.levenshteinDistance < current.levenshteinDistance ? best : current;
+    }, {
+        levenshteinDistance: 100000,
+        segmentFromStart: [],
     });
     if (videoScriptIndex > 0) {
         // console.log(bestMatch);
