@@ -95,13 +95,11 @@ function synthesizeAudio(audioFile, videoScript) {
         stdio: 'inherit',
     });
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
-    // alignedSubtitle.segments = alignedSubtitle.segments.map(x => {
-    //     return {
-    //         ...x,
-    //         start: x.start.toFixed(2),
-    //         end: x.end.toFixed(2),
-    //     }
-    // });
+    alignedSubtitle.segments = alignedSubtitle.segments.map(x => {
+        delete x.words;
+        delete x.tokens;
+        return x;
+    });
     fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
 
     return outputFile;
