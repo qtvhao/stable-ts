@@ -57,7 +57,7 @@ if (typeof queueInName !== 'undefined') {
         // let djb2_id = djb2(joinedText);
         // let alignFile = `/tmp/align-${djb2_id}.txt`;
         // let outputFile = `/align-output/output-x2-${djb2_id}.json`;
-        let completedJob = checkAligned(job, audioFile)
+        let completedJob = await checkAligned(job, audioFile)
         // fs.writeFileSync(alignFile, joinedText);
 
         // job.log('outputFile: ' + outputFile);

@@ -1,6 +1,6 @@
 let child_process = require('child_process');
 let alignVideoScript = require('./alignVideoScript.js');
-function checkAligned(job, audioFile) {
+async function checkAligned(job, audioFile) {
     let videoScript = job.data.videoScript;
     // convert to mp3
     let audioFileMp3 = audioFile.replace('.aac', '.mp3');
@@ -16,7 +16,7 @@ function checkAligned(job, audioFile) {
     audioFile = audioFileMp3;
 
     // console.log('videoScript', videoScript.map(x => x.text));
-    videoScript = alignVideoScript(videoScript, audioFile);
+    videoScript = await alignVideoScript(videoScript, audioFile);
     job.data.videoScript = videoScript;
     let lastVideoScriptItem = videoScript[videoScript.length - 1];
     let lastVideoScriptItemEnd = lastVideoScriptItem.end;
