@@ -65,7 +65,7 @@ function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
         // 
         let lastSegment = segmentFromStart[segmentFromStart.length - 1];
         // eg: next 0.32 and previous 2.88, ratio is 0.11
-        console.log('lastSegment.previousToNextRatio', lastSegment)
+        // console.log('lastSegment.previousToNextRatio', lastSegment)
         if (lastSegment.text.trim().match(/^#+\s\d+/)) {
             // console.log('lastSegment.text.trim().startsWith("#")', lastSegment);
             // throw new Error('lastSegment.text.trim().startsWith("#")');
@@ -76,13 +76,13 @@ function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
         }
         if (lastSegment.previousToNextRatio < 0.15) {
             // this segment is close to the next segment
-            console.log('this segment is close to the next segment');
+            // console.log('this segment is close to the next segment');
             return {
                 levenshteinDistance: 100000,
                 segmentFromStart,
             }
         } else {
-            console.log('this segment is close to the previous segment');
+            // console.log('this segment is close to the previous segment');
             // this segment is close to the previous segment
         }
         // 
@@ -98,6 +98,10 @@ function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
     let bestMatch = segmentsWithTextFromStart.reduce((best, current) => {
         return best.levenshteinDistance < current.levenshteinDistance ? best : current;
     });
+    if (videoScriptIndex > 0) {
+        // console.log(bestMatch);
+        // throw new Error('test');
+    }
 
     return bestMatch.segmentFromStart;
 }

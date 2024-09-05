@@ -54,6 +54,15 @@ function djb2(str) {
 let model = process.env.STABLE_TS_MODEL;
 let language = process.env.STABLE_TS_LANGUAGE;
 let alignOutputDir = '/align-output/';
+function removeSpecialCharacters(text) {
+    return removeMd(text)
+        .replace(/[:,\'\"\?\!\;\.\(\)\[\]\{\}\n]/g, ' ')
+        .replace(/#+/g, ' ')
+        .replace(/-/g, ' ')
+        .replace(/\n/g, ' ')
+        .replace(/\s+/g, ' ');
+}
+let removeMd = require('remove-markdown');
 
 function synthesizeAudio(audioFile, videoScript) {
     let alignTxtContent = videoScript.map(x => {
@@ -68,7 +77,7 @@ function synthesizeAudio(audioFile, videoScript) {
         return outputFile;
     }
     let alignFileTxt = path.join(alignOutputDir, 'output-' + djb2Hash + '.txt');
-    fs.writeFileSync(alignFileTxt, alignTxtContent);
+    fs.writeFileSync(alignFileTxt, removeSpecialCharacters(alignTxtContent));
 
     child_process.execFileSync('stable-ts', [
         audioFile,
@@ -153,7 +162,7 @@ async function alignVideoScript(videoScript, audioFile) {
     if (cutAudioFile) {
         others = await alignVideoScript(incorrectedVideoScriptItems, cutAudioFile);
     }
-    console.log('correctedVideoScriptItems', correctedVideoScriptItems);
+    // console.log('correctedVideoScriptItems', correctedVideoScriptItems);
     return [
         ...correctedVideoScriptItems,
         ...others,
