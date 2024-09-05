@@ -63,6 +63,16 @@ function synthesizeAudio(audioFile, videoScript) {
 
     return outputFile;
 }
+function cutAudioFileByTimestamp(audioFile, cutAudioFile, timestamp_a) {
+    let timestamp = getTimestampForFFMpeg(timestamp_a);
+    child_process.execFileSync('ffmpeg', [
+        '-i', audioFile,
+        '-ss', timestamp,
+        '-c', 'copy',
+        '-y',
+        cutAudioFile,
+    ]);
+}
 
 function alignVideoScript(videoScript, audioFile) {
     let outputFile = synthesizeAudio(audioFile, videoScript);
@@ -88,14 +98,8 @@ function alignVideoScript(videoScript, audioFile) {
     console.log('lastCorrectedSegmentEnd', lastCorrectedSegmentEnd);
 
     let cutAudioFile = '/align-output/cut-audio-' + lastCorrectedSegmentEnd + '.mp3';
-    let timestamp = getTimestampForFFMpeg(lastCorrectedSegmentEnd);
-    child_process.execFileSync('ffmpeg', [
-        '-i', audioFile,
-        '-ss', timestamp,
-        '-c', 'copy',
-        '-y',
-        cutAudioFile,
-    ]);
+    console.log('incorrectedVideoScriptItems', incorrectedVideoScriptItems);
+    cutAudioFileByTimestamp(audioFile, cutAudioFile, lastCorrectedSegmentEnd);
     console.log('timestamp', incorrectedVideoScriptItems);
 
     return [
