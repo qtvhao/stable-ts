@@ -118,6 +118,7 @@ function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems, audi
 
 async function alignVideoScript(videoScript, audioFile) {
     fs.appendFileSync('/align-input/logs.txt', " \n\n-> Align video script - Total sections: " + videoScript.length + "\n");
+    fs.appendFileSync('/align-input/logs.txt', "   - Before cut, audio mp3 duration: " + (await getAudioMp3Duration(audioFile)) + "s\n");
     let outputFile = synthesizeAudio(audioFile, videoScript);
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
     // 
@@ -130,11 +131,9 @@ async function alignVideoScript(videoScript, audioFile) {
     }
 
     let incorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
-    fs.appendFileSync('/align-input/logs.txt', " - Corrected video script items: " + correctedVideoScriptItems.length + "\n");
-    fs.appendFileSync('/align-input/logs.txt', " - Incorrected video script items: " + incorrectedVideoScriptItems.length + "\n");
-    // getAudioMp3Duration
-    let audioMp3Duration = await getAudioMp3Duration(audioFile);
-    fs.appendFileSync('/align-input/logs.txt', " - Audio mp3 duration: " + audioMp3Duration + "s\n");
+    fs.appendFileSync('/align-input/logs.txt', "   - Corrected video script items: " + correctedVideoScriptItems.length + "\n");
+    fs.appendFileSync('/align-input/logs.txt', "   - Incorrected video script items: " + incorrectedVideoScriptItems.length + "\n");
+
     if (incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length) {
         throw new Error('incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
     }
