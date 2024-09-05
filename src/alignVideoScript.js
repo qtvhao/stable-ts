@@ -74,6 +74,18 @@ function cutAudioFileByTimestamp(audioFile, cutAudioFile, timestamp_a) {
     ]);
 }
 
+function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems, audioFile) {
+    let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1].aligned;
+    let lastCorrectedSegment = lastCorrectedVideoScriptItem[lastCorrectedVideoScriptItem.length - 1];
+    let lastCorrectedSegmentEnd = lastCorrectedSegment.end;
+
+    let cutAudioFile = '/align-output/cut-audio-' + lastCorrectedSegmentEnd + '.mp3';
+    cutAudioFileByTimestamp(audioFile, cutAudioFile, lastCorrectedSegmentEnd);
+    console.log('timestamp', lastCorrectedSegmentEnd);
+
+    return cutAudioFile;
+}
+
 function alignVideoScript(videoScript, audioFile) {
     let outputFile = synthesizeAudio(audioFile, videoScript);
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
@@ -92,15 +104,7 @@ function alignVideoScript(videoScript, audioFile) {
         throw new Error('incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
     }
     // 
-    let lastCorrectedVideoScriptItem = correctedVideoScriptItems[correctedVideoScriptItems.length - 1].aligned;
-    let lastCorrectedSegment = lastCorrectedVideoScriptItem[lastCorrectedVideoScriptItem.length - 1];
-    let lastCorrectedSegmentEnd = lastCorrectedSegment.end;
-    console.log('lastCorrectedSegmentEnd', lastCorrectedSegmentEnd);
-
-    let cutAudioFile = '/align-output/cut-audio-' + lastCorrectedSegmentEnd + '.mp3';
-    console.log('incorrectedVideoScriptItems', incorrectedVideoScriptItems);
-    cutAudioFileByTimestamp(audioFile, cutAudioFile, lastCorrectedSegmentEnd);
-    console.log('timestamp', incorrectedVideoScriptItems);
+    let cutAudioFile = cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems, audioFile)
 
     return [
         ...correctedVideoScriptItems,
