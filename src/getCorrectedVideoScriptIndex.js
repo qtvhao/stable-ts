@@ -19,7 +19,7 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
         );
         segmentIndex += alignedVideoScriptItem.length;
         let alignedStart = alignedVideoScriptItem[0].start;
-        let alignedEnd = alignedVideoScriptItem[alignedVideoScriptItem.length - 1].end;
+        let alignedEnd = alignedVideoScriptItem.slice(-1)[0].end;
         if (alignedStart === alignedEnd) {
             return correctedVideoScript;
         }
