@@ -9,9 +9,9 @@ async function getAudioMp3Duration(audioMp3) {
             encoding: 'utf8',
             // stdio: 'pipe'
         }, (err, stdout, stderr) => {
-            console.log('stdout', stdout);
-            console.log('stderr', stderr);
-            console.log('err', err);
+            // console.log('stdout', stdout);
+            // console.log('stderr', stderr);
+            // console.log('err', err);
             fs.writeFileSync('/align-input/ffprobe-stderr.txt', stderr.toString().trim());
             if (err) {
                 reject(err);
@@ -112,11 +112,11 @@ async function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems
 
     let cutAudioFile = '/align-output/cut-audio-' + lastCorrectedSegmentEnd + '.mp3';
     let beforeCutAudioDuration = await getAudioMp3Duration(audioFile);
-    if (lastCorrectedSegmentEnd < beforeCutAudioDuration) {
-        return false;
+    if (beforeCutAudioDuration < 95) {
+        // return false;
     }
     await cutAudioFileByTimestamp(audioFile, cutAudioFile, lastCorrectedSegmentEnd);
-    console.log('timestamp', lastCorrectedSegmentEnd);
+    // console.log('timestamp', lastCorrectedSegmentEnd);
     fs.appendFileSync('/align-input/logs.txt', "   - After cut, audio mp3 duration: " + (await getAudioMp3Duration(cutAudioFile)) + "s\n");
 
     return cutAudioFile;
@@ -125,6 +125,8 @@ async function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems
 async function alignVideoScript(videoScript, audioFile) {
     let beforeCutAudioDuration = await getAudioMp3Duration(audioFile);
     fs.appendFileSync('/align-input/logs.txt', " \n\n-> Align video script - Total sections: " + videoScript.length + "\n");
+    fs.appendFileSync('/align-input/logs.txt', " \n" + videoScript.map(x => "| " + x.text.slice(0, 100).replace(/\n/g, ' ')).join('\n') + '\n');
+    // 
     fs.appendFileSync('/align-input/logs.txt', "   - Before cut, audio mp3 duration: " + beforeCutAudioDuration + "s\n");
     let outputFile = synthesizeAudio(audioFile, videoScript);
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
@@ -151,6 +153,7 @@ async function alignVideoScript(videoScript, audioFile) {
     if (cutAudioFile) {
         others = await alignVideoScript(incorrectedVideoScriptItems, cutAudioFile);
     }
+    console.log('correctedVideoScriptItems', correctedVideoScriptItems);
     return [
         ...correctedVideoScriptItems,
         ...others,
