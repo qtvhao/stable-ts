@@ -101,9 +101,9 @@ function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
         levenshteinDistance: 100000,
         segmentFromStart: [],
     });
-    if (videoScriptIndex > 0) {
-        // console.log(bestMatch);
-        // throw new Error('test');
+    if (bestMatch.segmentFromStart.length === 0) {
+        console.log('bestMatch.segmentFromStart.length === 0', bestMatch);
+        throw new Error('bestMatch.segmentFromStart.length === 0, levenshteinDistance: ' + bestMatch.levenshteinDistance + ', segmentsWithTextFromStart.length: ' + segmentsWithTextFromStart.length);
     }
 
     return bestMatch.segmentFromStart;
