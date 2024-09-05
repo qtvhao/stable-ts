@@ -1,6 +1,7 @@
 let getCorrectedVideoScriptIndex = require('./getCorrectedVideoScriptIndex.js');
 test('get corrected video script index', () => {
-    let videoScript = require('/align-input/align-1585795898.json')
-    let segments = require('/align-intput/segments/1.json')
-    getCorrectedVideoScriptIndex(videoScript, segments)
+    let videoScript = require('/align-scripts/1725549160104.json')
+    let segments = require('/align-segments/1725549160099.json')
+    let correctedVideoScriptIndex = getCorrectedVideoScriptIndex(videoScript, segments)
+    console.log('correctedVideoScriptIndex', correctedVideoScriptIndex);
 });
