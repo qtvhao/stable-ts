@@ -75,7 +75,7 @@ function synthesizeAudio(audioFile, videoScript) {
 
         return text;
     }).join('\n\n');
-    let djb2Hash = djb2(alignTxtContent);
+    let djb2Hash = djb2(alignTxtContent + ' ' + model + ' ' + language);
     let outputFile = path.join(alignOutputDir, 'output-' + djb2Hash + '.json');
     if (fs.existsSync(outputFile)) {
         return outputFile;
@@ -125,10 +125,10 @@ async function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems
 
     cutIndex++;
     let cutAudioFile = '/tmp/cut-audio-' + cutIndex + '.mp3';
-    let beforeCutAudioDuration = await getAudioMp3Duration(audioFile);
-    if (beforeCutAudioDuration < 95) {
-        // return false;
-    }
+    // let beforeCutAudioDuration = await getAudioMp3Duration(audioFile);
+    // if (lastCorrectedSegmentEnd > 60) {
+        // throw new Error('lastCorrectedSegmentEnd > 60');
+    // }
     await cutAudioFileByTimestamp(audioFile, cutAudioFile, lastCorrectedSegmentEnd);
     // console.log('timestamp', lastCorrectedSegmentEnd);
     fs.appendFileSync('/align-input/logs.txt', "   - After cut, audio mp3 duration: " + (await getAudioMp3Duration(cutAudioFile)) + "s\n");
@@ -159,6 +159,12 @@ async function alignVideoScript(videoScript, audioFile) {
 
     if (incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length) {
         throw new Error('incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
+    }
+    if (correctedVideoScriptItems.slice(-1)[0].aligned.slice(-1)[0].end > 60) {
+        fs.writeFileSync('/align-segments/' + new Date().getTime() + '.json', JSON.stringify(segments, null, 2));
+        fs.writeFileSync('/align-scripts/' + new Date().getTime() + '.json', JSON.stringify(videoScript, null, 2));
+
+        throw new Error('correctedVideoScriptItems.slice(-1)[0].aligned.slice(-1)[0].end > 60');
     }
     // 
     let cutAudioFile = await cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems, audioFile)

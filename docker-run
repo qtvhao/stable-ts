@@ -3,6 +3,8 @@ set -xeo pipefail
 
 docker build -t alignment .
 docker rm -f alignment || true
+GET_CORRECTED_VIDEO_SCRIPT_INDEX="get corrected video script index"
+TEST_ALIGNMENT=""
 docker run -it \
     --name alignment \
     -v ./data:/data \
@@ -10,6 +12,8 @@ docker run -it \
     -v ./src/:/workspace/src/ \
     -v ./audio.json:/workspace/audio.json \
     -v ./alignment.js:/workspace/alignment.js \
+    -v ./align-segments/:/align-segments/ \
+    -v ./align-scripts/:/align-scripts/ \
     -v ./align-input/:/align-input/ \
     -v ./align-output/:/align-output/ \
     -v /samba-claim0-apis-production/gen-audio-worker-storage/:/app/storage/audio/ \

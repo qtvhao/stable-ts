@@ -32,12 +32,10 @@ async function getAudioMp3Duration(audioMp3) {
     return totalSeconds;
 }
 test('test alignment video script', async () => {
-    let audioMp3 = '/align-input/synthesize-result-1790617115.mp3';
-    let videoScript = require('/align-input/align-1790617115.json').data.videoScript;
+    let audioMp3 = '/align-input/synthesize-result-404133988.mp3';
+    let videoScript = require('/align-input/align-404133988.json').data.videoScript;
     // 
     let audioMp3Duration = await getAudioMp3Duration(audioMp3);
-    // console.log('audioMp3Duration', audioMp3Duration);
-    // 00:03:20.76
     fs.writeFileSync('/align-input/logs.txt', "Quy trình lặp lại, ví dụ:\n\nTotal audio duration, Tổng cộng: " + audioMp3Duration + "s\n");
     let aligned = await alignVideoScript(
         videoScript,

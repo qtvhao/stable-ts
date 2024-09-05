@@ -6,9 +6,15 @@ function getCorrectedVideoScriptIndex(videoScript, segments) {
         if (i > 1) {
             break;
         }
+        let slicedSegments = segments.slice(segmentIndex);
+        if (slicedSegments.length === 0) {
+            console.log('slicedSegments.length === 0', i, segmentIndex, segments);
+            throw new Error('slicedSegments.length === 0');
+            // break;
+        }
         let alignedVideoScriptItem = getAlignedVideoScriptItem(
             videoScript,
-            segments.slice(segmentIndex),
+            slicedSegments,
             i
         );
         segmentIndex += alignedVideoScriptItem.length;

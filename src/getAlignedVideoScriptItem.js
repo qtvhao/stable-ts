@@ -57,6 +57,9 @@ function getAlignedVideoScriptItem(videoScript, segments, videoScriptIndex) {
             start: self[i - 1].end,
         };
     });
+    if (segments.length === 0) {
+        throw new Error('segments.length === 0');
+    }
     let segmentsWithTextFromStart = segments.map((_segment, i, self) => {
         let segmentFromStart = self.slice(0, i);
         if (i === 0) {
