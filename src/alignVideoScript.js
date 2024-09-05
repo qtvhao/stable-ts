@@ -1,6 +1,36 @@
 let path = require('path');
 let fs = require('fs');
 let child_process = require('child_process');
+async function getAudioMp3Duration(audioMp3) {
+    let stdout = await new Promise((resolve, reject) => {
+        child_process.execFile('ffprobe', [
+            audioMp3
+        ], {
+            encoding: 'utf8',
+            // stdio: 'pipe'
+        }, (err, stdout, stderr) => {
+            console.log('stdout', stdout);
+            console.log('stderr', stderr);
+            console.log('err', err);
+            fs.writeFileSync('/align-input/ffprobe-stderr.txt', stderr.toString().trim());
+            if (err) {
+                reject(err);
+            } else {
+                resolve(stderr.toString().trim());
+            }
+        });
+    });
+
+    //   Duration: 00:03:20.76, start: 0.046042, bitrate: 160 kb/s
+    let duration = stdout.match(/Duration: (\d+):(\d+):(\d+)\.(\d+)/);
+    let hours = parseInt(duration[1]);
+    let minutes = parseInt(duration[2]);
+    let seconds = parseInt(duration[3]);
+    let milliseconds = parseInt(duration[4]);
+    let totalSeconds = hours * 3600 + minutes * 60 + seconds + milliseconds / 1000;
+
+    return totalSeconds;
+}
 
 function getTimestampForFFMpeg(seconds) {
     let minutes = Math.floor((seconds % 3600) / 60);
@@ -86,7 +116,8 @@ function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems, audi
     return cutAudioFile;
 }
 
-function alignVideoScript(videoScript, audioFile) {
+async function alignVideoScript(videoScript, audioFile) {
+    fs.appendFileSync('/align-input/logs.txt', " \n\n-> Align video script - Total sections: " + videoScript.length + "\n");
     let outputFile = synthesizeAudio(audioFile, videoScript);
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
     // 
@@ -99,16 +130,31 @@ function alignVideoScript(videoScript, audioFile) {
     }
 
     let incorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
-
+    fs.appendFileSync('/align-input/logs.txt', " - Corrected video script items: " + correctedVideoScriptItems.length + "\n");
+    fs.appendFileSync('/align-input/logs.txt', " - Incorrected video script items: " + incorrectedVideoScriptItems.length + "\n");
+    // getAudioMp3Duration
+    let audioMp3Duration = await getAudioMp3Duration(audioFile);
+    fs.appendFileSync('/align-input/logs.txt', " - Audio mp3 duration: " + audioMp3Duration + "s\n");
     if (incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length) {
         throw new Error('incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
     }
     // 
+    console.log('correctedVideoScriptItems', correctedVideoScriptItems);
     let cutAudioFile = cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems, audioFile)
+    // 
+    // Có 10 items, đã correct 5 items, còn 5 items incorrected
+    // 5 items corrected end ở timestamp 110s
+    // 
+    // 5 items corrected end ở timestamp 90.5s
+    //
 
+    // Lấy 5 items đã correct, cắt audio cho 5 items incorrected
+    // gọi hàm alignVideoScript
+
+    let others = await alignVideoScript(incorrectedVideoScriptItems, cutAudioFile);
     return [
         ...correctedVideoScriptItems,
-        ...alignVideoScript(incorrectedVideoScriptItems, cutAudioFile),
+        ...others,
     ];
 }
 

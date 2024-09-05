@@ -38,10 +38,8 @@ test('test alignment video script', async () => {
     let audioMp3Duration = await getAudioMp3Duration(audioMp3);
     console.log('audioMp3Duration', audioMp3Duration);
     // 00:03:20.76
-    fs.writeFileSync('/align-input/logs.txt', "Total audio duration: " + audioMp3Duration + "\n");
-    process.exit(0);
-    // 
-    alignVideoScript(
+    fs.writeFileSync('/align-input/logs.txt', "Quy trình lặp lại, ví dụ:\n\nTotal audio duration, Tổng cộng: " + audioMp3Duration + "s\n");
+    await alignVideoScript(
         videoScript,
         audioMp3
     );
