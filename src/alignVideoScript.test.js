@@ -12,7 +12,7 @@ async function getAudioMp3Duration(audioMp3) {
             // console.log('stdout', stdout);
             // console.log('stderr', stderr);
             // console.log('err', err);
-            fs.writeFileSync('/align-input/ffprobe-stderr.txt', stderr.toString().trim());
+            fs.writeFileSync('./align-input/ffprobe-stderr.txt', stderr.toString().trim());
             if (err) {
                 reject(err);
             } else {
@@ -32,11 +32,11 @@ async function getAudioMp3Duration(audioMp3) {
     return totalSeconds;
 }
 test('test alignment video script', async () => {
-    let audioMp3 = '/align-input/synthesize-result-404133988.mp3';
-    let videoScript = require('/align-input/align-404133988.json').data.videoScript;
+    let audioMp3 = './align-input/synthesize-result-404133988.mp3';
+    let videoScript = require('../align-input/align-404133988.json').data.videoScript;
     // 
     let audioMp3Duration = await getAudioMp3Duration(audioMp3);
-    fs.writeFileSync('/align-input/logs.txt', "Quy trình lặp lại, ví dụ:\n\nTotal audio duration, Tổng cộng: " + audioMp3Duration + "s\n");
+    fs.writeFileSync('./align-input/logs.txt', "Quy trình lặp lại, ví dụ:\n\nTotal audio duration, Tổng cộng: " + audioMp3Duration + "s\n");
     let aligned = await alignVideoScript(
         videoScript,
         audioMp3

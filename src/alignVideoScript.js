@@ -1,8 +1,12 @@
 let path = require('path');
 let fs = require('fs');
 let child_process = require('child_process');
-if (!fs.existsSync('/align-input/')) {
-    fs.mkdirSync('/align-input/');
+let alignInputDir = '/align-input/';
+if (process.platform === 'darwin') {
+    alignInputDir = './align-input/';
+}
+if (!fs.existsSync(alignInputDir)) {
+    fs.mkdirSync(alignInputDir);
 }
 
 async function getAudioMp3Duration(audioMp3) {
@@ -16,7 +20,7 @@ async function getAudioMp3Duration(audioMp3) {
             // console.log('stdout', stdout);
             // console.log('stderr', stderr);
             // console.log('err', err);
-            fs.writeFileSync('/align-input/ffprobe-stderr.txt', stderr.toString().trim());
+            fs.writeFileSync('./align-input/ffprobe-stderr.txt', stderr.toString().trim());
             if (err) {
                 reject(err);
             } else {
@@ -136,10 +140,10 @@ async function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems
 
 async function alignVideoScript(videoScript, audioFile) {
     let beforeCutAudioDuration = await getAudioMp3Duration(audioFile);
-    fs.appendFileSync('/align-input/logs.txt', " \n\n-> Align video script - Total sections: " + videoScript.length + "\n");
-    fs.appendFileSync('/align-input/logs.txt', " \n" + videoScript.map(x => "| " + x.text.slice(0, 100).replace(/\n/g, ' ')).join('\n') + '\n');
+    fs.appendFileSync('./align-input/logs.txt', " \n\n-> Align video script - Total sections: " + videoScript.length + "\n");
+    fs.appendFileSync('./align-input/logs.txt', " \n" + videoScript.map(x => "| " + x.text.slice(0, 100).replace(/\n/g, ' ')).join('\n') + '\n');
     // 
-    fs.appendFileSync('/align-input/logs.txt', "   - Before cut, audio mp3 duration: " + beforeCutAudioDuration + "s\n");
+    fs.appendFileSync('./align-input/logs.txt', "   - Before cut, audio mp3 duration: " + beforeCutAudioDuration + "s\n");
     let outputFile = synthesizeAudio(audioFile, videoScript);
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
     // 
