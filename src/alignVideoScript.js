@@ -61,7 +61,7 @@ function djb2(str) {
 }
 let model = process.env.STABLE_TS_MODEL;
 let language = process.env.STABLE_TS_LANGUAGE;
-let alignOutputDir = '/align-output/';
+let alignOutputDir = './align-output/';
 function removeSpecialCharacters(text) {
     return removeMd(text)
         .replace(/[:,\'\"\?\!\;\.\(\)\[\]\{\}\n]/g, ' ')
@@ -86,8 +86,7 @@ function synthesizeAudio(audioFile, videoScript) {
     }
     let alignFileTxt = path.join(alignOutputDir, 'output-' + djb2Hash + '.txt');
     fs.writeFileSync(alignFileTxt, removeSpecialCharacters(alignTxtContent));
-
-    child_process.execFileSync('stable-ts', [
+    let stableTsArgs = [
         audioFile,
         '--model', model,
         '--language', language,
@@ -95,7 +94,9 @@ function synthesizeAudio(audioFile, videoScript) {
         '--overwrite',
         '--output', outputFile,
         '-fw',
-    ], {
+    ];
+
+    child_process.execFileSync('stable-ts', stableTsArgs, {
         stdio: 'inherit',
     });
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
