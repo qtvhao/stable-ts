@@ -158,15 +158,15 @@ async function alignVideoScript(videoScript, audioFile) {
     }
 
     let incorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
-    fs.appendFileSync('/align-input/logs.txt', "   - Corrected video script items: " + correctedVideoScriptItems.length + "\n");
-    fs.appendFileSync('/align-input/logs.txt', "   - Incorrected video script items: " + incorrectedVideoScriptItems.length + "\n");
+    fs.appendFileSync('./align-input/logs.txt', "   - Corrected video script items: " + correctedVideoScriptItems.length + "\n");
+    fs.appendFileSync('./align-input/logs.txt', "   - Incorrected video script items: " + incorrectedVideoScriptItems.length + "\n");
 
     if (incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length) {
         throw new Error('incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
     }
     if (correctedVideoScriptItems.slice(-1)[0].aligned.slice(-1)[0].end > 60) {
-        fs.writeFileSync('/align-segments/' + new Date().getTime() + '.json', JSON.stringify(segments, null, 2));
-        fs.writeFileSync('/align-scripts/' + new Date().getTime() + '.json', JSON.stringify(videoScript, null, 2));
+        fs.writeFileSync('./align-segments/' + new Date().getTime() + '.json', JSON.stringify(segments, null, 2));
+        fs.writeFileSync('./align-scripts/' + new Date().getTime() + '.json', JSON.stringify(videoScript, null, 2));
 
         throw new Error('correctedVideoScriptItems.slice(-1)[0].aligned.slice(-1)[0].end > 60');
     }
