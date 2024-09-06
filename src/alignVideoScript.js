@@ -59,8 +59,8 @@ function djb2(str) {
     }
     return hash;
 }
-let model = process.env.STABLE_TS_MODEL;
-let language = process.env.STABLE_TS_LANGUAGE;
+let model = process.env.STABLE_TS_MODEL || 'tiny';
+let language = process.env.STABLE_TS_LANGUAGE || 'vi';
 let alignOutputDir = './align-output/';
 function removeSpecialCharacters(text) {
     return removeMd(text)
@@ -95,6 +95,7 @@ function synthesizeAudio(audioFile, videoScript) {
         '--output', outputFile,
         '-fw',
     ];
+    console.log('stable-ts', stableTsArgs);
 
     child_process.execFileSync('stable-ts', stableTsArgs, {
         stdio: 'inherit',
