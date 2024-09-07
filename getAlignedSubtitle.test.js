@@ -30,8 +30,8 @@ test('test alignment', () => {
         alignFileTxt,
         outputFile,
         audio,
-    } = getInput('/align-input/align-1484178056.json');
-    let audioFile = '/align-input/synthesize-result-1484178056.mp3';
+    } = getInput(path.join(alignInputDir, 'align-1484178056.json'));
+    let audioFile = path.join(alignInputDir, 'synthesize-result-1484178056.mp3');
     checkAligned(alignFileTxt, outputFile, audio, audioFile)
     // expect(aligned).toBeDefined();
 });
@@ -40,8 +40,8 @@ test('test alignment 2', () => {
         alignFileTxt,
         outputFile,
         audio,
-    } = getInput('/align-input/align-2544651730.json');
-    let audioFile = '/align-input/synthesize-result-2544651730.aac';
+    } = getInput(path.join(alignInputDir, 'align-2544651730.json'));
+    let audioFile = path.join(alignInputDir, 'synthesize-result-2544651730.aac');
     checkAligned(alignFileTxt, outputFile, audio, audioFile)
 });
 test('test alignment 3', () => {
@@ -49,17 +49,22 @@ test('test alignment 3', () => {
         alignFileTxt,
         outputFile,
         audio,
-    } = getInput('/align-input/align-1925143408.json');
-    let audioFile = '/align-input/synthesize-result-1925143408.aac';
+    } = getInput(path.join(alignInputDir, 'align-1925143408.json'));
+    let audioFile = path.join(alignInputDir, 'synthesize-result-1925143408.aac');
     checkAligned(alignFileTxt, outputFile, audio, audioFile)
 });
 
+let alignInputDir = './align-input/';
+if (fs.existsSync('/align-input')) {
+    alignInputDir = '/align-input/';
+}
+// let path = require('path');
 test('test alignment 4', () => {
     let {
         // alignFileTxt,
         // outputFile,
         audio,
-    } = getInput('/align-input/align-1585795898.json');
-    let audioFile = '/align-input/synthesize-result-1585795898.aac';
+    } = getInput(path.join(alignInputDir, 'align-404133988.json'));
+    let audioFile = path.join(alignInputDir, 'synthesize-result-404133988.mp3');
     checkAligned(audio, audioFile)
 });

@@ -113,8 +113,9 @@ function synthesizeAudio(audioFile, videoScript) {
 
     return outputFile;
 }
+let logsFile = path.join(alignInputDir, 'logs.txt');
 async function cutAudioFileByTimestamp(audioFile, cutAudioFile, timestamp_a) {
-    fs.appendFileSync('/align-input/logs.txt', "   - Cut from " + timestamp_a + "s\n");
+    fs.appendFileSync(logsFile, "   - Cut from " + timestamp_a + "s\n");
     let timestamp = getTimestampForFFMpeg(timestamp_a);
     child_process.execFileSync('ffmpeg', [
         '-i', audioFile,
@@ -138,7 +139,7 @@ async function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems
     // }
     await cutAudioFileByTimestamp(audioFile, cutAudioFile, lastCorrectedSegmentEnd);
     // console.log('timestamp', lastCorrectedSegmentEnd);
-    fs.appendFileSync('/align-input/logs.txt', "   - After cut, audio mp3 duration: " + (await getAudioMp3Duration(cutAudioFile)) + "s\n");
+    fs.appendFileSync(logsFile, "   - After cut, audio mp3 duration: " + (await getAudioMp3Duration(cutAudioFile)) + "s\n");
 
     return cutAudioFile;
 }
@@ -167,9 +168,10 @@ async function alignVideoScript(videoScript, audioFile) {
     if (incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length) {
         throw new Error('incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
     }
-    if (correctedVideoScriptItems.slice(-1)[0].aligned.slice(-1)[0].end > 60) {
+    if (correctedVideoScriptItems.slice(-1)[0].aligned.slice(-1)[0].end > 120) {
         fs.writeFileSync('./align-segments/' + new Date().getTime() + '.json', JSON.stringify(segments, null, 2));
         fs.writeFileSync('./align-scripts/' + new Date().getTime() + '.json', JSON.stringify(videoScript, null, 2));
+        console.log('correctedVideoScriptItems', correctedVideoScriptItems);
 
         throw new Error('correctedVideoScriptItems.slice(-1)[0].aligned.slice(-1)[0].end > 60');
     }

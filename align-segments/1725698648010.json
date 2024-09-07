@@ -1,0 +1,372 @@
+[
+  {
+    "start": 0.98,
+    "end": 2.64,
+    "text": " Chính sách công Public Policy",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 4.34,
+    "end": 26.74,
+    "text": " là các quyết định hành động của chính phủ nhằm giải quyết các vấn đề xã hội kinh tế môi trường hay các lĩnh vực khác trong cuộc sống Đây là những quy định pháp luật kế hoạch và chương trình được thiết kế để định hướng cách xã hội hoạt động giúp quản lý tài nguyên thúc đẩy sự phát triển và đảm bảo công bằng xã hội",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 30.72,
+    "end": 38.76,
+    "text": " Giải quyết các vấn đề xã hội ** Chính sách công giúp chính phủ tìm ra giải pháp cho những vấn đề như thất nghiệp giáo dục y tế và an sinh xã hội",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 39.28,
+    "end": 40.4,
+    "text": " Phân bổ nguồn lực",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 40.92,
+    "end": 48.16,
+    "text": " ** Chính phủ quyết định cách sử dụng tài nguyên quốc gia như tài chính nhân lực và cơ sở hạ tầng để phục vụ cộng đồng",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 49,
+    "end": 55.78,
+    "text": " Bảo vệ lợi ích công cộng ** Chính sách công bảo vệ các quyền lợi của người dân môi trường và các giá trị chung",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 56.4,
+    "end": 65.64,
+    "text": " Định hình tương lai ** Chính sách không chỉ giải quyết các vấn đề hiện tại mà còn xây dựng cơ sở cho tương lai như phát triển bền vững hay nâng cao chất lượng sống của người dân",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 66.16,
+    "end": 68.36,
+    "text": " Quá trình hình thành một chính sách công",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 71.44,
+    "end": 73.12,
+    "text": " thường bao gồm các bước sau",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 73.88,
+    "end": 75.1,
+    "text": " Nhận diện vấn đề",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 75.78,
+    "end": 84.06,
+    "text": " ** Chính phủ phải xác định rõ vấn đề cần giải quyết Ví dụ nạn thất nghiệp ô nhiễm môi trường hay sự bất bình đẳng trong xã hội",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 85.14,
+    "end": 92.26,
+    "text": " Phân tích các giải pháp ** Các cơ quan liên quan sẽ nghiên cứu thu thập dữ liệu và xem xét nhiều phương án khác nhau để giải quyết vấn đề",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 93.02,
+    "end": 93.72,
+    "text": " Tham vấn",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 94.3,
+    "end": 101.12,
+    "text": " ** Chính phủ có thể tổ chức các cuộc hội thảo gặp gỡ với các chuyên gia tổ chức xã hội để lắng nghe quan điểm từ các phía liên quan",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 102.26,
+    "end": 103.08,
+    "text": " Ra quyết định",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 103.74,
+    "end": 107.92,
+    "text": " ** Sau khi cân nhắc chính phủ sẽ chọn giải pháp tối ưu nhất và ban hành chính sách",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 109.18,
+    "end": 115.32,
+    "text": " Thực thi ** Chính sách sẽ được thực hiện qua các cơ quan công quyền địa phương hoặc thông qua luật pháp",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 116.06,
+    "end": 124.9,
+    "text": " Đánh giá và điều chỉnh ** Sau khi thực hiện các chính sách sẽ được theo dõi và đánh giá hiệu quả từ đó có thể điều chỉnh cho phù hợp với tình hình thực tế",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 126.38,
+    "end": 135.4,
+    "text": " Chính sách kinh tế ** Tập trung vào phát triển kinh tế quản lý tài chính quốc gia tạo việc làm và thúc đẩy tăng",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 137.08,
+    "end": 144.08,
+    "text": " trưởng Chính sách xã hội ** Liên quan đến các vấn đề như giáo dục y tế an sinh xã hội quyền lợi của các nhóm yếu thế",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 145.02,
+    "end": 146.1,
+    "text": " Chính sách môi trường",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 146.72,
+    "end": 151.9,
+    "text": " ** Đưa ra các biện pháp bảo vệ tài nguyên thiên nhiên giảm thiểu ô nhiễm ứng phó với biến đổi khí hậu",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 152.64,
+    "end": 158.44,
+    "text": " Chính sách an ninh ** Đảm bảo an ninh quốc gia phòng chống tội phạm và quản lý các vấn đề di cư",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 159.48,
+    "end": 169.2,
+    "text": " Chính sách giáo dục miễn phí ** Chính phủ hỗ trợ tài chính cho hệ thống giáo dục công lập nhằm đảm bảo mọi người đều có cơ hội học tập",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 169.74,
+    "end": 176.4,
+    "text": " Chính sách bảo vệ môi trường ** Các quy định giới hạn khí thải công nghiệp nhằm giảm ô nhiễm và bảo vệ sức khỏe cộng đồng",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 177.36,
+    "end": 178.86,
+    "text": " Chính sách y tế cộng đồng",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 179.42,
+    "end": 184.04,
+    "text": " ** Chính phủ triển khai các chương trình tiêm chủng miễn phí nhằm kiểm soát và ngăn ngừa dịch bệnh",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 186.14,
+    "end": 186.46,
+    "text": " Mâu",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 190.02,
+    "end": 190.72,
+    "text": " thuẫn lợi",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 191.58,
+    "end": 196.38,
+    "text": " ích ** Nhiều khi chính sách có thể làm hài lòng một nhóm người nhưng gây thiệt hại cho nhóm khác",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 197.46,
+    "end": 198.58,
+    "text": " Nguồn lực hạn chế",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 199.12,
+    "end": 204.96,
+    "text": " ** Ngân sách và tài nguyên của một quốc gia có giới hạn vì thế chính phủ phải quyết định cách phân bổ hợp lý nhất",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 205.86,
+    "end": 207.16,
+    "text": " Tác động không dự báo trước",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 207.84,
+    "end": 213.66,
+    "text": " ** Một số chính sách có thể có hậu quả không lường trước gây ra những vấn đề mới hoặc làm trầm trọng thêm vấn đề cũ",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 215.3,
+    "end": 221.94,
+    "text": " Chính sách công là một phần quan trọng của cuộc sống hàng ngày vì nó định hình cách xã hội vận hành",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 222.5,
+    "end": 231.96,
+    "text": " Việc hiểu biết về chính sách công giúp chúng ta nhận thức rõ hơn về vai trò của chính phủ và ảnh hưởng của các quyết định chính trị đối với đời sống cá nhân và cộng đồng",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  },
+  {
+    "start": 234.28,
+    "end": 242.66,
+    "text": " Hy vọng bài giảng này đã cung cấp một cái nhìn tổng quan về chính sách công và tầm quan trọng của nó trong quản lý và phát triển xã hội hội ",
+    "seek": null,
+    "temperature": null,
+    "avg_logprob": null,
+    "compression_ratio": null,
+    "no_speech_prob": null
+  }
+]
