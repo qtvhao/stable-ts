@@ -20,7 +20,7 @@ async function getAudioMp3Duration(audioMp3) {
             // console.log('stdout', stdout);
             // console.log('stderr', stderr);
             // console.log('err', err);
-            fs.writeFileSync('./align-input/ffprobe-stderr.txt', stderr.toString().trim());
+            fs.writeFileSync(path.join(alignInputDir, 'ffprobe-stderr.txt'), stderr.toString().trim());
             if (err) {
                 reject(err);
             } else {
@@ -142,10 +142,10 @@ async function cutAudioFileByCorrectedVideoScriptItems(correctedVideoScriptItems
 
 async function alignVideoScript(videoScript, audioFile) {
     let beforeCutAudioDuration = await getAudioMp3Duration(audioFile);
-    fs.appendFileSync('./align-input/logs.txt', " \n\n-> Align video script - Total sections: " + videoScript.length + "\n");
-    fs.appendFileSync('./align-input/logs.txt', " \n" + videoScript.map(x => "| " + x.text.slice(0, 100).replace(/\n/g, ' ')).join('\n') + '\n');
+    fs.appendFileSync(path.join(alignInputDir, 'logs.txt'), " \n\n-> Align video script - Total sections: " + videoScript.length + "\n");
+    fs.appendFileSync(path.join(alignInputDir, 'logs.txt'), " \n" + videoScript.map(x => "| " + x.text.slice(0, 100).replace(/\n/g, ' ')).join('\n') + '\n');
     // 
-    fs.appendFileSync('./align-input/logs.txt', "   - Before cut, audio mp3 duration: " + beforeCutAudioDuration + "s\n");
+    fs.appendFileSync(path.join(alignInputDir, 'logs.txt'), "   - Before cut, audio mp3 duration: " + beforeCutAudioDuration + "s\n");
     let outputFile = synthesizeAudio(audioFile, videoScript);
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
     // 
@@ -158,8 +158,8 @@ async function alignVideoScript(videoScript, audioFile) {
     }
 
     let incorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
-    fs.appendFileSync('./align-input/logs.txt', "   - Corrected video script items: " + correctedVideoScriptItems.length + "\n");
-    fs.appendFileSync('./align-input/logs.txt', "   - Incorrected video script items: " + incorrectedVideoScriptItems.length + "\n");
+    fs.appendFileSync(path.join(alignInputDir, 'logs.txt'), "   - Corrected video script items: " + correctedVideoScriptItems.length + "\n");
+    fs.appendFileSync(path.join(alignInputDir, 'logs.txt'), "   - Incorrected video script items: " + incorrectedVideoScriptItems.length + "\n");
 
     if (incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length) {
         throw new Error('incorrectedVideoScriptItems.length + correctedVideoScriptItems.length !== videoScript.length');
