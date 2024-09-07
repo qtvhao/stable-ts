@@ -61,7 +61,10 @@ function djb2(str) {
 }
 let model = process.env.STABLE_TS_MODEL || 'tiny';
 let language = process.env.STABLE_TS_LANGUAGE || 'vi';
-let alignOutputDir = './align-output/';
+let alignOutputDir = '/align-output/';
+if (!fs.existsSync(alignOutputDir)) {
+    alignOutputDir = './align-output/';
+}
 function removeSpecialCharacters(text) {
     return removeMd(text)
         .replace(/[:,\'\"\?\!\;\.\(\)\[\]\{\}\n]/g, ' ')
