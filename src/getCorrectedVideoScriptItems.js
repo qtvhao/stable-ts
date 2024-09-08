@@ -1,4 +1,6 @@
+// let synthesizeAudio = require('./synthesizeAudio.js');
 async function getCorrectedVideoScriptItems(videoScript, audioFile) {
+    // let segments = await synthesizeAudio(audioFile, videoScript);
     let timestamp = 0;
     let correctedVideoScriptItems = videoScript.slice(0, 2).map(x => {
         let start = timestamp;
