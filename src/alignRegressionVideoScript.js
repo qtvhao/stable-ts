@@ -14,8 +14,7 @@ async function alignRegressionVideoScript(videoScript, audioFile) {
     fs.appendFileSync(logsFile, " \n" + videoScript.map(x => "| " + x.text.slice(0, 100).replace(/\n/g, ' ')).join('\n') + '\n');
     fs.appendFileSync(logsFile, "   - Before cut, audio mp3 duration: " + beforeCutAudioDuration + "s\n");
 
-    let segments = [];
-    let correctedVideoScriptItems = await getCorrectedVideoScriptItems(videoScript, segments);
+    let {correctedVideoScriptItems, audioLeft} = await getCorrectedVideoScriptItems(videoScript, audioFile);
 
     let incorrectedVideoScriptItems = videoScript.slice(correctedVideoScriptItems.length);
     if (incorrectedVideoScriptItems.length === 0) {
@@ -25,8 +24,7 @@ async function alignRegressionVideoScript(videoScript, audioFile) {
     fs.appendFileSync(logsFile, "   - Corrected video script items: " + correctedVideoScriptItems.length + "\n");
     fs.appendFileSync(logsFile, "   - Incorrected video script items: " + incorrectedVideoScriptItems.length + "\n");
 
-    let cutAudioFile = audioFile;
-    let othersAligned = await alignRegressionVideoScript(incorrectedVideoScriptItems, cutAudioFile);
+    let othersAligned = await alignRegressionVideoScript(incorrectedVideoScriptItems, audioLeft);
 
     let lastCorrectedVideoScriptItem = correctedVideoScriptItems.slice(-1)[0];
     let aligned = lastCorrectedVideoScriptItem.aligned;

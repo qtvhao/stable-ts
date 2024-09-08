@@ -1,6 +1,6 @@
-async function getCorrectedVideoScriptItems(videoScript, segments) {
+async function getCorrectedVideoScriptItems(videoScript, audioFile) {
     let timestamp = 0;
-    return videoScript.slice(0, 2).map(x => {
+    let correctedVideoScriptItems = videoScript.slice(0, 2).map(x => {
         let start = timestamp;
         timestamp++;
         let end = timestamp;
@@ -17,6 +17,11 @@ async function getCorrectedVideoScriptItems(videoScript, segments) {
             ]
         };
     });
+
+    return {
+        correctedVideoScriptItems, 
+        audioLeft: audioFile
+    };
 }
 
 module.exports = getCorrectedVideoScriptItems;
