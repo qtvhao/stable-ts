@@ -1,11 +1,22 @@
 let getCheckedAlignedVideoScript = require('./getCheckedAlignedVideoScript.js');
-test('getCheckedAlignedVideoScript', async () => {
-    let job = {
-        data: {
-            videoScript: []
-        }
-    }
-    let audioFile = 'test/audio.aac';
-    let aligned = await getCheckedAlignedVideoScript(job, audioFile)
-    console.log('aligned', aligned);
+let testDataProviders = [
+    "1.json",
+    // "2.json",
+    // "3.json",
+    // "4.json",
+    // "5.json",
+    // "6.json",
+    // "7.json",
+    // "8.json",
+    // "9.json",
+    // "10.json",
+]
+
+testDataProviders.forEach(testDataProvider => {
+    test(`getCheckedAlignedVideoScript ${testDataProvider}`, async () => {
+        let job = require(`../testdata/${testDataProvider}`);
+        let audioFile = job.data.audioFile;
+        // let aligned = await getCheckedAlignedVideoScript(job, audioFile)
+        // console.log('aligned', aligned);
+    });
 });
