@@ -7,7 +7,7 @@ console.log('='.repeat(350));
 let queueInName = process.env.QUEUE_IN_NAME;
 let queueOutName = process.env.QUEUE_OUT_NAME;
 let {getAlignedSubtitle} = require('./getAlignedSubtitle.js');
-let getCheckedAlignedVideoScript = require('./src/checkAligned.js');
+let getCheckedAlignedVideoScript = require('./src/getCheckedAlignedVideoScript.js');
 const path = require('path');
 function removePunctuation(text) {
     return text.replace(/[-,\?,\!,\:,\;,\n*]/g, ' ').replace(/\s+/g, ' ');
