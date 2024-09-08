@@ -33,7 +33,7 @@ async function getCheckedAlignedVideoScript(job, audioFile) {
         }).join('\n'.repeat(5)))
     }
 
-    return job;
+    return job.data.videoScript;
 }
 
 module.exports = getCheckedAlignedVideoScript;
