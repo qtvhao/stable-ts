@@ -1,6 +1,7 @@
+let getAudioMp3Duration = require('./getAudioMp3Duration');
 async function alignRegressionVideoScript(videoScript, audioFile) {
-    // let audioDuration = await getAudioDuration(audioFile);
-    // let videoDuration = await getVideoDuration(videoFile);
+    let beforeCutAudioDuration = await getAudioMp3Duration(audioFile);
+    
 
     return videoScript;
 }
