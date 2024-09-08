@@ -46,6 +46,12 @@ async function synthesizeAudio(audioFile, videoScript) {
     alignedSubtitle.segments = alignedSubtitle.segments.map(x => {
         delete x.words;
         delete x.tokens;
+        delete x.avg_logprob;
+        delete x.compression_ratio;
+        delete x.no_speech_prob;
+        delete x.seek;
+        delete x.temperature;
+
         return x;
     });
     fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
