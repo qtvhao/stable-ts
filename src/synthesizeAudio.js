@@ -24,7 +24,7 @@ async function synthesizeAudio(audioFile, videoScript) {
     let djb2Hash = djb2(alignTxtContent + ' ' + model + ' ' + language);
     let outputFile = path.join(alignOutputDir, 'output-' + djb2Hash + '.json');
     if (fs.existsSync(outputFile)) {
-        // return outputFile;
+        return outputFile;
     }
     let alignFileTxt = path.join(alignOutputDir, 'output-' + djb2Hash + '.txt');
     fs.writeFileSync(alignFileTxt, alignTxtContent);
