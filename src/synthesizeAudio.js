@@ -13,6 +13,57 @@ function djb2(str) {
 let model = 'tiny';
 let language = 'vi';
 let alignOutputDir = path.join(__dirname, '..', 'align-output');
+function postprocessSegments(segments) {
+    // set previous silence duration
+    segments = segments.map((segment, i, self) => {
+        if (i === 0) {
+            return {
+                start: segment.start,
+                end: segment.end,
+                text: segment.text,
+                previousSilenceDuration: 0,
+            }
+        }
+        return {
+            start: segment.start,
+            end: segment.end,
+            text: segment.text,
+            previousSilenceDuration: segment.start - self[i - 1].end,
+        };
+    });
+    // set next silence duration
+    segments = segments.map((segment, i, self) => {
+        if (i === self.length - 1) {
+            return segment;
+        }
+        return {
+            ...segment,
+            nextSilenceDuration: self[i + 1].start - segment.end,
+        };
+    });
+    // set duration
+    segments = segments.map((segment) => {
+        let previousSilenceDuration = segment.previousSilenceDuration || 0;
+        let nextSilenceDuration = segment.nextSilenceDuration || 0;
+        return {
+            ...segment,
+            duration: segment.end - segment.start,
+            previousToNextRatio: nextSilenceDuration / previousSilenceDuration,
+        };
+    });
+
+    segments = segments.map((segment, i, self) => {
+        if (i === 0) {
+            return segment;
+        }
+        return {
+            ...segment,
+            start: self[i - 1].end,
+        };
+    });
+
+    return segments;
+}
 
 async function synthesizeAudio(audioFile, videoScript) {
     let alignTxtContent = videoScript.map(x => {
@@ -24,7 +75,11 @@ async function synthesizeAudio(audioFile, videoScript) {
     let djb2Hash = djb2(alignTxtContent + ' ' + model + ' ' + language);
     let outputFile = path.join(alignOutputDir, 'output-' + djb2Hash + '.json');
     if (fs.existsSync(outputFile)) {
-        return outputFile;
+        let outputFileContent = fs.readFileSync(outputFile, 'utf8');
+        let parsedOutputFileContent = JSON.parse(outputFileContent);
+        let segments = parsedOutputFileContent.segments;
+
+        return postprocessSegments(segments);
     }
     let alignFileTxt = path.join(alignOutputDir, 'output-' + djb2Hash + '.txt');
     fs.writeFileSync(alignFileTxt, alignTxtContent);
@@ -56,7 +111,7 @@ async function synthesizeAudio(audioFile, videoScript) {
     });
     fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
 
-    return alignedSubtitle.segments;
+    return postprocessSegments(alignedSubtitle.segments);
 }
 
 module.exports = synthesizeAudio;

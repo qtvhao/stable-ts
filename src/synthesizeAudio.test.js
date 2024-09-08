@@ -10,7 +10,7 @@ let child_process = require('child_process');
 testDataProviders.forEach(testDataProvider => {
     test('synthesizeAudio ' + testDataProvider, async () => {
         let jobFilePath = path.join(synthesizeDir, testDataProvider);
-        console.log(jobFilePath);
+        // console.log(jobFilePath);
         let job = require(jobFilePath);
         let videoScript = job.data.videoScript;
         let audioFilePath = job.data.audioFile;
@@ -18,10 +18,15 @@ testDataProviders.forEach(testDataProvider => {
         let audioMp3Path = audioFilePath.replace('.aac', '.mp3');
         child_process.execSync('ffmpeg -y -i ' + audioFilePath + ' ' + audioMp3Path);
         let segments = await synthesizeAudio(audioMp3Path, videoScript);
-        console.log(segments);
+        // console.log(segments);
         let expectedTheLastSegments = job.expectedTheLastSegments;
         let theLastSegments = segments.slice(-expectedTheLastSegments.length);
-        console.log(JSON.stringify(theLastSegments, null, 2));
-        expect(theLastSegments).toEqual(expectedTheLastSegments);
+        // console.log(JSON.stringify(theLastSegments, null, 2));
+        // 
+        for (let i = 0; i < theLastSegments.length; i++) {
+            expect(theLastSegments[i].text).toEqual(expectedTheLastSegments[i].text);
+            expect(theLastSegments[i].start).toEqual(expectedTheLastSegments[i].start);
+            expect(theLastSegments[i].end).toEqual(expectedTheLastSegments[i].end);
+        }
     });
 });
