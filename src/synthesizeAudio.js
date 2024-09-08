@@ -42,15 +42,15 @@ async function synthesizeAudio(audioFile, videoScript) {
     child_process.execFileSync('stable-ts', stableTsArgs, {
         stdio: 'inherit',
     });
+    let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
+    alignedSubtitle.segments = alignedSubtitle.segments.map(x => {
+        delete x.words;
+        delete x.tokens;
+        return x;
+    });
+    fs.writeFileSync(outputFile, JSON.stringify(alignedSubtitle, null, 2));
 
-    let alignedSubtitle = {
-        segments: []
-    }
-    // let outputFile = synthesizeAudio(audioFile, videoScript);
-    // let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
-    let segments = alignedSubtitle.segments;
-
-    return segments;
+    return alignedSubtitle.segments;
 }
 
 module.exports = synthesizeAudio;
