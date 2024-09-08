@@ -26,6 +26,19 @@ async function synthesizeAudio(audioFile, videoScript) {
     if (fs.existsSync(outputFile)) {
         return outputFile;
     }
+    let alignFileTxt = path.join(alignOutputDir, 'output-' + djb2Hash + '.txt');
+    fs.writeFileSync(alignFileTxt, alignTxtContent);
+    let stableTsArgs = [
+        audioFile,
+        '--model', model,
+        '--language', language,
+        '--align', alignFileTxt,
+        '--overwrite',
+        '--output', outputFile,
+        '-fw',
+    ];
+    console.log('stable-ts', stableTsArgs);
+
     let alignedSubtitle = {
         segments: []
     }
