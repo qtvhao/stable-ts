@@ -289,6 +289,7 @@ Docstrings:
     noise removal and low/high-pass filter. The postprocessing performed on the transcription result includes:
     adjusting timestamps with VAD and custom regrouping segments based punctuation and speech gaps.
 
+
     Parameters
     ----------
     model : whisper.model.Whisper
