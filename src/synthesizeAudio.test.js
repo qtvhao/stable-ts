@@ -5,6 +5,7 @@ let synthesizeDir = path.join(testdataDir, 'synthesize');
 let testDataProviders = [
     "1.json",
 ];
+let child_process = require('child_process');
 
 testDataProviders.forEach(testDataProvider => {
     test('synthesizeAudio ' + testDataProvider, async () => {
@@ -12,7 +13,10 @@ testDataProviders.forEach(testDataProvider => {
         let job = require(jobFilePath);
         let videoScript = job.data.videoScript;
         let audioFilePath = job.data.audioFile;
-        let segments = await synthesizeAudio(audioFilePath, videoScript);
+        audioFilePath = audioFilePath.replace('/app/storage/audio/', '/samba-claim0-apis-production/gen-audio-worker-storage/');
+        let audioMp3Path = audioFilePath.replace('.aac', '.mp3');
+        child_process.execSync('ffmpeg -y -i ' + audioFilePath + ' ' + audioMp3Path);
+        let segments = await synthesizeAudio(audioMp3Path, videoScript);
         console.log(segments);
     });
 });

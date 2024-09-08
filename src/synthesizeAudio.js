@@ -11,7 +11,7 @@ function djb2(str) {
     return hash;
 }
 let model = 'tiny';
-let language = 'en';
+let language = 'vi';
 let alignOutputDir = path.join(__dirname, '..', 'align-output');
 
 async function synthesizeAudio(audioFile, videoScript) {
@@ -24,7 +24,7 @@ async function synthesizeAudio(audioFile, videoScript) {
     let djb2Hash = djb2(alignTxtContent + ' ' + model + ' ' + language);
     let outputFile = path.join(alignOutputDir, 'output-' + djb2Hash + '.json');
     if (fs.existsSync(outputFile)) {
-        return outputFile;
+        // return outputFile;
     }
     let alignFileTxt = path.join(alignOutputDir, 'output-' + djb2Hash + '.txt');
     fs.writeFileSync(alignFileTxt, alignTxtContent);
@@ -37,7 +37,11 @@ async function synthesizeAudio(audioFile, videoScript) {
         '--output', outputFile,
         '-fw',
     ];
-    console.log('stable-ts', stableTsArgs);
+    // console.log('stable-ts', stableTsArgs);
+
+    child_process.execFileSync('stable-ts', stableTsArgs, {
+        stdio: 'inherit',
+    });
 
     let alignedSubtitle = {
         segments: []
