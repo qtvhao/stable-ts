@@ -7,6 +7,7 @@ console.log('='.repeat(350));
 let queueInName = process.env.QUEUE_IN_NAME;
 let queueOutName = process.env.QUEUE_OUT_NAME;
 let {getAlignedSubtitle} = require('./getAlignedSubtitle.js');
+let getCheckedAlignedVideoScript = require('./src/checkAligned.js');
 const path = require('path');
 function removePunctuation(text) {
     return text.replace(/[-,\?,\!,\:,\;,\n*]/g, ' ').replace(/\s+/g, ' ');
@@ -114,7 +115,15 @@ if (typeof queueInName !== 'undefined') {
         // stable-ts in.wav --model tiny --language vi --align all.txt --overwrite --output ni.json
         let outputFileContent = fs.readFileSync(outputFile, 'utf8');
         alignedSubtitle = JSON.parse(outputFileContent);
-        let aligned = getAlignedSubtitle(job, alignedSubtitle);
+        let aligned
+        try {
+            aligned = getAlignedSubtitle(job, alignedSubtitle);
+        } catch(e) {
+            console.log('error', e);
+            let tmpAudioFile = '/tmp/' + path.basename(audioFile);
+            fs.copyFileSync(audioFile, tmpAudioFile);
+            aligned = await getCheckedAlignedVideoScript(job, tmpAudioFile)
+        }
         await queueOut.add({
             ...jobData,
             videoScript: aligned,
