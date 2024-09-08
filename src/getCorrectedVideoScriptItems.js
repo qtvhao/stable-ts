@@ -1,5 +1,5 @@
-let timestamp = 0;
 async function getCorrectedVideoScriptItems(videoScript, segments) {
+    let timestamp = 0;
     return videoScript.slice(0, 2).map(x => {
         let start = timestamp;
         timestamp++;
