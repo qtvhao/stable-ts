@@ -7,7 +7,7 @@ function getLevenshteinDistance(text1, text2) {
 }
 
 function getSegmentsForVideoScriptItem(videoScriptItem, segments) {
-    console.log(videoScriptItem);
+    // console.log(videoScriptItem);
     // console.log(segments);
     let bestMatchSegment = segments
         .slice(1)
@@ -16,7 +16,7 @@ function getSegmentsForVideoScriptItem(videoScriptItem, segments) {
             return x;
         })
         .map((_segment, i, self) => {
-            let segmentsFromStart = self.slice(0, i + 1);
+            let segmentsFromStart = segments.slice(0, i + 1);
             let segmentsFromStartText = segmentsFromStart.map(x => x.text).join(' ');
 
             let levenshteinDistance = getLevenshteinDistance(videoScriptItem.text, segmentsFromStartText);
@@ -31,13 +31,9 @@ function getSegmentsForVideoScriptItem(videoScriptItem, segments) {
             levenshteinDistance: Infinity,
             segmentsFromStart: [],
         });
-    console.log(bestMatchSegment);
+    // console.log(bestMatchSegment);
 
-    return [
-        {
-            end: 1,
-        }
-    ];
+    return bestMatchSegment.segmentsFromStart;
 }
 
 module.exports = getSegmentsForVideoScriptItem;
