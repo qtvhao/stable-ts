@@ -11,8 +11,8 @@ function djb2(str) {
     }
     return hash;
 }
-let model = 'tiny';
-let language = 'vi';
+let model = process.env.STABLE_TS_MODEL || 'tiny';
+let language = process.env.STABLE_TS_LANGUAGE || 'vi';
 let alignOutputDir = path.join(__dirname, '..', 'align-output');
 function postprocessSegments(segments) {
     // set previous silence duration

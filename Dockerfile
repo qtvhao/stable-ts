@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y ffmpeg
 
 COPY in.wav .
 COPY output/all.txt .
-ENV STABLE_TS_MODEL=small
+ENV STABLE_TS_MODEL=tiny
 # // tiny	39 M	tiny.en	tiny	~1 GB	~32x
 # // base	74 M	base.en	base	~1 GB	~16x
 # // small	244 M	small.en	small	~2 GB	~6x
