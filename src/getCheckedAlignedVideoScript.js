@@ -1,8 +1,12 @@
 let alignRegressionVideoScript = require('./alignRegressionVideoScript.js');
 let convertAudioFileMp3 = require('./convertAudioFileMp3.js')
+let path = require('path');
+let fs = require('fs');
 
 async function getCheckedAlignedVideoScript(job, audioFile) {
     audioFile = convertAudioFileMp3(audioFile);
+    let copiedAudioFile = path.join(__dirname, path.basename(audioFile) + '_copied.mp3');
+    fs.copyFileSync(audioFile, copiedAudioFile);
 
     job.data.videoScript = await alignRegressionVideoScript(job.data.videoScript, audioFile);
     let lastVideoScriptItem = job.data.videoScript.slice(-1)[0];
@@ -18,7 +22,7 @@ async function getCheckedAlignedVideoScript(job, audioFile) {
     } else {
         console.log('All aligned');
         console.log('videoScript', job.data.videoScript.map(x => {
-            return x.aligned.map(x => x.text).join('');
+            return x.aligned.map(x => x.text).join(' ');
         }).join('\n'.repeat(5)))
     }
 

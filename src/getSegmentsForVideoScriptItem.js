@@ -8,7 +8,6 @@ function getLevenshteinDistance(text1, text2) {
 
 function getSegmentsForVideoScriptItem(videoScriptItem, segments) {
     let bestMatchSegment = segments
-        .slice(1)
         .map(x => {
             x.text = removeSpecialCharacters(x.text).trim();
             return x;
