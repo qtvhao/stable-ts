@@ -49,7 +49,7 @@ if (typeof queueInName !== 'undefined') {
             queueOutJobCounts = await queueOut.getJobCounts();
         }
         let alignedSubtitle;
-        let jobData = job.data;
+        let jobData = JSON.parse(JSON.stringify(job.data));
         let videoScript = jobData.videoScript;
         let audioFile = jobData.audioFile;
         let texts = videoScript.map(x => removeMd(x.text));
@@ -121,7 +121,7 @@ if (typeof queueInName !== 'undefined') {
             aligned = getAlignedSubtitle(job, alignedSubtitle);
         } catch(e) {
             console.log('error', e);
-            await queueInBackup.add(job.data);
+            await queueInBackup.add(jobData);
             throw e;
             // let tmpAudioFile = '/tmp/' + path.basename(audioFile);
             // fs.copyFileSync(audioFile, tmpAudioFile);
