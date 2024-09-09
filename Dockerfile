@@ -21,7 +21,7 @@ RUN bash -c "set -xeo pipefail; cat ni.json | grep 'trong IaC mang lại nhiều
 COPY yarn.lock package.json ./
 RUN yarn install
 RUN which jest || npm install -g jest
-RUN mkdir -p /workspace/align-input/
+RUN mkdir -p /workspace/align-input/ /workspace/align-output/
 
 COPY audio.json .
 COPY alignment.js .

@@ -5,15 +5,10 @@ docker build -t alignment .
 docker rm -f alignment || true
 docker run -it \
     --name alignment \
-    -v ./data:/data \
-    -v ./output:/output \
     -v ./audio.json:/workspace/audio.json \
-    -v ./alignment.js:/workspace/alignment.js \
-    -v ./align-input/:/align-input/ \
     -v ./testdata/:/workspace/testdata/ \
     -v /samba-claim0-apis-production/gen-audio-worker-storage/:/samba-claim0-apis-production/gen-audio-worker-storage/ \
-    -v ./align-output/:/workspace/align-output/ \
     -v /samba-claim0-apis-production/gen-audio-worker-storage/:/app/storage/audio/ \
     -v ./getAlignedSubtitle.test.js:/workspace/getAlignedSubtitle.test.js \
     -v ./getAlignedSubtitle.js:/workspace/getAlignedSubtitle.js \
-    alignment /bin/bash -c "jest -t 'synthesizeAudio'"
+    alignment /bin/bash -c "jest -t 'getCheckedAlignedVideoScript'"

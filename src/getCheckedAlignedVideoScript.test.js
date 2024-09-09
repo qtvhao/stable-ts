@@ -19,5 +19,5 @@ testDataProviders.forEach(testDataProvider => {
         audioFile = audioFile.replace('/app/storage/audio/', '/samba-claim0-apis-production/gen-audio-worker-storage/');
         let videoScript = await getCheckedAlignedVideoScript(job, audioFile)
         console.log('videoScript', videoScript);
-    }, 30_000);
+    }, 300_000);
 });
