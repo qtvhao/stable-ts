@@ -33,39 +33,66 @@
   },
   "expectedTheLastSegments": [
     {
-      "start": 269.81,
-      "end": 269.81,
-      "text": " Ngay cả khi bạn không phải là một chuyên gia DevOps,"
+      "start": 211.06,
+      "end": 221.94,
+      "text": " Đưa ra quyết định Dựa trên kết quả phân tích nhóm phát triển có thể đưa ra các quyết định như tối ưu hóa quy trình build thay đổi cấu hình hệ thống hoặc cải tiến mã nguồn",
+      "previousSilenceDuration": 0.8199999999999932,
+      "nextSilenceDuration": 0.7199999999999989,
+      "duration": 10.060000000000002,
+      "previousToNextRatio": 0.8780487804878108
     },
     {
-      "start": 269.81,
-      "end": 269.81,
-      "text": " hiểu và áp dụng Build Analytics có thể mang lại những giá trị to lớn cho dự án phần mềm của bạn."
+      "start": 221.94,
+      "end": 230.48,
+      "text": "   5 Kết luận Build Analytics không chỉ là một công cụ hỗ trợ kỹ thuật mà còn là một yếu tố chiến lược trong phát triển phần mềm",
+      "previousSilenceDuration": 0.7199999999999989,
+      "nextSilenceDuration": 0.5800000000000125,
+      "duration": 7.819999999999993,
+      "previousToNextRatio": 0.8055555555555742
     },
     {
-      "start": 269.81,
-      "end": 269.81,
-      "text": " **Câu hỏi và thảo luận**: - Bạn đã từng gặp phải những vấn đề gì trong quá trình build phần mềm?"
+      "start": 230.48,
+      "end": 239.24,
+      "text": " Nó giúp các tổ chức hiểu rõ hơn về quy trình phát triển của mình từ đó cải thiện hiệu quả tiết kiệm chi phí và nâng cao chất lượng sản phẩm",
+      "previousSilenceDuration": 0.5800000000000125,
+      "nextSilenceDuration": 1.0999999999999943,
+      "duration": 8.180000000000007,
+      "previousToNextRatio": 1.8965517241378804
     },
     {
-      "start": 269.81,
-      "end": 269.81,
-      "text": " - Bạn nghĩ Build Analytics có thể giúp gì trong dự án hiện tại của mình?"
+      "start": 239.24,
+      "end": 248.26,
+      "text": " Ngay cả khi bạn không phải là một chuyên gia DevOps hiểu và áp dụng Build Analytics có thể mang lại những giá trị to lớn cho dự án phần mềm của bạn",
+      "previousSilenceDuration": 1.0999999999999943,
+      "nextSilenceDuration": 1.3000000000000114,
+      "duration": 7.9199999999999875,
+      "previousToNextRatio": 1.1818181818181983
     },
     {
-      "start": 269.81,
-      "end": 269.81,
-      "text": " ---  Hy vọng bài giảng này giúp bạn hiểu rõ hơn về Build Analytics và tầm quan trọng của nó trong phát triển phần mềm."
+      "start": 248.26,
+      "end": 259.72,
+      "text": " Câu hỏi và thảo luận Bạn đã từng gặp phải những vấn đề gì trong quá trình build phần mềm Bạn nghĩ Build Analytics có thể giúp gì trong dự án hiện tại của mình",
+      "previousSilenceDuration": 1.3000000000000114,
+      "nextSilenceDuration": 0.5799999999999841,
+      "duration": 10.160000000000025,
+      "previousToNextRatio": 0.44615384615383
     },
     {
-      "start": 269.81,
-      "end": 269.81,
-      "text": " Nếu có câu hỏi nào,"
+      "start": 259.72,
+      "end": 265.84,
+      "text": " Hy vọng bài giảng này giúp bạn hiểu rõ hơn về Build Analytics và tầm quan trọng của nó trong phát triển phần",
+      "previousSilenceDuration": 0.5799999999999841,
+      "nextSilenceDuration": 1.420000000000016,
+      "duration": 5.539999999999964,
+      "previousToNextRatio": 2.4482758620690603
     },
     {
-      "start": 269.81,
-      "end": 269.81,
-      "text": " hãy thoải mái thảo luận."
+      "start": 265.84,
+      "end": 269.72,
+      "text": " mềm Nếu có câu hỏi nào hãy thoải mái thảo luận ",
+      "previousSilenceDuration": 1.420000000000016,
+      "duration": 2.4600000000000364,
+      "previousToNextRatio": 0
     }
   ],
   "returnValue": null

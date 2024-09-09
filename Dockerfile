@@ -26,5 +26,6 @@ RUN which jest || npm install -g jest
 COPY audio.json .
 COPY alignment.js .
 COPY getAlignedSubtitle.js .
+COPY src src
 # RUN node /workspace/alignment.js
 
