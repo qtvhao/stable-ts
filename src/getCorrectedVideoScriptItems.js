@@ -1,6 +1,19 @@
 let synthesizeAudio = require('./synthesizeAudio.js');
 let getSegmentsForVideoScriptItem = require('./getSegmentsForVideoScriptItem.js');
-function cutAudioFromTimestamp(audioFile, _timestamp) {
+let child_process = require('child_process');
+let path = require('path');
+function cutAudioFromTimestamp(audioFile, timestamp) {
+    let cutAudioFile = path.join(__dirname, 'cut_' + timestamp + '.mp3');
+    child_process.execFileSync('ffmpeg', [
+        '-i', audioFile,
+        '-ss', timestamp,
+        '-c', 'copy',
+        '-y',
+        cutAudioFile,
+    ], {
+        stdio: 'inherit',
+    });
+
     return audioFile;
 }
 async function getCorrectedVideoScriptItems(videoScript, audioFile) {
@@ -17,6 +30,7 @@ async function getCorrectedVideoScriptItems(videoScript, audioFile) {
         segments = segments.slice(videoScriptItem.aligned.length);
         correctedVideoScript.push(videoScriptItem);
     }
+    // console.log('correctedVideoScript', correctedVideoScript);
 
     return {
         audioLeft: cutAudioFromTimestamp(audioFile, cutAudioFrom),
