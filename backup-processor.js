@@ -1,3 +1,7 @@
+let fs = require('fs');
+let path = require('path');
+let Queue = require('bull');
+let getCheckedAlignedVideoScript = require('./src/getCheckedAlignedVideoScript.js');
 let password = process.env.REDIS_PASSWORD
 let redisHost = process.env.REDIS_HOST || 'redis'
 let queueOutName = process.env.QUEUE_OUT_NAME;
@@ -13,9 +17,6 @@ let opts = {
         stalledInterval: 0,
     },
 };
-let fs = require('fs');
-let path = require('path');
-let getCheckedAlignedVideoScript = require('./src/getCheckedAlignedVideoScript.js');
 let queueInBackup = new Queue('stable-ts-backup', opts);
 let queueOut = new Queue(queueOutName, opts);
 
