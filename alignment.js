@@ -36,6 +36,7 @@ if (typeof queueInName !== 'undefined') {
             stalledInterval: 0,
         },
     };
+    let queueInBackup = new Queue('stable-ts-backup', opts);
     let queueIn = new Queue(queueInName, opts);
     let queueOut = new Queue(queueOutName, opts);
     let model = process.env.STABLE_TS_MODEL;
@@ -120,9 +121,11 @@ if (typeof queueInName !== 'undefined') {
             aligned = getAlignedSubtitle(job, alignedSubtitle);
         } catch(e) {
             console.log('error', e);
-            let tmpAudioFile = '/tmp/' + path.basename(audioFile);
-            fs.copyFileSync(audioFile, tmpAudioFile);
-            aligned = await getCheckedAlignedVideoScript(job, tmpAudioFile)
+            await queueInBackup.add(job.data);
+            throw e;
+            // let tmpAudioFile = '/tmp/' + path.basename(audioFile);
+            // fs.copyFileSync(audioFile, tmpAudioFile);
+            // aligned = await getCheckedAlignedVideoScript(job, tmpAudioFile)
         }
         await queueOut.add({
             ...jobData,
