@@ -21,9 +21,9 @@ async function getCheckedAlignedVideoScript(job, audioFile) {
         throw new Error('The last video script item start and end are the same. This is not allowed. Start: ' + lastVideoScriptItem_Start + ', End: ' + lastVideoScriptItem_End);
     } else {
         console.log('All aligned');
-        console.log('videoScript', job.data.videoScript.map(x => {
-            return x.aligned.map(x => x.text).join(' ');
-        }).join('\n'.repeat(5)))
+        // console.log('videoScript', job.data.videoScript.map(x => {
+        //     return x.aligned.map(x => x.text).join(' ');
+        // }).join('\n'.repeat(5)))
     }
 
     return job.data.videoScript;

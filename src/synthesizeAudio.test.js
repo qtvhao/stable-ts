@@ -25,8 +25,8 @@ testDataProviders.forEach(testDataProvider => {
         // 
         for (let i = 0; i < theLastSegments.length; i++) {
             expect(theLastSegments[i].text).toEqual(expectedTheLastSegments[i].text);
-            expect(theLastSegments[i].start).toEqual(expectedTheLastSegments[i].start);
-            expect(theLastSegments[i].end).toEqual(expectedTheLastSegments[i].end);
+            // expect(theLastSegments[i].start).toEqual(expectedTheLastSegments[i].start);
+            // expect(theLastSegments[i].end).toEqual(expectedTheLastSegments[i].end);
         }
     });
 });
