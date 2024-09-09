@@ -1,7 +1,7 @@
 let getCheckedAlignedVideoScript = require('./getCheckedAlignedVideoScript.js');
 let testDataProviders = [
     "1.json",
-    // "2.json",
+    "2.json",
     // "3.json",
     // "4.json",
     // "5.json",

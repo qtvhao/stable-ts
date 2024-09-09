@@ -72,7 +72,7 @@ async function synthesizeAudio(audioFile, videoScript) {
 
         return removeSpecialCharacters(text);
     }).join('\n\n');
-    let djb2Hash = djb2(alignTxtContent + ' ' + model + ' ' + language);
+    let djb2Hash = djb2(alignTxtContent + ' ' + model + ' ' + language + ' ' + audioFile);
     let outputFile = path.join(alignOutputDir, 'output-' + djb2Hash + '.json');
     if (fs.existsSync(outputFile)) {
         let outputFileContent = fs.readFileSync(outputFile, 'utf8');

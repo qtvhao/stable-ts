@@ -1,19 +1,8 @@
-let child_process = require('child_process');
 let alignRegressionVideoScript = require('./alignRegressionVideoScript.js');
+let convertAudioFileMp3 = require('./convertAudioFileMp3.js')
 
 async function getCheckedAlignedVideoScript(job, audioFile) {
-    // convert to mp3
-    let audioFileMp3 = audioFile.replace('.aac', '.mp3');
-    child_process.execFileSync('ffmpeg', [
-        '-i', audioFile,
-        '-c:a', 'libmp3lame',
-        '-b:a', '192k',
-        '-y',
-        audioFileMp3,
-    ], {
-        stdio: 'ignore', // 'inherit' or 'pipe' or 'ignore'
-    });
-    audioFile = audioFileMp3;
+    audioFile = convertAudioFileMp3(audioFile);
 
     job.data.videoScript = await alignRegressionVideoScript(job.data.videoScript, audioFile);
     let lastVideoScriptItem = job.data.videoScript.slice(-1)[0];
