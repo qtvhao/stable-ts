@@ -27,14 +27,20 @@ async function getCorrectedVideoScriptItems(videoScript, audioFile) {
             break;
         }
         cutAudioFrom = videoScriptItem.aligned.slice(-1)[0].end;
-        segments = segments.slice(videoScriptItem.aligned.length);
+        segments = segments.slice(videoScriptItem.aligned.length - 1);
         correctedVideoScript.push(videoScriptItem);
     }
     // console.log('correctedVideoScript', correctedVideoScript);
     let remainingVideoScriptCount = videoScript.length - correctedVideoScript.length;
+    let audioLeft;
+    if (remainingVideoScriptCount === 0) {
+        audioLeft = false
+    } else {
+        audioLeft = cutAudioFromTimestamp(audioFile, cutAudioFrom, remainingVideoScriptCount);
+    }
 
     return {
-        audioLeft: cutAudioFromTimestamp(audioFile, cutAudioFrom, remainingVideoScriptCount),
+        audioLeft: audioLeft,
         correctedVideoScriptItems: correctedVideoScript
     };
 }

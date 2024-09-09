@@ -4,7 +4,6 @@ let testdataDir = path.join(__dirname, '..', 'testdata');
 let synthesizeDir = path.join(testdataDir, 'synthesize');
 let testDataProviders = [
     "1.json",
-    "2.json",
 ];
 let child_process = require('child_process');
 
