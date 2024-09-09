@@ -25,6 +25,7 @@ RUN mkdir -p /workspace/align-input/ /workspace/align-output/
 
 COPY audio.json .
 COPY alignment.js .
+COPY backup-processor.js .
 COPY getAlignedSubtitle.js .
 COPY src src
 # RUN node /workspace/alignment.js
