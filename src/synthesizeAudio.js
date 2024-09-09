@@ -1,6 +1,7 @@
 let path = require('path');
 let fs = require('fs');
 let child_process = require('child_process');
+let removeSpecialCharacters = require('./removeSpecialCharacters.js');
 
 function djb2(str) {
     let hash = 5381;
@@ -64,13 +65,12 @@ function postprocessSegments(segments) {
 
     return segments;
 }
-
 async function synthesizeAudio(audioFile, videoScript) {
     let alignTxtContent = videoScript.map(x => {
         let text = x.text.trim();
         text = text.replace(/\.$/, '') + '.';
 
-        return text;
+        return removeSpecialCharacters(text);
     }).join('\n\n');
     let djb2Hash = djb2(alignTxtContent + ' ' + model + ' ' + language);
     let outputFile = path.join(alignOutputDir, 'output-' + djb2Hash + '.json');
