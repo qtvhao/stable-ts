@@ -7,6 +7,7 @@ console.log('='.repeat(350));
 let queueInName = process.env.QUEUE_IN_NAME;
 let queueOutName = process.env.QUEUE_OUT_NAME;
 let {getAlignedSubtitle} = require('./getAlignedSubtitle.js');
+let waitQueueToHaveWaitingCount = require('./src/waitQueueToHaveWaitingCount.js');
 const path = require('path');
 function removePunctuation(text) {
     return text.replace(/[-,\?,\!,\:,\;,\n*]/g, ' ').replace(/\s+/g, ' ');
@@ -41,6 +42,7 @@ if (typeof queueInName !== 'undefined') {
     let model = process.env.STABLE_TS_MODEL;
     let language = process.env.STABLE_TS_LANGUAGE;
     queueIn.process(async job => {
+        await waitQueueToHaveWaitingCount(queueOut, 0, job);
         let queueOutJobCounts = await queueOut.getJobCounts();
         while (queueOutJobCounts.waiting > 10) {
             console.log('queueOut is busy, wait 10 seconds');

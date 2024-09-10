@@ -1,6 +1,7 @@
 let fs = require('fs');
 let path = require('path');
 let Queue = require('bull');
+let waitQueueToHaveWaitingCount = require('./src/waitQueueToHaveWaitingCount.js');
 let getCheckedAlignedVideoScript = require('./src/getCheckedAlignedVideoScript.js');
 let password = process.env.REDIS_PASSWORD
 let redisHost = process.env.REDIS_HOST || 'redis'
@@ -21,6 +22,7 @@ let queueInBackup = new Queue('stable-ts-backup', opts);
 let queueOut = new Queue(queueOutName, opts);
 
 queueInBackup.process(async (job) => {
+    await waitQueueToHaveWaitingCount(queueOut, 0, job);
     let jobData = job.data;
     let audioFile = jobData.audioFile;
     let tmpAudioFile = '/tmp/' + path.basename(audioFile);
