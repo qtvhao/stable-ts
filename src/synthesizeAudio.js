@@ -19,6 +19,7 @@ function postprocessSegments(segments) {
     segments = segments.map((segment, i, self) => {
         if (i === 0) {
             return {
+                words: segment.words,
                 start: segment.start,
                 end: segment.end,
                 text: segment.text,
@@ -26,6 +27,7 @@ function postprocessSegments(segments) {
             }
         }
         return {
+            words: segment.words,
             start: segment.start,
             end: segment.end,
             text: segment.text,
@@ -99,7 +101,7 @@ async function synthesizeAudio(audioFile, videoScript) {
     });
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
     alignedSubtitle.segments = alignedSubtitle.segments.map(x => {
-        delete x.words;
+        // delete x.words;
         delete x.tokens;
         delete x.avg_logprob;
         delete x.compression_ratio;
