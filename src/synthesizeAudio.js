@@ -102,6 +102,13 @@ async function synthesizeAudio(audioFile, videoScript) {
     let alignedSubtitle = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
     alignedSubtitle.segments = alignedSubtitle.segments.map(x => {
         // delete x.words;
+        x.words = x.words.map(y => {
+            return {
+                start: y.start,
+                end: y.end,
+                word: y.word,
+            };
+        });
         delete x.tokens;
         delete x.avg_logprob;
         delete x.compression_ratio;

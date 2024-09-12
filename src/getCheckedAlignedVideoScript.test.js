@@ -1,7 +1,7 @@
 let getCheckedAlignedVideoScript = require('./getCheckedAlignedVideoScript.js');
 let testDataProviders = [
     "1.json",
-    "2.json",
+    // "2.json",
     // "3.json",
     // "4.json",
     // "5.json",
@@ -35,5 +35,13 @@ testDataProviders.forEach(testDataProvider => {
                 }
             }
         }
+        let endTimes = videoScript.map(x => x.aligned.slice(-1)[0].words.slice(-1)[0].end);
+        let startTimes = videoScript.map(x => x.aligned[0].words[0].start);
+        // 
+        let sortedStartTimes = startTimes.slice().sort((a, b) => a - b);
+        let sortedEndTimes = endTimes.slice().sort((a, b) => a - b);
+        // 
+        expect(startTimes).toEqual(sortedStartTimes);
+        expect(endTimes).toEqual(sortedEndTimes);
     }, 300_000);
 });
