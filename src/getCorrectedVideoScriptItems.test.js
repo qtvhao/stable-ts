@@ -23,7 +23,7 @@ testDataProviders.forEach(testDataProvider => {
             let correctedVideoScriptItem = correctedVideoScriptItems[i];
             let text = correctedVideoScriptItem.text;
             let aligned = correctedVideoScriptItem.aligned;
-            console.log(JSON.stringify(correctedVideoScriptItems[i], null, 2));
+            // console.log(JSON.stringify(correctedVideoScriptItems[i], null, 2));
         }
     });
 });

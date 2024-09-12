@@ -42,6 +42,17 @@ async function getCorrectedVideoScriptItems(videoScript, audioFile, zeroIndexSta
     correctedVideoScript = correctedVideoScript.map((correctedVideoScriptItem) => {
         let aligned = correctedVideoScriptItem.aligned;
         aligned = aligned.map((segment) => {
+            let words = segment.words.map((word) => {
+                let start = zeroIndexStartTime + word.start;
+                let end = zeroIndexStartTime + word.end;
+                end = Math.round(end * 1000) / 1000;
+                start = Math.round(start * 1000) / 1000;
+                return {
+                    ...word,
+                    start,
+                    end,
+                };
+            });
             let start = zeroIndexStartTime + segment.start;
             let end = zeroIndexStartTime + segment.end;
             end = Math.round(end * 1000) / 1000;
@@ -50,6 +61,7 @@ async function getCorrectedVideoScriptItems(videoScript, audioFile, zeroIndexSta
                 ...segment,
                 start,
                 end,
+                words,
             };
         });
 

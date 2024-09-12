@@ -12,6 +12,16 @@ let testDataProviders = [
     // "10.json",
 ]
 
+function checkStartTimesAndEndTimes(startTimes, endTimes) {
+    let sortedStartTimes = startTimes.slice().sort((a, b) => a - b);
+    let sortedEndTimes = endTimes.slice().sort((a, b) => a - b);
+    // 
+    expect(startTimes).toEqual(sortedStartTimes);
+    expect(endTimes).toEqual(sortedEndTimes);
+    // console.log('startTimes', startTimes);
+    // console.log('endTimes', endTimes);
+}
+
 testDataProviders.forEach(testDataProvider => {
     test(`getCheckedAlignedVideoScript ${testDataProvider}`, async () => {
         let job = require(`../testdata/${testDataProvider}`);
@@ -37,13 +47,9 @@ testDataProviders.forEach(testDataProvider => {
         }
         let endTimes = videoScript.map(x => x.aligned.slice(-1)[0].words.slice(-1)[0].end);
         let startTimes = videoScript.map(x => x.aligned[0].words[0].start);
-        // 
-        let sortedStartTimes = startTimes.slice().sort((a, b) => a - b);
-        let sortedEndTimes = endTimes.slice().sort((a, b) => a - b);
-        // 
-        expect(startTimes).toEqual(sortedStartTimes);
-        expect(endTimes).toEqual(sortedEndTimes);
-        console.log('startTimes', startTimes);
-        console.log('endTimes', endTimes);
+        checkStartTimesAndEndTimes(startTimes, endTimes);
+        endTimes = videoScript.map(x => x.end);
+        startTimes = videoScript.map(x => x.start);
+        checkStartTimesAndEndTimes(startTimes, endTimes);
     }, 300_000);
 });
