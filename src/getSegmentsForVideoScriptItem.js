@@ -28,9 +28,9 @@ function getSegmentsForVideoScriptItem(videoScriptItem, segments) {
             levenshteinDistance: Infinity,
             segmentsFromStart: [],
         });
-    if (0 === bestMatchSegment.segmentsFromStart.length) {
-        throw new Error('No aligned segments for video script item.');
-    }
+    // if (0 === bestMatchSegment.segmentsFromStart.length) {
+    //     throw new Error('No aligned segments for video script item.');
+    // }
 
     return bestMatchSegment.segmentsFromStart;
 }
