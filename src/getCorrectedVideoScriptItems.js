@@ -1,3 +1,4 @@
+let removeSpecialCharacters = require('./removeSpecialCharacters.js');
 let synthesizeAudio = require('./synthesizeAudio.js');
 let getSegmentsForVideoScriptItem = require('./getSegmentsForVideoScriptItem.js');
 let child_process = require('child_process');
@@ -26,11 +27,31 @@ async function getCorrectedVideoScriptItems(videoScript, audioFile, zeroIndexSta
         if (i > 1) {
             break;
         }
+        if (videoScriptItem.aligned.length === 0) {
+            // break;
+        }
         cutAudioFrom = videoScriptItem.aligned.slice(-1)[0].end;
         segments = segments.slice(videoScriptItem.aligned.length - 1);
+        let text = removeSpecialCharacters(videoScriptItem.text).trim();
+        let aligned = videoScriptItem.aligned;
+        let firstSegment = aligned[0];
+        let lastSegment = aligned.slice(-1)[0];
+        // 
+        let firstSegment_5Words = firstSegment.words.slice(0, 5).map(x => x.word).join('').trim();
+        let lastSegment_5Words = lastSegment.words.slice(-5).map(x => x.word).join('').trim();
+        // 
+        let alignedWords = aligned.map(x => x.text).join(' ').trim();
+        // console.log('='.repeat(10), alignedWords, '='.repeat(10), firstSegment_5Words, '='.repeat(10), text, '='.repeat(10), lastSegment_5Words);
+        // 
+        if (firstSegment_5Words !== text.slice(0, firstSegment_5Words.length).trim()) {
+            // throw new Error('firstSegment_5Words !== text.slice(0, firstSegment_5Words.length).trim()');
+        }
+        if (lastSegment_5Words !== text.slice(-lastSegment_5Words.length).trim()) {
+            // throw new Error('lastSegment_5Words !== text.slice(-lastSegment_5Words.length).trim()');
+        }
         correctedVideoScript.push(videoScriptItem);
     }
-    // console.log('correctedVideoScript', correctedVideoScript);
+
     let remainingVideoScriptCount = videoScript.length - correctedVideoScript.length;
     let audioLeft;
     if (remainingVideoScriptCount === 0) {
