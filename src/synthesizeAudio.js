@@ -15,6 +15,18 @@ let model = process.env.STABLE_TS_MODEL || 'tiny';
 let language = process.env.STABLE_TS_LANGUAGE || 'vi';
 let alignOutputDir = path.join(__dirname, '..', 'align-output');
 function postprocessSegments(segments) {
+    segments = segments.map((segment) => {
+        let start = segment.start;
+        let end = segment.end;
+        start = Math.round(start * 1000) / 1000;
+        end = Math.round(end * 1000) / 1000;
+
+        return {
+            ...segment,
+            start,
+            end,
+        };
+    });
     // set previous silence duration
     segments = segments.map((segment, i, self) => {
         if (i === 0) {
@@ -48,6 +60,8 @@ function postprocessSegments(segments) {
     segments = segments.map((segment) => {
         let previousSilenceDuration = segment.previousSilenceDuration || 0;
         let nextSilenceDuration = segment.nextSilenceDuration || 0;
+        let previousToNextRatio = nextSilenceDuration / previousSilenceDuration;
+        previousToNextRatio = Math.round(previousToNextRatio * 1000) / 1000;
         return {
             ...segment,
             duration: segment.end - segment.start,
