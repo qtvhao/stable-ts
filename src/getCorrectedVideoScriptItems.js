@@ -23,31 +23,33 @@ async function getCorrectedVideoScriptItems(videoScript, audioFile, zeroIndexSta
     let cutAudioFrom = 0;
     for (let i = 0; i < videoScript.length; i++) {
         let videoScriptItem = videoScript[i];
-        videoScriptItem.aligned = getSegmentsForVideoScriptItem(videoScriptItem, segments);
-        if (i > 1) {
-            break;
-        }
-        if (videoScriptItem.aligned.length === 0) {
-            // break;
+        let isTheLastVideoScriptItem = i === videoScript.length - 1;
+        if (isTheLastVideoScriptItem) {
+            console.log('segment', segments);
+            videoScriptItem.aligned = segments;
+        }else{
+            videoScriptItem.aligned = getSegmentsForVideoScriptItem(videoScriptItem, segments);
         }
         cutAudioFrom = videoScriptItem.aligned.slice(-1)[0].end;
-        segments = segments.slice(videoScriptItem.aligned.length - 1);
+        segments = segments.slice(videoScriptItem.aligned.length);
         let text = removeSpecialCharacters(videoScriptItem.text).trim();
         let aligned = videoScriptItem.aligned;
         let firstSegment = aligned[0];
         let lastSegment = aligned.slice(-1)[0];
         // 
         let firstSegment_5Words = firstSegment.words.slice(0, 5).map(x => x.word).join('').trim();
-        let lastSegment_5Words = lastSegment.words.slice(-5).map(x => x.word).join('').trim();
+        let lastSegment_5Words = lastSegment.words.slice(-5).map(x => x.word).join('').trim().replace(/\.$/, ' ').trim();
         // 
         let alignedWords = aligned.map(x => x.text).join(' ').trim();
-        // console.log('='.repeat(10), alignedWords, '='.repeat(10), firstSegment_5Words, '='.repeat(10), text, '='.repeat(10), lastSegment_5Words);
+        let console_log = (['='.repeat(10), alignedWords, '='.repeat(10), firstSegment_5Words, '='.repeat(10) + ' text: ', text, '='.repeat(10), lastSegment_5Words]).join(' ');
         // 
         if (firstSegment_5Words !== text.slice(0, firstSegment_5Words.length).trim()) {
-            // throw new Error('firstSegment_5Words !== text.slice(0, firstSegment_5Words.length).trim()');
+            console.log(console_log);
+            throw new Error('firstSegment_5Words !== text.slice(0, firstSegment_5Words.length).trim()');
         }
         if (lastSegment_5Words !== text.slice(-lastSegment_5Words.length).trim()) {
-            // throw new Error('lastSegment_5Words !== text.slice(-lastSegment_5Words.length).trim()');
+            console.log(console_log);
+            throw new Error('lastSegment_5Words !== text.slice(-lastSegment_5Words.length).trim()');
         }
         correctedVideoScript.push(videoScriptItem);
     }
