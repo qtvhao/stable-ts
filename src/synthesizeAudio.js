@@ -84,9 +84,9 @@ function postprocessSegments(segments) {
 async function synthesizeAudio(audioFile, videoScript) {
     let alignTxtContent = videoScript.map(x => {
         let text = x.text.trim();
-        text = text.replace(/\.$/, '') + '.';
+        text = removeSpecialCharacters(text).replace(/\.$/, ' ').trim() + '.';
 
-        return removeSpecialCharacters(text);
+        return text;
     }).join('\n\n');
     let djb2Hash = djb2(alignTxtContent + ' ' + model + ' ' + language + ' ' + audioFile);
     let outputFile = path.join(alignOutputDir, 'output-' + djb2Hash + '.json');
