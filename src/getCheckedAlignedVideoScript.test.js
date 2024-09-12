@@ -1,4 +1,5 @@
 let getCheckedAlignedVideoScript = require('./getCheckedAlignedVideoScript.js');
+let removeSpecialCharacters = require('./removeSpecialCharacters.js');
 let testDataProviders = [
     "1.json",
     // "2.json",
@@ -33,6 +34,18 @@ testDataProviders.forEach(testDataProvider => {
         expect(videoScript.length).toBe(job.data.videoScript.length);
         for (let i = 0; i < videoScript.length; i++) {
             let aligned = videoScript[i].aligned;
+            let text = removeSpecialCharacters(videoScript[i].text).trim();
+            let firstSegment = aligned[0];
+            let lastSegment = aligned.slice(-1)[0];
+            // 
+            let firstSegment_5Words = firstSegment.words.slice(0, 5).map(x => x.word).join('').trim();
+            let lastSegment_5Words = lastSegment.words.slice(-5).map(x => x.word).join('').trim();
+            // 
+            console.log('firstSegment', firstSegment_5Words);
+            console.log('lastSegment', lastSegment_5Words);
+            expect(firstSegment_5Words).toBe(text.slice(0, firstSegment_5Words.length).trim());
+            expect(lastSegment_5Words).toBe(text.slice(-lastSegment_5Words.length).trim());
+            // 
             for (let j = 0; j < aligned.length; j++) {
                 let words = aligned[j].words;
                 expect(words).toBeDefined();

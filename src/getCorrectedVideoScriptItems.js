@@ -36,7 +36,7 @@ async function getCorrectedVideoScriptItems(videoScript, audioFile, zeroIndexSta
     if (remainingVideoScriptCount === 0) {
         audioLeft = false
     } else {
-        audioLeft = cutAudioFromTimestamp(audioFile, cutAudioFrom, remainingVideoScriptCount);
+        audioLeft = cutAudioFromTimestamp(audioFile, cutAudioFrom, '' + zeroIndexStartTime);
     }
     // 
     correctedVideoScript = correctedVideoScript.map((correctedVideoScriptItem) => {
