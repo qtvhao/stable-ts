@@ -16,7 +16,7 @@ function cutAudioFromTimestamp(audioFile, timestamp, i) {
 
     return audioFile;
 }
-async function getCorrectedVideoScriptItems(videoScript, audioFile) {
+async function getCorrectedVideoScriptItems(videoScript, audioFile, zeroIndexStartTime) {
     let segments = await synthesizeAudio(audioFile, videoScript);
     let correctedVideoScript = [];
     let cutAudioFrom = 0;
