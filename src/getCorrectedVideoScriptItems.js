@@ -38,6 +38,39 @@ async function getCorrectedVideoScriptItems(videoScript, audioFile, zeroIndexSta
     } else {
         audioLeft = cutAudioFromTimestamp(audioFile, cutAudioFrom, remainingVideoScriptCount);
     }
+    // 
+    correctedVideoScript = correctedVideoScript.map((correctedVideoScriptItem) => {
+        let aligned = correctedVideoScriptItem.aligned;
+        aligned = aligned.map((segment) => {
+            let start = zeroIndexStartTime + segment.start;
+            let end = zeroIndexStartTime + segment.end;
+            end = Math.round(end * 1000) / 1000;
+            start = Math.round(start * 1000) / 1000;
+            return {
+                ...segment,
+                start,
+                end,
+            };
+        });
+
+        return {
+            ...correctedVideoScriptItem,
+            aligned: aligned,
+        };
+    });
+    correctedVideoScript = correctedVideoScript.map((correctedVideoScriptItem) => {
+        let aligned = correctedVideoScriptItem.aligned;
+        let firstSegment = aligned[0];
+        let lastSegment = aligned.slice(-1)[0];
+        let start = Math.round(firstSegment.start * 1000) / 1000;
+        let end = Math.round(lastSegment.end * 1000) / 1000;
+
+        return {
+            ...correctedVideoScriptItem,
+            start: start,
+            end: end,
+        };
+    });
 
     return {
         audioLeft: audioLeft,

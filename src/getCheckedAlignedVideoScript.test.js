@@ -43,5 +43,7 @@ testDataProviders.forEach(testDataProvider => {
         // 
         expect(startTimes).toEqual(sortedStartTimes);
         expect(endTimes).toEqual(sortedEndTimes);
+        console.log('startTimes', startTimes);
+        console.log('endTimes', endTimes);
     }, 300_000);
 });
