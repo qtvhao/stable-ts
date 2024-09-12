@@ -39,10 +39,10 @@ testDataProviders.forEach(testDataProvider => {
             let lastSegment = aligned.slice(-1)[0];
             // 
             let firstSegment_5Words = firstSegment.words.slice(0, 5).map(x => x.word).join('').trim();
-            let lastSegment_5Words = lastSegment.words.slice(-5).map(x => x.word).join('').trim();
+            let lastSegment_5Words = lastSegment.words.slice(-5).map(x => x.word).join('').trim().replace(/\.$/, ' ').trim();
             let alignedWords = aligned.map(x => x.text).join(' ').trim();
             // 
-            console.log('='.repeat(10), alignedWords, '='.repeat(10), firstSegment_5Words, '='.repeat(10), text, '='.repeat(10), lastSegment_5Words);
+            // console.log('='.repeat(10), alignedWords, '='.repeat(10), firstSegment_5Words, '='.repeat(10), text, '='.repeat(10), lastSegment_5Words);
             expect(firstSegment_5Words).toBe(text.slice(0, firstSegment_5Words.length).trim());
             expect(lastSegment_5Words).toBe(text.slice(-lastSegment_5Words.length).trim());
             // 

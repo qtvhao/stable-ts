@@ -25,13 +25,13 @@ async function getCorrectedVideoScriptItems(videoScript, audioFile, zeroIndexSta
         let videoScriptItem = videoScript[i];
         let isTheLastVideoScriptItem = i === videoScript.length - 1;
         if (isTheLastVideoScriptItem) {
-            console.log('segment', segments);
+            // console.log('segment', segments);
             videoScriptItem.aligned = segments;
         }else{
             videoScriptItem.aligned = getSegmentsForVideoScriptItem(videoScriptItem, segments);
+            cutAudioFrom = videoScriptItem.aligned.slice(-1)[0].end;
+            segments = segments.slice(videoScriptItem.aligned.length);
         }
-        cutAudioFrom = videoScriptItem.aligned.slice(-1)[0].end;
-        segments = segments.slice(videoScriptItem.aligned.length);
         let text = removeSpecialCharacters(videoScriptItem.text).trim();
         let aligned = videoScriptItem.aligned;
         let firstSegment = aligned[0];

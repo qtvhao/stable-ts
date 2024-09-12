@@ -5,6 +5,7 @@ function getLevenshteinDistance(text1, text2) {
 }
 
 function getSegmentsForVideoScriptItem(videoScriptItem, segments) {
+    // console.log('='.repeat(100));
     segments = segments.slice();
     segments = segments
         .map(x => {
@@ -32,10 +33,10 @@ function getSegmentsForVideoScriptItem(videoScriptItem, segments) {
         .reduce((best, current) => {
             let currentIsBetter = current.levenshteinDistance < best.levenshteinDistance;
             if (currentIsBetter) {
-                console.log(
-                    current.videoScriptItemTextSliced, '='.repeat(10),
-                    current.segmentsFromStartTextSliced, '='.repeat(10), 
-                    current.levenshteinDistance);
+                // console.log(
+                //     current.videoScriptItemTextSliced, '='.repeat(10),
+                //     current.segmentsFromStartTextSliced, '='.repeat(10), 
+                //     current.levenshteinDistance);
             }
 
             return currentIsBetter ? current : best;
