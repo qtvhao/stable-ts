@@ -17,6 +17,7 @@ function cutAudioFromTimestamp(audioFile, timestamp, i) {
 
     return audioFile;
 }
+let levenshtein = require('fast-levenshtein');
 async function getCorrectedVideoScriptItems(videoScript, audioFile, zeroIndexStartTime) {
     let segments = await synthesizeAudio(audioFile, videoScript);
     let correctedVideoScript = [];
@@ -33,32 +34,28 @@ async function getCorrectedVideoScriptItems(videoScript, audioFile, zeroIndexSta
             segments = segments.slice(videoScriptItem.aligned.length);
         }
         let text = removeSpecialCharacters(videoScriptItem.text).trim();
-        let textFromOffset1 = text.slice(1);
-        let textFromOffset2 = text.slice(2);
         let aligned = videoScriptItem.aligned;
-        let firstSegment = aligned[0];
-        let lastSegment = aligned.slice(-1)[0];
-        let nearLastSegment = aligned.slice(-2)[0];
-        // 
-        let firstSegment_5Words = firstSegment.words.slice(0, 5).map(x => x.word).join('').trim();
-        let lastSegment_5Words = lastSegment.words.slice(-5).map(x => x.word).join('').trim().replace(/\.$/, ' ').trim();
-        let nearLastSegment_5Words = nearLastSegment.words.slice(-5).map(x => x.word).join('').trim().replace(/\.$/, ' ').trim();
-        // 
-        let alignedWords = aligned.map(x => x.text).join(' ').trim();
+        // // 
+        let accAligned = aligned.reduce((acc, segment) => { return [...acc, ...segment.words.map(x => x.word)] }, []);
+        let firstSegment_5Words = accAligned.slice(0, 15).join('').trim();
+        let lastSegment_5Words = accAligned.slice(-15).join('').trim().replace(/\.$/, ' ').trim();
+        // // 
         let log = ([
-            '='.repeat(10), alignedWords,
+            // '='.repeat(10), alignedWords,
             '='.repeat(10), firstSegment_5Words,
             '='.repeat(10) + ' text: ', text, 
             '='.repeat(10), lastSegment_5Words,
-            '='.repeat(10), nearLastSegment_5Words,
+            // '='.repeat(10), nearLastSegment_5Words,
         ]).join(' ');
         // 
-        if (firstSegment_5Words !== text.slice(0, firstSegment_5Words.length).trim() && firstSegment_5Words !== textFromOffset1.slice(0, firstSegment_5Words.length).trim() && firstSegment_5Words !== textFromOffset2.slice(0, firstSegment_5Words.length).trim()) {
-            console.log(log);
+        let aEnd = levenshtein.get(firstSegment_5Words, text.slice(0, firstSegment_5Words.length).trim()) / firstSegment_5Words.length;
+        let zEnd = levenshtein.get(lastSegment_5Words, text.slice(-lastSegment_5Words.length).trim()) / lastSegment_5Words.length;
+        if (aEnd > 0.2) { // lower is better
+            console.log(log, '=', aEnd);
             throw new Error('firstSegment_5Words !== text.slice(0, firstSegment_5Words.length).trim()');
         }
-        if (lastSegment_5Words !== text.slice(-lastSegment_5Words.length).trim() && nearLastSegment_5Words !== text.slice(-nearLastSegment_5Words.length).trim()) {
-            console.log(log);
+        if (zEnd > 0.2) { // lower is better
+            console.log(log, '=', zEnd);
             throw new Error('lastSegment_5Words !== text.slice(-lastSegment_5Words.length).trim()');
         }
         correctedVideoScript.push(videoScriptItem);
