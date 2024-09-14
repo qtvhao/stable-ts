@@ -1,0 +1,72 @@
+{
+  "data": {
+    "article": {
+      "parentCategory": {
+        "parentCategory": {
+          "parentCategory": {
+            "parentCategory": {
+              "depth": 0
+            },
+            "name": "Health",
+            "depth": 1
+          },
+          "name": "Health Technology",
+          "depth": 2,
+          "priority": 211
+        },
+        "name": "Health Wearables",
+        "depth": 3,
+        "priority": 303
+      },
+      "name": "Glucose Monitors",
+      "depth": 4,
+      "priority": 406,
+      "addedBy": "context-depth-4"
+    },
+    "audioFile": "/app/storage/audio/synthesize-result-2769856186.aac",
+    "videoScript": [
+      {
+        "headings": [
+          "1. Glucose Monitors là gì?"
+        ],
+        "text": "#### 1. **Glucose Monitors là gì?**\n**Glucose Monitors** (Thiết bị theo dõi đường huyết) là những thiết bị y tế giúp đo mức độ glucose (đường) trong máu của bạn. Glucose là một loại đường mà cơ thể sử dụng làm năng lượng, và việc duy trì mức glucose ổn định rất quan trọng cho sức khỏe, đặc biệt đối với những người mắc bệnh tiểu đường."
+      },
+      {
+        "headings": [
+          "2. Vì sao cần theo dõi mức đường huyết?"
+        ],
+        "text": "#### 2. **Vì sao cần theo dõi mức đường huyết?**\n- **Tiểu đường** là một bệnh lý ảnh hưởng đến cách cơ thể xử lý glucose. Những người mắc bệnh tiểu đường phải kiểm soát mức glucose của họ chặt chẽ để tránh các biến chứng nguy hiểm như:\n  - Tổn thương thận\n  - Các vấn đề về tim mạch\n  - Tổn thương thần kinh\n- **Theo dõi mức đường huyết** giúp người bệnh điều chỉnh chế độ ăn uống, sử dụng thuốc và lối sống hàng ngày để giữ đường huyết trong mức an toàn."
+      },
+      {
+        "headings": [
+          "3. Các loại Glucose Monitors phổ biến"
+        ],
+        "text": "#### 3. **Các loại Glucose Monitors phổ biến**\nHiện nay có hai loại thiết bị phổ biến giúp theo dõi đường huyết:\n**a) Máy đo đường huyết truyền thống**  \n- **Cách hoạt động:** Bạn cần dùng một kim chích nhỏ để lấy một giọt máu từ đầu ngón tay, sau đó nhỏ giọt máu này lên que thử. Máy sẽ đọc và hiển thị kết quả mức glucose.\n- **Ưu điểm:** Chi phí thấp, độ chính xác cao.\n- **Nhược điểm:** Đòi hỏi chích máu nhiều lần trong ngày, gây khó chịu cho người sử dụng.\n**b) Thiết bị theo dõi đường huyết liên tục (CGM - Continuous Glucose Monitor)**  \n- **Cách hoạt động:** CGM sử dụng một cảm biến nhỏ đặt dưới da để theo dõi liên tục mức glucose trong dịch kẽ (khu vực giữa các tế bào). Cảm biến này truyền dữ liệu đến thiết bị cầm tay hoặc điện thoại thông minh.\n- **Ưu điểm:** Không cần chích máu liên tục, cung cấp dữ liệu theo thời gian thực suốt cả ngày.\n- **Nhược điểm:** Chi phí cao hơn và cần thay cảm biến định kỳ."
+      },
+      {
+        "headings": [
+          "4. Lợi ích của việc sử dụng Glucose Monitors"
+        ],
+        "text": "#### 4. **Lợi ích của việc sử dụng Glucose Monitors**\n- **Kiểm soát tốt hơn**: Glucose Monitors giúp theo dõi đường huyết thường xuyên, từ đó đưa ra quyết định kịp thời để điều chỉnh chế độ ăn, hoạt động thể dục hoặc liều insulin (đối với bệnh nhân tiểu đường).\n- **Cảnh báo nguy hiểm**: Một số CGM có chức năng cảnh báo khi mức glucose lên quá cao hoặc xuống quá thấp, giúp ngăn chặn tình trạng nguy hiểm như hạ đường huyết hoặc tăng đường huyết.\n- **Tiện lợi và dễ sử dụng**: Các thiết bị ngày càng được cải tiến để thân thiện với người dùng, nhỏ gọn và tiện lợi, có thể kết nối với điện thoại để xem và theo dõi dữ liệu mọi lúc mọi nơi."
+      },
+      {
+        "headings": [
+          "5. Ai nên sử dụng Glucose Monitors?"
+        ],
+        "text": "#### 5. **Ai nên sử dụng Glucose Monitors?**\n- **Người mắc bệnh tiểu đường tuýp 1**: Vì cơ thể không sản xuất insulin, họ cần theo dõi glucose liên tục để điều chỉnh insulin phù hợp.\n- **Người mắc bệnh tiểu đường tuýp 2**: Dù họ vẫn sản xuất insulin, cơ thể không sử dụng insulin hiệu quả, nên việc theo dõi cũng rất quan trọng.\n- **Những người có nguy cơ cao** mắc bệnh tiểu đường hoặc có vấn đề với mức glucose cũng có thể sử dụng thiết bị này để theo dõi và kiểm soát sức khỏe tốt hơn."
+      },
+      {
+        "headings": [
+          "6. Kết nối với công nghệ đeo thông minh"
+        ],
+        "text": "#### 6. **Kết nối với công nghệ đeo thông minh**\nNgày nay, **Glucose Monitors** còn có khả năng kết nối với các thiết bị đeo thông minh (Health Wearables) như đồng hồ thông minh, giúp bạn dễ dàng quản lý sức khỏe của mình. Những công nghệ này cung cấp thông tin chi tiết về mức glucose liên tục và giúp bạn theo dõi qua các ứng dụng di động, từ đó cải thiện thói quen hàng ngày của bạn."
+      },
+      {
+        "headings": [],
+        "text": "#### 7. **Kết luận**\nGlucose Monitors là công cụ không thể thiếu cho những người mắc bệnh tiểu đường và những ai muốn kiểm soát sức khỏe của mình tốt hơn. Với sự tiến bộ trong công nghệ, các thiết bị theo dõi đường huyết ngày càng tiện lợi, dễ sử dụng và thân thiện hơn với người dùng. Thói quen theo dõi mức glucose thường xuyên sẽ giúp bạn sống khỏe mạnh và giảm thiểu nguy cơ của các biến chứng liên quan đến tiểu đường"
+      }
+    ],
+    "responseText": "### Bài giảng về \"Glucose Monitors\" (Thiết bị theo dõi đường huyết)\n\n---\n\n#### 1. **Glucose Monitors là gì?**\n\n**Glucose Monitors** (Thiết bị theo dõi đường huyết) là những thiết bị y tế giúp đo mức độ glucose (đường) trong máu của bạn. Glucose là một loại đường mà cơ thể sử dụng làm năng lượng, và việc duy trì mức glucose ổn định rất quan trọng cho sức khỏe, đặc biệt đối với những người mắc bệnh tiểu đường.\n\n---\n\n#### 2. **Vì sao cần theo dõi mức đường huyết?**\n\n- **Tiểu đường** là một bệnh lý ảnh hưởng đến cách cơ thể xử lý glucose. Những người mắc bệnh tiểu đường phải kiểm soát mức glucose của họ chặt chẽ để tránh các biến chứng nguy hiểm như:\n  - Tổn thương thận\n  - Các vấn đề về tim mạch\n  - Tổn thương thần kinh\n\n- **Theo dõi mức đường huyết** giúp người bệnh điều chỉnh chế độ ăn uống, sử dụng thuốc và lối sống hàng ngày để giữ đường huyết trong mức an toàn.\n\n---\n\n#### 3. **Các loại Glucose Monitors phổ biến**\n\nHiện nay có hai loại thiết bị phổ biến giúp theo dõi đường huyết:\n\n**a) Máy đo đường huyết truyền thống**  \n- **Cách hoạt động:** Bạn cần dùng một kim chích nhỏ để lấy một giọt máu từ đầu ngón tay, sau đó nhỏ giọt máu này lên que thử. Máy sẽ đọc và hiển thị kết quả mức glucose.\n- **Ưu điểm:** Chi phí thấp, độ chính xác cao.\n- **Nhược điểm:** Đòi hỏi chích máu nhiều lần trong ngày, gây khó chịu cho người sử dụng.\n\n**b) Thiết bị theo dõi đường huyết liên tục (CGM - Continuous Glucose Monitor)**  \n- **Cách hoạt động:** CGM sử dụng một cảm biến nhỏ đặt dưới da để theo dõi liên tục mức glucose trong dịch kẽ (khu vực giữa các tế bào). Cảm biến này truyền dữ liệu đến thiết bị cầm tay hoặc điện thoại thông minh.\n- **Ưu điểm:** Không cần chích máu liên tục, cung cấp dữ liệu theo thời gian thực suốt cả ngày.\n- **Nhược điểm:** Chi phí cao hơn và cần thay cảm biến định kỳ.\n\n---\n\n#### 4. **Lợi ích của việc sử dụng Glucose Monitors**\n\n- **Kiểm soát tốt hơn**: Glucose Monitors giúp theo dõi đường huyết thường xuyên, từ đó đưa ra quyết định kịp thời để điều chỉnh chế độ ăn, hoạt động thể dục hoặc liều insulin (đối với bệnh nhân tiểu đường).\n  \n- **Cảnh báo nguy hiểm**: Một số CGM có chức năng cảnh báo khi mức glucose lên quá cao hoặc xuống quá thấp, giúp ngăn chặn tình trạng nguy hiểm như hạ đường huyết hoặc tăng đường huyết.\n\n- **Tiện lợi và dễ sử dụng**: Các thiết bị ngày càng được cải tiến để thân thiện với người dùng, nhỏ gọn và tiện lợi, có thể kết nối với điện thoại để xem và theo dõi dữ liệu mọi lúc mọi nơi.\n\n---\n\n#### 5. **Ai nên sử dụng Glucose Monitors?**\n\n- **Người mắc bệnh tiểu đường tuýp 1**: Vì cơ thể không sản xuất insulin, họ cần theo dõi glucose liên tục để điều chỉnh insulin phù hợp.\n  \n- **Người mắc bệnh tiểu đường tuýp 2**: Dù họ vẫn sản xuất insulin, cơ thể không sử dụng insulin hiệu quả, nên việc theo dõi cũng rất quan trọng.\n\n- **Những người có nguy cơ cao** mắc bệnh tiểu đường hoặc có vấn đề với mức glucose cũng có thể sử dụng thiết bị này để theo dõi và kiểm soát sức khỏe tốt hơn.\n\n---\n\n#### 6. **Kết nối với công nghệ đeo thông minh**\n\nNgày nay, **Glucose Monitors** còn có khả năng kết nối với các thiết bị đeo thông minh (Health Wearables) như đồng hồ thông minh, giúp bạn dễ dàng quản lý sức khỏe của mình. Những công nghệ này cung cấp thông tin chi tiết về mức glucose liên tục và giúp bạn theo dõi qua các ứng dụng di động, từ đó cải thiện thói quen hàng ngày của bạn.\n\n---\n\n#### 7. **Kết luận**\n\nGlucose Monitors là công cụ không thể thiếu cho những người mắc bệnh tiểu đường và những ai muốn kiểm soát sức khỏe của mình tốt hơn. Với sự tiến bộ trong công nghệ, các thiết bị theo dõi đường huyết ngày càng tiện lợi, dễ sử dụng và thân thiện hơn với người dùng. Thói quen theo dõi mức glucose thường xuyên sẽ giúp bạn sống khỏe mạnh và giảm thiểu nguy cơ của các biến chứng liên quan đến tiểu đường."
+  },
+  "returnValue": null
+}

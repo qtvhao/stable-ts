@@ -33,22 +33,32 @@ async function getCorrectedVideoScriptItems(videoScript, audioFile, zeroIndexSta
             segments = segments.slice(videoScriptItem.aligned.length);
         }
         let text = removeSpecialCharacters(videoScriptItem.text).trim();
+        let textFromOffset1 = text.slice(1);
+        let textFromOffset2 = text.slice(2);
         let aligned = videoScriptItem.aligned;
         let firstSegment = aligned[0];
         let lastSegment = aligned.slice(-1)[0];
+        let nearLastSegment = aligned.slice(-2)[0];
         // 
         let firstSegment_5Words = firstSegment.words.slice(0, 5).map(x => x.word).join('').trim();
         let lastSegment_5Words = lastSegment.words.slice(-5).map(x => x.word).join('').trim().replace(/\.$/, ' ').trim();
+        let nearLastSegment_5Words = nearLastSegment.words.slice(-5).map(x => x.word).join('').trim().replace(/\.$/, ' ').trim();
         // 
         let alignedWords = aligned.map(x => x.text).join(' ').trim();
-        let console_log = (['='.repeat(10), alignedWords, '='.repeat(10), firstSegment_5Words, '='.repeat(10) + ' text: ', text, '='.repeat(10), lastSegment_5Words]).join(' ');
+        let log = ([
+            '='.repeat(10), alignedWords,
+            '='.repeat(10), firstSegment_5Words,
+            '='.repeat(10) + ' text: ', text, 
+            '='.repeat(10), lastSegment_5Words,
+            '='.repeat(10), nearLastSegment_5Words,
+        ]).join(' ');
         // 
-        if (firstSegment_5Words !== text.slice(0, firstSegment_5Words.length).trim()) {
-            console.log(console_log);
+        if (firstSegment_5Words !== text.slice(0, firstSegment_5Words.length).trim() && firstSegment_5Words !== textFromOffset1.slice(0, firstSegment_5Words.length).trim() && firstSegment_5Words !== textFromOffset2.slice(0, firstSegment_5Words.length).trim()) {
+            console.log(log);
             throw new Error('firstSegment_5Words !== text.slice(0, firstSegment_5Words.length).trim()');
         }
-        if (lastSegment_5Words !== text.slice(-lastSegment_5Words.length).trim()) {
-            console.log(console_log);
+        if (lastSegment_5Words !== text.slice(-lastSegment_5Words.length).trim() && nearLastSegment_5Words !== text.slice(-nearLastSegment_5Words.length).trim()) {
+            console.log(log);
             throw new Error('lastSegment_5Words !== text.slice(-lastSegment_5Words.length).trim()');
         }
         correctedVideoScript.push(videoScriptItem);
