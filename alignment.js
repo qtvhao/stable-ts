@@ -130,6 +130,7 @@ if (typeof queueInName !== 'undefined') {
         }
         await queueOut.add({
             ...jobData,
+            initiator: process.argv[1],
             videoScript: aligned,
         });
 
