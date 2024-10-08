@@ -21,22 +21,37 @@ let opts = {
 let queueInBackup = new Queue('stable-ts-backup', opts);
 let queueOut = new Queue(queueOutName, opts);
 
-queueInBackup.process(async (job) => {
-    await waitQueueToHaveWaitingCount(queueOut, 0, job);
-    let jobData = job.data;
-    let audioFile = jobData.audioFile;
-    let tmpAudioFile = '/tmp/' + path.basename(audioFile);
-    fs.copyFileSync(audioFile, tmpAudioFile);
-    let aligned = await getCheckedAlignedVideoScript(job, tmpAudioFile)
-    await queueOut.add({
-        ...jobData,
-        videoScript: aligned,
+(async function(){
+    let touched = '/app/storage/audio/touched';
+    let touched2 = '/align-output/touched';
+    while(true) {
+        try {
+            fs.writeFileSync(touched, 'touched');
+            fs.writeFileSync(touched2, 'touched');
+            break;
+        }catch(e) {
+            console.error(e);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            console.error(e);
+        }
+    }
+    queueInBackup.process(async (job) => {
+        await waitQueueToHaveWaitingCount(queueOut, 0, job);
+        let jobData = job.data;
+        let audioFile = jobData.audioFile;
+        let tmpAudioFile = '/tmp/' + path.basename(audioFile);
+        fs.copyFileSync(audioFile, tmpAudioFile);
+        let aligned = await getCheckedAlignedVideoScript(job, tmpAudioFile)
+        await queueOut.add({
+            ...jobData,
+            videoScript: aligned,
+        });
+    
+        fs.unlinkSync(tmpAudioFile);
+    
+        return {
+            success: true,
+            message: 'Backup processed successfully',
+        };
     });
-
-    fs.unlinkSync(tmpAudioFile);
-
-    return {
-        success: true,
-        message: 'Backup processed successfully',
-    };
-});
+})();
