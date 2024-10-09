@@ -21,6 +21,7 @@ let opts = {
 let queueInBackup = new Queue('stable-ts-backup', opts);
 let queueOut = new Queue(queueOutName, opts);
 
+let alignOutput = '/align-output';
 (async function(){
     let touched = '/app/storage/audio/touched';
     let touched2 = '/align-output/touched';
@@ -41,7 +42,14 @@ let queueOut = new Queue(queueOutName, opts);
         let audioFile = jobData.audioFile;
         let tmpAudioFile = '/tmp/' + path.basename(audioFile);
         fs.copyFileSync(audioFile, tmpAudioFile);
-        let aligned = await getCheckedAlignedVideoScript(job, tmpAudioFile)
+        let alignOutputFile = path.join(alignOutput, path.basename(audioFile) + '.json');
+        let aligned;
+        if (fs.existsSync(alignOutputFile)) {
+            aligned = JSON.parse(fs.readFileSync(alignOutputFile, 'utf8'));
+        }else{
+            aligned = await getCheckedAlignedVideoScript(job, tmpAudioFile)
+            fs.writeFileSync(alignOutputFile, JSON.stringify(aligned, null, 4));
+        }
         await queueOut.add({
             ...jobData,
             videoScript: aligned,
