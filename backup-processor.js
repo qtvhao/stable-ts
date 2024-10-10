@@ -38,6 +38,7 @@ let alignOutput = '/align-output';
     }
     queueInBackup.process(async (job) => {
         await waitQueueToHaveWaitingCount(queueOut, 0, job);
+        await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'step_2.1', 'prompt': job.data.article.name, 'secret_key': job.data.secret_key,}),});
         let jobData = job.data;
         let audioFile = jobData.audioFile;
         let tmpAudioFile = '/tmp/' + path.basename(audioFile);
@@ -47,7 +48,12 @@ let alignOutput = '/align-output';
         if (fs.existsSync(alignOutputFile)) {
             aligned = JSON.parse(fs.readFileSync(alignOutputFile, 'utf8'));
         }else{
-            aligned = await getCheckedAlignedVideoScript(job, tmpAudioFile)
+            try {
+                aligned = await getCheckedAlignedVideoScript(job, tmpAudioFile)
+            } catch (error) {
+                await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'step_2.1.there_is_some_error', 'prompt': job.data.article.name, 'secret_key': job.data.secret_key,}),});
+                throw error;
+            }
             fs.writeFileSync(alignOutputFile, JSON.stringify(aligned, null, 4));
         }
         await queueOut.add({
