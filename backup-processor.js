@@ -51,7 +51,11 @@ let alignOutput = '/align-output';
             try {
                 aligned = await getCheckedAlignedVideoScript(job, tmpAudioFile)
             } catch (error) {
-                await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'step_2.1.there_is_some_error', 'prompt': job.data.article.name, 'secret_key': job.data.secret_key,}),});
+                try{
+                    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'step_2.1.there_is_some_error', 'prompt': job.data.article.name, 'secret_key': job.data.secret_key,}),});
+                }catch(e) {
+                    console.error(e);
+                }
                 throw error;
             }
             fs.writeFileSync(alignOutputFile, JSON.stringify(aligned, null, 4));
