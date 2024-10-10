@@ -6,6 +6,7 @@ let getCheckedAlignedVideoScript = require('./src/getCheckedAlignedVideoScript.j
 let password = process.env.REDIS_PASSWORD
 let redisHost = process.env.REDIS_HOST || 'redis'
 let queueOutName = process.env.QUEUE_OUT_NAME;
+const http = require('http');
 
 let lockDuration = 20 * 60 * 1000; // 20 minutes
 let opts = {
@@ -52,7 +53,20 @@ let alignOutput = '/align-output';
                 aligned = await getCheckedAlignedVideoScript(job, tmpAudioFile)
             } catch (error) {
                 try{
-                    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'step_2.1.there_is_some_error', 'prompt': job.data.article.name, 'secret_key': job.data.secret_key,}),});
+                    http.request({
+                        host: 'distributor-api',
+                        port: 80,
+                        path: '/',
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }, function(res) {}).end(JSON.stringify({
+                        'status': 'step_2.1.there_is_some_error',
+                        'prompt': job.data.article.name,
+                        'secret_key': job.data.secret_key,
+                    }));
+                    // await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'step_2.1.there_is_some_error', 'prompt': job.data.article.name, 'secret_key': job.data.secret_key,}),});
                 }catch(e) {
                     console.error(e);
                 }
