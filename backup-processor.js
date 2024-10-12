@@ -62,7 +62,8 @@ let alignOutput = '/align-output';
                             'Content-Type': 'application/json',
                         },
                     }, function(res) {}).end(JSON.stringify({
-                        'status': 'step_2.1.there_is_some_error',
+                        // 'status': 'step_2.1. an error occurred with your prompt. Try another prompt',
+                        'status': 'step_2.1. Có lỗi xảy ra với prompt bạn đã chọn. Vui lòng chọn prompt khác',
                         'prompt': job.data.article.name,
                         'secret_key': job.data.secret_key,
                     }));
