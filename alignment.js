@@ -43,7 +43,9 @@ if (typeof queueInName !== 'undefined') {
     let language = process.env.STABLE_TS_LANGUAGE;
     queueIn.process(async job => {
         await waitQueueToHaveWaitingCount(queueOut, 0, job);
-        await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'step_2.1', 'prompt': job.data.article.name, 'secret_key': job.data.secret_key,}),});
+        if (job.data.secret_key) {
+            await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'step_2.1', 'prompt': job.data.article.name, 'secret_key': job.data.secret_key,}),});
+        }
         let queueOutJobCounts = await queueOut.getJobCounts();
         while (queueOutJobCounts.waiting > 10) {
             console.log('queueOut is busy, wait 10 seconds');
