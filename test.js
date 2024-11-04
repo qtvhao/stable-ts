@@ -1,9 +1,27 @@
+let url = 'https://http-align-partnerapis-production-80.schnworks.com/todos';
 let data = {
+  accessKeyId: '7f5599ee-b77e-4c3a-89f0-76a017a60ad2',
+  secretAccessKey: 'acee4aef-3eb0-4675-bac7-df651263da4f',
   jobData: {
     format: 'text-with-audio',
     text: ''
   },
 };
+let path = require('path');
+
+function ensureDirectoryExists(directory) {
+    if (!fs.existsSync(directory)) {
+        fs.mkdirSync(directory);
+    }
+}
+
+function generateSplitId() {
+    return Math.round(Math.random() * 1000000000);
+}
+
+function getSplitFolder(splitId) {
+    return path.join(__dirname, 'splits', `${splitId}`);
+}
 const removeMd = require('remove-markdown');
 let fs = require('fs');
 function nestedMapObjects(tokens) {
@@ -133,26 +151,16 @@ function splitAudioByStamps(audioFile, silences, splitFolder) {
     
     return files;
 }
-
-let splitFolder = join(__dirname, 'splits');
-if (!fs.existsSync(splitFolder)) {
-    fs.mkdirSync(splitFolder);
-};
-(async function() {
-    let splitId = Math.round(Math.random() * 1000000000);
-    let splitFolder_Id = join(splitFolder, `${splitId}`);
-    fs.mkdirSync(splitFolder_Id);
-    let audioFile = 'synthesize-result-2532432836.aac';
-    splitAudioByStamps(
-        convertAACtoMP3(audioFile),
-        getSilences(audioFile, .5),
-        splitFolder_Id
-    );
-    // 
+function getJob() {
     let tJson = 't.json'
     let job = fs.readFileSync(tJson, 'utf8');
     let job1 = JSON.parse(job)[1];
-    let tokens = (JSON.parse(job1).result.tokens);
+
+    return JSON.parse(job1);
+}
+function getTokens() {
+    let job = getJob();
+    let tokens = (job.result.tokens);
     tokens = nestedMapObjects(tokens);
     tokens = tokens.reduce((acc, token) => {
         if (token.type === 'space') {
@@ -169,12 +177,15 @@ if (!fs.existsSync(splitFolder)) {
         }
         return acc;
     }, []);
-    let tokenJson = join(splitFolder, 'tokens_' + splitId + '.json');
-    let outputFile = join(splitFolder, 'output_' + splitId + '.json'); 
 
-    fs.writeFileSync(tokenJson, JSON.stringify(tokens, null, 2));
-    // 
-    let t = child_process.spawnSync('python3', [
+    return tokens;
+}
+
+function stableTsFolder(splitId, tokenJson) {
+    let splitFolder_Id = getSplitFolder(splitId);
+    let outputFile = join(splitFolder, 'output_' + splitId + '.json');
+    
+    child_process.spawnSync('python3', [
         'stable-ts-folder.py',
         splitFolder_Id,
         tokenJson,
@@ -185,15 +196,26 @@ if (!fs.existsSync(splitFolder)) {
     let output = fs.readFileSync(outputFile, 'utf8');
     let outputJson = JSON.parse(output);
 
-    return;
-    // let result =
-    let response = await fetch(url, {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    });
-    let result = await response.json();
-    console.log(result);
+    return outputJson;
+}
+
+let splitFolder = join(__dirname, 'splits');
+ensureDirectoryExists(splitFolder);
+(async function() {
+    let splitId = generateSplitId();
+    let splitFolder_Id = getSplitFolder(splitId);
+    fs.mkdirSync(splitFolder_Id);
+    let audioFile = 'synthesize-result-2532432836.aac';
+    splitAudioByStamps(
+        convertAACtoMP3(audioFile),
+        getSilences(audioFile, .5),
+        splitFolder_Id
+    );
+    // 
+    let tokens = getTokens();
+    let tokenJson = join(splitFolder, 'tokens_' + splitId + '.json');
+    fs.writeFileSync(tokenJson, JSON.stringify(tokens, null, 2));
+    // 
+    let stablized = stableTsFolder(splitId, tokenJson);
+    console.log(stablized);
 })();
