@@ -42,7 +42,7 @@ function getSegmentsOfList(token) {
     return items;
 }
 let child_process = require('child_process');
-const { join } = require('path');
+const { join, basename } = require('path');
 function getSilences(audioFile, silenceDuration) {
     let silencedetect = child_process.spawnSync('ffmpeg', [
         '-i', audioFile,
@@ -101,24 +101,28 @@ function splitAudioByStamps(audioFile, silences, splitFolder) {
     for (let i = 0; i < silences.length; i++) {
         let silence = silences[i];
         let average = silence.average;
-        let splitFile = join(splitFolder, `split-${i}.mp3`);
+        let splitFile = join(splitFolder, `split-${`${i}`.padStart(3, '0')}`);
         // 
         if (0 === average) {
             continue;
         }
         let outputFile;
         let splitArgs = [
-            '-y', '-i', audioFile, '-to', average, '-c', 'copy', outputFile = `${splitFile}-0-${average}.mp3`
+            '-y', '-i', audioFile, '-to', average, '-c', 'copy', outputFile = `${splitFile}-0-${`${average}`.replace('.', '-')}.mp3`
         ];
         // 
         if (i === silences.length - 1) {
             splitArgs = [
-                '-y', '-i', audioFile, '-ss', average, '-c', 'copy', outputFile = `${splitFile}-${average}-end.mp3`
+                '-y', '-i', audioFile, '-ss', average, '-c', 'copy', outputFile = `${splitFile}-${`${average}`.replace('.', '-')}-end.mp3`
             ];
         }
         if (i > 0) {
             splitArgs = [
-                '-y', '-i', audioFile, '-ss', silences[i - 1].average, '-to', average, '-c', 'copy', outputFile = `${splitFile}-${silences[i - 1].average}-${average}.mp3`
+                '-y', '-i', audioFile, '-ss', silences[i - 1].average, '-to', average, '-c', 'copy', outputFile = `${splitFile}-${
+                    `${silences[i - 1].average}`.replace('.', '-')
+                }-${
+                    `${average}`.replace('.', '-')
+                }.mp3`
             ];
         }
         let split = child_process.spawnSync('ffmpeg', splitArgs);
@@ -130,22 +134,18 @@ function splitAudioByStamps(audioFile, silences, splitFolder) {
     return files;
 }
 
+let splitFolder = join(__dirname, 'splits');
+if (!fs.existsSync(splitFolder)) {
+    fs.mkdirSync(splitFolder);
+};
 (async function() {
-    let audioFile = 'synthesize-result-2532432836.aac';
-    let splitFolder = join(__dirname, 'splits');
-    if (!fs.existsSync(splitFolder)) {
-        fs.mkdirSync(splitFolder);
-    }
-    // split audio file by silence
-    let silenceDuration = .5;
-
-    let silences = getSilences(audioFile, silenceDuration);
-    console.log(silences);
-    // Convert AAC to MP3
-    const mp3File = convertAACtoMP3(audioFile);
-
-    console.log(splitAudioByStamps(mp3File, silences, splitFolder));
-    return;
+    // let audioFile = 'synthesize-result-2532432836.aac';
+    // splitAudioByStamps(
+    //     convertAACtoMP3(audioFile),
+    //     getSilences(audioFile, .5),
+    //     splitFolder
+    // );
+    // return;
     // 
     let tJson = 't.json'
     let job = fs.readFileSync(tJson, 'utf8');
@@ -154,7 +154,7 @@ function splitAudioByStamps(audioFile, silences, splitFolder) {
     tokens = nestedMapObjects(tokens);
     tokens = tokens.reduce((acc, token) => {
         if (token.type === 'space') {
-            acc.push('='.repeat(251));
+            // acc.push('='.repeat(251));
         }else{
             if ("list" === token.type) {
                 acc = acc.concat(getSegmentsOfList(token));
@@ -168,7 +168,19 @@ function splitAudioByStamps(audioFile, silences, splitFolder) {
         return acc;
     }, []);
 
-    console.log(JSON.stringify(tokens, null, 2));
+    // console.log(JSON.stringify(tokens, null, 2));
+    fs.writeFileSync('tokens.json', JSON.stringify(tokens, null, 2));
+    // 
+    let t = child_process.spawnSync('python3', [
+        'stable-ts-folder.py',
+        splitFolder,
+        "tokens.json",
+    ], {
+        stdio: 'inherit',
+    });
+
+    console.log(t.stdout.toString());
+    console.log(t.stderr.toString());
     return;
     // let result =
     let response = await fetch(url, {
