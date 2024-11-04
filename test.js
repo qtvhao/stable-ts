@@ -42,7 +42,7 @@ function getSegmentsOfList(token) {
     return items;
 }
 let child_process = require('child_process');
-const { join, basename } = require('path');
+const { join } = require('path');
 function getSilences(audioFile, silenceDuration) {
     let silencedetect = child_process.spawnSync('ffmpeg', [
         '-i', audioFile,
@@ -139,13 +139,15 @@ if (!fs.existsSync(splitFolder)) {
     fs.mkdirSync(splitFolder);
 };
 (async function() {
-    // let audioFile = 'synthesize-result-2532432836.aac';
-    // splitAudioByStamps(
-    //     convertAACtoMP3(audioFile),
-    //     getSilences(audioFile, .5),
-    //     splitFolder
-    // );
-    // return;
+    let splitId = Math.round(Math.random() * 1000000000);
+    let splitFolder_Id = join(splitFolder, `${splitId}`);
+    fs.mkdirSync(splitFolder_Id);
+    let audioFile = 'synthesize-result-2532432836.aac';
+    splitAudioByStamps(
+        convertAACtoMP3(audioFile),
+        getSilences(audioFile, .5),
+        splitFolder_Id
+    );
     // 
     let tJson = 't.json'
     let job = fs.readFileSync(tJson, 'utf8');
@@ -167,20 +169,22 @@ if (!fs.existsSync(splitFolder)) {
         }
         return acc;
     }, []);
+    let tokenJson = join(splitFolder, 'tokens_' + splitId + '.json');
+    let outputFile = join(splitFolder, 'output_' + splitId + '.json'); 
 
-    // console.log(JSON.stringify(tokens, null, 2));
-    fs.writeFileSync('tokens.json', JSON.stringify(tokens, null, 2));
+    fs.writeFileSync(tokenJson, JSON.stringify(tokens, null, 2));
     // 
     let t = child_process.spawnSync('python3', [
         'stable-ts-folder.py',
-        splitFolder,
-        "tokens.json",
+        splitFolder_Id,
+        tokenJson,
+        outputFile,
     ], {
         stdio: 'inherit',
     });
+    let output = fs.readFileSync(outputFile, 'utf8');
+    let outputJson = JSON.parse(output);
 
-    console.log(t.stdout.toString());
-    console.log(t.stderr.toString());
     return;
     // let result =
     let response = await fetch(url, {
