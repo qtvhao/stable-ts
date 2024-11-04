@@ -61,7 +61,7 @@ function getSegmentsOfList(token) {
 }
 let child_process = require('child_process');
 const { join } = require('path');
-function getSilences(audioFile, silenceDuration) {
+function getSilences(audioFile, silenceDuration, minSilences) {
     let silencedetect = child_process.spawnSync('ffmpeg', [
         '-i', audioFile,
         '-af', `silencedetect=noise=-30dB:d=${silenceDuration}`,
@@ -97,13 +97,17 @@ function getSilences(audioFile, silenceDuration) {
                 average: Math.round(average * 1000) / 1000,
             };
         });
-    if (silences.length > 20) {
-        return getSilences(audioFile, silenceDuration + .2);
+    console.log('Silences:', silences.length);
+    if (silences.length <= minSilences) {
+        return getSilences(audioFile, silenceDuration - .1, minSilences);
     }else{
-        console.log('Silences:', silences.length);
+        return silences;
     }
-    
-    return silences;
+    // if (silences.length > 20) {
+    //     return getSilences(audioFile, silenceDuration + .2);
+    // }else{
+    //     console.log('Silences:', silences.length);
+    // }
 }
 function convertAACtoMP3(audioFile) {
     const mp3File = audioFile.replace('.aac', '.mp3');
@@ -145,8 +149,8 @@ function splitAudioByStamps(audioFile, silences, splitFolder) {
         }
         let split = child_process.spawnSync('ffmpeg', splitArgs);
         files.push(outputFile);
-        console.log(split.stdout.toString());
-        console.log(split.stderr.toString());
+        // console.log(split.stdout.toString());
+        // console.log(split.stderr.toString());
     }
     
     return files;
@@ -202,17 +206,19 @@ function stableTsFolder(splitId, tokenJson) {
 let splitFolder = join(__dirname, 'splits');
 ensureDirectoryExists(splitFolder);
 (async function() {
+    let tokens = getTokens();
+    console.log(tokens.length);
+    // 
     let splitId = generateSplitId();
     let splitFolder_Id = getSplitFolder(splitId);
     fs.mkdirSync(splitFolder_Id);
     let audioFile = 'synthesize-result-2532432836.aac';
     splitAudioByStamps(
         convertAACtoMP3(audioFile),
-        getSilences(audioFile, .5),
+        getSilences(audioFile, 2.5, tokens.length * 2),
         splitFolder_Id
     );
     // 
-    let tokens = getTokens();
     let tokenJson = join(splitFolder, 'tokens_' + splitId + '.json');
     fs.writeFileSync(tokenJson, JSON.stringify(tokens, null, 2));
     // 

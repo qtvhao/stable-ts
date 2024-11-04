@@ -11,25 +11,33 @@ def match_segments(human_segments, non_human_segments):
 
     for human_segment in human_segments:
         human_text = human_segment["text"]
-        best_match = None
-        highest_ratio = 0.0
-
-        # Find the best match in non-human segments
+        start_timestamp = None
+        end_timestamp = None
+        matching_texts = []
+        
+        # Loop through non-human segments and collect consecutive matches
         for non_human_segment in non_human_segments:
             non_human_text = non_human_segment["text"]
             similarity = SequenceMatcher(None, human_text, non_human_text).ratio()
 
-            # Update best match if a higher similarity is found
-            if similarity > highest_ratio:
-                highest_ratio = similarity
-                best_match = non_human_segment
+            # Consider a match if similarity is above a certain threshold (e.g., 0.5 or higher)
+            if similarity > 0.5:
+                # Append matched non-human text to matching_texts
+                matching_texts.append(non_human_text)
+                
+                # Update start and end timestamps
+                if start_timestamp is None:
+                    start_timestamp = non_human_segment["start"]
+                end_timestamp = non_human_segment["end"]
 
-        # Assign timestamps to the human segment from the best-matched non-human segment
-        if best_match:
+        # Concatenate matching texts and assign timestamps if there are matches
+        if matching_texts:
+            concatenated_text = " ".join(matching_texts)
             matched_segment = {
                 "text": human_text,
-                "start": best_match["start"],
-                "end": best_match["end"]
+                "matched_text": concatenated_text,
+                "start": start_timestamp,
+                "end": end_timestamp
             }
             matched_segments.append(matched_segment)
 
@@ -55,12 +63,19 @@ output_file = cli_args[3]
 tokens_content = open(tokens_file).read()
 human_written_segments = json.loads(tokens_content)
 files = os.listdir(folder)
-model = stable_whisper.load_model('tiny')
+model = stable_whisper.load_model('base')
+result_language = None
 for file in files:
     if file.endswith('.mp3'):
         file2 = file
-        result = model.transcribe(folder + '/' + file)
-        result.save_as_json(folder + '/' + file + '.json')
+        if result_language is None:
+            result = model.transcribe(folder + '/' + file)
+        else:
+            result = model.transcribe(folder + '/' + file, language=result_language)
+        result_json_file = folder + '/' + file + '.json'
+        result.save_as_json(result_json_file)
+        result_json = json.loads(open(result_json_file).read())
+        result_language = result_json['language']
 
 non_human_segments_with_timestamps = []
 duration = 0
@@ -69,23 +84,24 @@ json_files.sort()
 for file in json_files:
     if file.endswith('.json'):
         audio_file = file.replace('.json', '')
-        duration += get_duration_mp3(folder + '/' + audio_file)
         parsed = json.loads(open(folder + '/' + file).read())
         segments = parsed['segments']
         for segment in segments:
             start = segment['start'] + duration
             end = segment['end'] + duration
             text = segment['text']
+            print(start, end, text)
             non_human_segments_with_timestamps.append({
                 "start": int(start),
                 "end": int(end),
                 "text": text
             })
+        duration += get_duration_mp3(folder + '/' + audio_file)
 
 # Run the function to get timestamps for human-tecn segments
 matched_segments_with_timestamps = match_segments(human_written_segments, non_human_segments_with_timestamps)
 
-print(json.dumps(matched_segments_with_timestamps))
+# print(json.dumps(matched_segments_with_timestamps))
 with open(output_file, 'w') as f:
     f.write(json.dumps(matched_segments_with_timestamps))
 
