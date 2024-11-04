@@ -41,9 +41,112 @@ function getSegmentsOfList(token) {
 
     return items;
 }
+let child_process = require('child_process');
+const { join } = require('path');
+function getSilences(audioFile, silenceDuration) {
+    let silencedetect = child_process.spawnSync('ffmpeg', [
+        '-i', audioFile,
+        '-af', `silencedetect=noise=-30dB:d=${silenceDuration}`,
+        '-f', 'null', '-'
+    ], {
+        stdio: 'pipe',
+    });
+
+    let silenceLines = silencedetect.stderr.toString()
+        .replace(/[\r\n]+/g, '\n')
+        .split('\n')
+        .filter(line => line.includes('silencedetect'));
+    let silences = silenceLines.filter(line => line.includes('silence_end'))
+        .map((line, i) => {
+            let matcherSilenceEnd = /silence_end: (\d+\.\d+)/;
+            let matcherSilenceDuration = /silence_duration: (\d+\.\d+)/;
+            let silenceEnd = parseFloat(line.match(matcherSilenceEnd)[1]);
+            let silenceDuration = parseFloat(line.match(matcherSilenceDuration)[1]);
+            silenceEnd = Math.round(silenceEnd * 1000) / 1000;
+            silenceDuration = Math.round(silenceDuration * 1000) / 1000;
+            let silenceStart = silenceEnd - silenceDuration;
+            silenceStart = Math.round(silenceStart * 1000) / 1000;
+
+            let average = (silenceStart + silenceEnd) / 2;
+            if (i === 0) {
+                average = 0;
+            }
+
+            return {
+                // start: silenceStart,
+                // end: silenceEnd,
+                // duration: silenceDuration,
+                average: Math.round(average * 1000) / 1000,
+            };
+        });
+    if (silences.length > 20) {
+        return getSilences(audioFile, silenceDuration + .2);
+    }else{
+        console.log('Silences:', silences.length);
+    }
+    
+    return silences;
+}
+function convertAACtoMP3(audioFile) {
+    const mp3File = audioFile.replace('.aac', '.mp3');
+    child_process.spawnSync('ffmpeg', [
+        '-i', audioFile,
+        '-q:a', '0',
+        mp3File
+    ]);
+    return mp3File;
+}
+function splitAudioByStamps(audioFile, silences, splitFolder) {
+    let files = [];
+    for (let i = 0; i < silences.length; i++) {
+        let silence = silences[i];
+        let average = silence.average;
+        let splitFile = join(splitFolder, `split-${i}.mp3`);
+        // 
+        if (0 === average) {
+            continue;
+        }
+        let outputFile;
+        let splitArgs = [
+            '-y', '-i', audioFile, '-to', average, '-c', 'copy', outputFile = `${splitFile}-0-${average}.mp3`
+        ];
+        // 
+        if (i === silences.length - 1) {
+            splitArgs = [
+                '-y', '-i', audioFile, '-ss', average, '-c', 'copy', outputFile = `${splitFile}-${average}-end.mp3`
+            ];
+        }
+        if (i > 0) {
+            splitArgs = [
+                '-y', '-i', audioFile, '-ss', silences[i - 1].average, '-to', average, '-c', 'copy', outputFile = `${splitFile}-${silences[i - 1].average}-${average}.mp3`
+            ];
+        }
+        let split = child_process.spawnSync('ffmpeg', splitArgs);
+        files.push(outputFile);
+        console.log(split.stdout.toString());
+        console.log(split.stderr.toString());
+    }
+    
+    return files;
+}
 
 (async function() {
     let audioFile = 'synthesize-result-2532432836.aac';
+    let splitFolder = join(__dirname, 'splits');
+    if (!fs.existsSync(splitFolder)) {
+        fs.mkdirSync(splitFolder);
+    }
+    // split audio file by silence
+    let silenceDuration = .5;
+
+    let silences = getSilences(audioFile, silenceDuration);
+    console.log(silences);
+    // Convert AAC to MP3
+    const mp3File = convertAACtoMP3(audioFile);
+
+    console.log(splitAudioByStamps(mp3File, silences, splitFolder));
+    return;
+    // 
     let tJson = 't.json'
     let job = fs.readFileSync(tJson, 'utf8');
     let job1 = JSON.parse(job)[1];
