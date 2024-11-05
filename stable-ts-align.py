@@ -6,6 +6,19 @@ import subprocess
 from difflib import SequenceMatcher
 import unicodedata
 # 
+def ends_with(text, char):
+    """
+    Checks if the text ends with a character.
+    
+    Args:
+        text (str): The text to check.
+        char (str): The character to check.
+        
+    Returns:
+        bool: True if the text ends with the character, False otherwise.
+    """
+    return text[-1].strip() == char
+
 def find_best_match(tokens_texts, corrected_segments):
     """
     Finds the index of the best match in `tokens_texts` for the `corrected_segments_texts`.
@@ -60,6 +73,25 @@ tokens = json.loads(open(tokens_json).read())
 tokens_texts = [token['text'] for token in tokens]
 
 model = stable_whisper.load_model('tiny')
+
+def get_segments_by_index(segments, index):
+    # return segments[:index], segments[index:]
+    corrected_segments = segments[:index]
+    incorrected_segments = segments[index:]
+    corrected_segments_joined = " ".join([segment['text'] for segment in corrected_segments])
+    incorrected_segments_joined = " ".join([segment['text'] for segment in incorrected_segments])
+    segments_joined = " ".join([segment['text'] for segment in segments])
+    incorrected_start = incorrected_segments[0]['start']
+    print("=====================================")
+    print(f"Segments: {segments_joined}")
+    print("=====================================")
+    print(f"Corrected: {corrected_segments_joined}")
+    print("=====================================")
+    print(f"Incorrected: {incorrected_segments_joined}")
+    print("=====================================")
+    print(f"Incorrected Start: {incorrected_start}")
+    
+    return corrected_segments, incorrected_segments, incorrected_start
 
 def get_segments_from_audio_file(audio_file, tokens_texts):
     corrected_segments = []
