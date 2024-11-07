@@ -88,6 +88,7 @@ def get_segments_from_segments_file(audio_file, tokens_texts, output_file='outpu
         "end": segment['end'],
         "text": segment['text']
     } for segment in segments], tokens_texts)
+    start = segments_end
     
     # Step 4: Print debug information
     print(f"Matched sentences: {matched_sentences}")
@@ -95,22 +96,29 @@ def get_segments_from_segments_file(audio_file, tokens_texts, output_file='outpu
     print(f"Best match segment text: {segments_to_add}")
     print('===')
     # raise ValueError("Stop")
-    if None == segments_end:
-        raise ValueError("segments_end is None")
+    # if None == segments_end:
+        # raise ValueError("segments_end is None")
     print(f"Best match segment end: {segments_end}")
     # print(f"Best match: {best_match}")
     print('===')
     # print(best_match_segment)
     print(f"Remaining tokens: {remaining_tokens}")
 
-    # raise ValueError("Stop")
-
     # Step 5: If there are no remaining tokens, return the initial matched segments
-    if not remaining_tokens:
-        return [{'start': segment['start'], 'end': segment['end'], 'text': segment['text']} for segment in segments]
+    if None == segments_end:
+        trimmed_audio_file = ''
+        remaining_tokens = None
+        start = None
+        segments_to_add = []
+        # segments_to_add = [{
+        #     "start": segment['start'],
+        #     "end": segment['end'],
+        #     "text": segment['text']
+        # } for segment in segments_to_add]
+
+        return trimmed_audio_file, remaining_tokens, start, segments_to_add
     
     # Step 6: Determine starting point for the next segment and process remaining tokens
-    start = segments_end
     remaining_tokens_joined = "\n\n".join(remaining_tokens)
     matched_sentences_joined = "\n\n".join(matched_sentences)
 
@@ -122,14 +130,15 @@ def get_segments_from_segments_file(audio_file, tokens_texts, output_file='outpu
     with open(f"{trimmed_audio_file}-remaining.txt", 'w') as file:
         file.write(remaining_tokens_joined)
         
-    return trimmed_audio_file, remaining_tokens, start, segments
+    return trimmed_audio_file, remaining_tokens, start, segments_to_add
 
 def recursive_get_segments_from_audio_file(audio_file, tokens_texts, output_file='output.json'):
+    if None == tokens_texts:
+        return []
     trimmed_audio_file, remaining_tokens, start, segments = get_segments_from_audio_file(audio_file, tokens_texts, output_file)
 
     # Step 8: Recursively process remaining audio and tokens
     remaining_segments = recursive_get_segments_from_audio_file(trimmed_audio_file, remaining_tokens, trimmed_audio_file + '.json')
-
     # Step 9: Adjust the start and end times for the remaining segments and combine results
     aligned_segments = [{
         'start': segment['start'] + start,
