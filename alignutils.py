@@ -25,10 +25,12 @@ def find_best_segment_match(segments, sentences_texts):
     """
     processed_sentences, remaining_sentences = split_sentences_by_highest_similarity_to_segments(sentences_texts, segments)
     highest_ratio = 0
+    matched_segments = None
+    matched_segment_end = None
     for i, segment in enumerate(segments):
         for sentence in processed_sentences:
             ratio = calculate_similarity_ratio(segment['text'], sentence)
-            if ratio > highest_ratio:
+            if ratio >= highest_ratio:
                 highest_ratio = ratio
                 matched_segments = segments[:i+1]
                 matched_segment_end = matched_segments[-1]['end']

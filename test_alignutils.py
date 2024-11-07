@@ -37,9 +37,17 @@ def test_calculate_similarity_ratio(segment_text, candidate_text, expected_ratio
         ["Short segment.", "Another short segment."]
     ),
     (
+        [{"text": "Short segment.", "end": 5}, {"text": "Another short segment.", "end": 15}],
+        ["Short segment.", "Another short segment.", "Third short segment."],
+        [{"text": "Short segment.", "end": 5}, {"text": "Another short segment.", "end": 15}],
+        15,
+        ["Third short segment."],
+        ["Short segment.", "Another short segment."]
+    ),
+    (
         [{"text": "Segment one.", "end": 5}, {"text": "Segment two.", "end": 10}],
         ["No match here.", "Another non-matching sentence."],
-        [],
+        None,
         None,
         ["No match here.", "Another non-matching sentence."],
         []
