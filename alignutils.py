@@ -28,6 +28,7 @@ def get_valid_segments(segments):
         else:
             print(f"Segment {i}: {segment['text']}")
             valid_segments = segments[:i]
+    return valid_segments
 
 def find_best_segment_match(segments, sentences_texts):
     """

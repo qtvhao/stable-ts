@@ -83,11 +83,12 @@ def get_segments_from_segments_file(audio_file, tokens_texts, output_file='outpu
     # os.remove(output_file)
 
     # Step 3: Find the best match segment for the tokens
-    segments_to_add, segments_end, remaining_tokens, matched_sentences = find_best_segment_match([{
+    map_segments = [{
         "start": segment['start'],
         "end": segment['end'],
         "text": segment['text']
-    } for segment in segments], tokens_texts)
+    } for segment in segments]
+    segments_to_add, segments_end, remaining_tokens, matched_sentences = find_best_segment_match(map_segments, tokens_texts)
     start = segments_end
     
     # Step 4: Print debug information
@@ -110,6 +111,10 @@ def get_segments_from_segments_file(audio_file, tokens_texts, output_file='outpu
         remaining_tokens = None
         start = None
         segments_to_add = []
+        print("=== segments_end is None ===")
+        print(map_segments)
+        print(tokens_texts)
+        raise ValueError("segments_end is None")
         # segments_to_add = [{
         #     "start": segment['start'],
         #     "end": segment['end'],
