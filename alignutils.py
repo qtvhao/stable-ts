@@ -45,5 +45,9 @@ def find_best_segment_match(segments, sentences_texts):
             if ratio >= highest_ratio:
                 highest_ratio = ratio
                 matched_segments = segments[:i+1]
-                matched_segment_end = matched_segments[-1]['end']
+                if len(matched_segments) == len(segments):
+                    matched_segment_end = None
+                else:
+                    matched_segment_end = matched_segments[-1]['end']
+
     return matched_segments, matched_segment_end, remaining_sentences, processed_sentences

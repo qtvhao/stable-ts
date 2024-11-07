@@ -106,20 +106,10 @@ def get_segments_from_segments_file(audio_file, tokens_texts, output_file='outpu
     print(f"Remaining tokens: {remaining_tokens}")
 
     # Step 5: If there are no remaining tokens, return the initial matched segments
-    if None == segments_end:
+    if None == start:
         trimmed_audio_file = ''
-        remaining_tokens = None
-        start = None
-        segments_to_add = []
-        print("=== segments_end is None ===")
-        print(map_segments)
-        print(tokens_texts)
-        raise ValueError("segments_end is None")
-        # segments_to_add = [{
-        #     "start": segment['start'],
-        #     "end": segment['end'],
-        #     "text": segment['text']
-        # } for segment in segments_to_add]
+        if len(remaining_tokens) > 0:
+            raise ValueError("remaining_tokens is not empty")
 
         return trimmed_audio_file, remaining_tokens, start, segments_to_add
     
