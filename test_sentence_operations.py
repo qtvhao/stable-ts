@@ -78,6 +78,62 @@ from sentence_operations import split_sentences_by_highest_similarity_to_segment
             "Three sentence",
         ]
     ),
+    # Unhappy cases
+    (
+        ["Sentence without match"],
+        [
+            {
+                "text": "No match here",
+            },
+        ],
+        [],
+        [
+            "Sentence without match",
+        ]
+    ),
+    (
+        ["Partial match . sentence . . . . ", "Another one"],
+        [
+            {
+                "text": "Partial 1, 2, 3, 4, 5, 6 match.",
+            },
+        ],
+        [],
+        [
+            "Partial match . sentence . . . . ",
+            "Another one",
+        ]
+    ),
+    (
+        ["Completely different sentence"],
+        [
+            {
+                "text": "Totally unrelated segment",
+            },
+        ],
+        [],
+        [
+            "Completely different sentence",
+        ]
+    ),
+    (
+        [],
+        [
+            {
+                "text": "Segment without sentence",
+            },
+        ],
+        [],
+        []
+    ),
+    (
+        ["Sentence without segment"],
+        [],
+        [],
+        [
+            "Sentence without segment",
+        ]
+    ),
 ])
 def test_get_processed_and_remaining_sentences(sentences_texts, corrected_segments, expected_processed, expected_remaining):
     processed, remaining = split_sentences_by_highest_similarity_to_segments(sentences_texts, corrected_segments)

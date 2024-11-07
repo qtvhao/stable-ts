@@ -17,14 +17,23 @@ def split_sentences_by_highest_similarity_to_segments(sentences_texts, corrected
     Tìm segment có độ tương đồng cao nhất với sentences_text (nhưng không vượt quá sentences_text, bởi vì sentences_text có thể chứa nhiều hơn 1 segment).
     """
     highest_ratio = 0
+    processed = []
+    remaining = sentences_texts
     for i, segment_ in enumerate(corrected_segments):
+        # print(f"i: {i}")
         segments_to_compare = [segment["text"] for segment in corrected_segments[:i+1]]
         segments_to_compare_joined = " ".join(segments_to_compare)
+        # print(f"Segments to compare: {segments_to_compare_joined}")
         for j, sentence_ in enumerate(sentences_texts):
+            # print(f"- j: {j}")
             sentences_to_compare = sentences_texts[:j+1]
             sentences_to_compare_joined = " ".join(sentences_to_compare)
             ratio = calculate_similarity_ratio(segments_to_compare_joined, sentences_to_compare_joined)
-            if ratio >= highest_ratio:
+            print(f"Sentences to compare: {sentences_to_compare_joined}")
+            print(f"Segments to compare: {segments_to_compare_joined}")
+            print(f"Ratio: {ratio}")
+            print("+++++")
+            if ratio >= highest_ratio and ratio > 0.5:
                 highest_ratio = ratio
                 processed = sentences_texts[:j+1]
                 remaining = sentences_texts[j+1:]
