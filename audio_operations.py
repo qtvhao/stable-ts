@@ -1,4 +1,9 @@
 import subprocess
+import json
+import os
+import stable_whisper
+from alignutils import find_best_segment_match
+model = stable_whisper.load_model('tiny')
 
 def cut_audio_file(audio_file, start=None, end=None):
     start_str = str(start).replace('.', '_') if start is not None else 'start'
