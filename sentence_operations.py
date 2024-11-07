@@ -1,4 +1,4 @@
-from alignutils import calculate_similarity_ratio
+from utils import calculate_similarity_ratio
 
 def split_sentences_by_highest_similarity_to_segments(sentences_texts, corrected_segments):
     """

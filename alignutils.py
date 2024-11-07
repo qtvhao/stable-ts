@@ -1,4 +1,5 @@
-from difflib import SequenceMatcher
+from sentence_operations import split_sentences_by_highest_similarity_to_segments
+from utils import calculate_similarity_ratio
 
 def get_segments_by_index(segments, index):
     corrected_segments = segments[:index]
@@ -18,42 +19,17 @@ def get_segments_by_index(segments, index):
     
     return corrected_segments, incorrected_segments
 
-def calculate_similarity_ratio(segment_text, candidate_text):
-    """
-    Calculate the similarity ratio between the last 10 words of two strings.
-    
-    Args:
-        segment_text (str): The text from corrected segments.
-        candidate_text (str): The text from tokens.
-        
-    Returns:
-        float: The similarity ratio between the last 10 words of the two strings.
-    """
-    if not segment_text or not candidate_text:
-        return 0.0
-    segment_words = segment_text.split()[-10:]
-    candidate_words = candidate_text.split()[-10:]
-    segment_last_10 = ' '.join(segment_words)
-    candidate_last_10 = ' '.join(candidate_words)
-    return SequenceMatcher(None, segment_last_10, candidate_last_10).ratio()
-
 def find_best_segment_match(segments, sentences_texts):
     """
-    Find the best match segment in `corrected_segments` for `sentences_texts`.
-    
-    Args:
-        corrected_segments (list of dict): List of dictionaries containing 'text' from corrected segments.
-        sentences_texts (list of str): List of strings, each representing a sentence.
-        
-    Returns:
-        dict: The best matching segment.
+    Tìm segments tối đa, mà segments đó có độ tương đồng cao nhất với sentences_texts.
     """
+    processed_sentences, remaining_sentences = split_sentences_by_highest_similarity_to_segments(sentences_texts, segments)
     highest_ratio = 0
-    best_match = None
-    for segment in segments:
-        for sentence in sentences_texts:
+    for i, segment in enumerate(segments):
+        for sentence in processed_sentences:
             ratio = calculate_similarity_ratio(segment['text'], sentence)
             if ratio > highest_ratio:
                 highest_ratio = ratio
-                best_match = segment
-    return best_match
+                matched_segments = segments[:i+1]
+                matched_segment_end = matched_segments[-1]['end']
+    return matched_segments, matched_segment_end, remaining_sentences, processed_sentences
