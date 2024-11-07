@@ -29,6 +29,8 @@ def calculate_similarity_ratio(segment_text, candidate_text):
     Returns:
         float: The similarity ratio between the last 10 words of the two strings.
     """
+    if not segment_text or not candidate_text:
+        return 0.0
     segment_words = segment_text.split()[-10:]
     candidate_words = candidate_text.split()[-10:]
     segment_last_10 = ' '.join(segment_words)
