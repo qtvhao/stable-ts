@@ -2,8 +2,10 @@ import subprocess
 import json
 import os
 import stable_whisper
+# from time import sleep
 from alignutils import find_best_segment_match
-model = stable_whisper.load_model('tiny')
+model = stable_whisper.load_model(name="tiny", device="cpu", in_memory=True)
+from random import randint
 
 def cut_audio_file(audio_file, start=None, end=None):
     start_str = str(start).replace('.', '_') if start is not None else 'start'
@@ -15,12 +17,47 @@ def cut_audio_file(audio_file, start=None, end=None):
         subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-ss", str(start), "-c", "copy", output_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
         subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-ss", str(start), "-to", str(end), "-c", "copy", output_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return output_file
         
 def get_segments_from_audio_file(audio_file, tokens_texts, output_file='output.json'):
     # Step 1: Align the tokens with the audio file
-    alignment_result = model.align(audio_file, '\n\n'.join(tokens_texts), language="vi")
-    alignment_result.save_as_json(output_file)
+    tokens_texts_joined = "\n\n".join(tokens_texts)
+    print(f"Aligning {audio_file} with {tokens_texts_joined}")
+    is_pytest = os.environ.get('PYTEST_CURRENT_TEST')
+    if is_pytest:
+        # stable-ts audio.mp3 --align text.txt --language en
+        tmp_file = '/tmp/align-input-' + str(randint(0, 1000000)) + '.txt'
+        open(tmp_file, 'w').write(tokens_texts_joined)
+        # Open the process with Popen
+        process = subprocess.Popen([
+            "/usr/local/bin/stable-ts", 
+            audio_file,
+            "-y",
+            "--align", tmp_file,
+            "--language", "vi",
+            "--output_format", "json",
+            "--model", "tiny",
+            "--output", output_file,
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
+        # Print outputs in real-time
+        print("=== Output ===")
+
+        for line in process.stderr:
+            print(line, end='')
+        for line in process.stdout:
+            print(line, end='')  # `end=''` to avoid double newlines
+
+        process.stdout.close()
+        process.stderr.close()
+
+        # Wait for the process to complete
+        process.wait()
+
+        print("=== Output ===")
+    else:
+        alignment_result = model.align(audio_file, tokens_texts_joined, language="vi")
+        alignment_result.save_as_json(output_file)
     # Step 2: Load the alignment results
     with open(output_file, 'r') as file:
         human_written_segments = json.load(file)
@@ -67,7 +104,6 @@ def get_segments_from_audio_file(audio_file, tokens_texts, output_file='output.j
     trimmed_audio_file = cut_audio_file(audio_file, start, None)
     with open(f"{trimmed_audio_file}-remaining.txt", 'w') as file:
         file.write(remaining_tokens_joined)
-    raise ValueError("Stop")
 
     # Step 8: Recursively process remaining audio and tokens
     remaining_segments = get_segments_from_audio_file(trimmed_audio_file, remaining_tokens, trimmed_audio_file + '.json')

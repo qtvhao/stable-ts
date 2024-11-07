@@ -5,10 +5,10 @@ import subprocess
 from difflib import SequenceMatcher
 import unicodedata
 # 
-from utils import ends_with
-from alignutils import calculate_similarity_ratio, get_segments_by_index
-from token_operations import get_remaining_tokens
-from sentence_operations import get_processed_and_remaining_sentences
+# from utils import ends_with
+# from alignutils import calculate_similarity_ratio, get_segments_by_index
+# from token_operations import get_remaining_tokens
+# from sentence_operations import get_processed_and_remaining_sentences
 from audio_operations import cut_audio_file, get_segments_from_audio_file
 
 tokens_json = sys.argv[1]
