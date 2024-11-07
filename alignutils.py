@@ -19,15 +19,21 @@ def get_segments_by_index(segments, index):
     
     return corrected_segments, incorrected_segments
 
+def get_valid_segments(segments):
+    for i, segment in enumerate(segments):
+        if segment['end'] == segment['start']:
+            print(f"Segment {i} has no text")
+
+            return valid_segments
+        else:
+            print(f"Segment {i}: {segment['text']}")
+            valid_segments = segments[:i]
+
 def find_best_segment_match(segments, sentences_texts):
     """
     Tìm segments tối đa, mà segments đó có độ tương đồng cao nhất với sentences_texts.
     """
-    for i, segment in enumerate(segments):
-        if segment['end'] == segment['start']:
-            break
-        else:
-            segments = segments[:i]
+    segments = get_valid_segments(segments)
     processed_sentences, remaining_sentences = split_sentences_by_highest_similarity_to_segments(sentences_texts, segments)
     highest_ratio = 0
     matched_segments = None

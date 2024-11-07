@@ -62,7 +62,7 @@ def get_segments_from_audio_file(audio_file, tokens_texts, output_file='output.j
         # Wait for the process to complete
         process.wait()
 
-        print("=== Output ===")
+        print("=== Output === ")
         if 1 == process.returncode:
             raise ValueError("Alignment failed")
     else:
@@ -80,7 +80,7 @@ def get_segments_from_segments_file(audio_file, tokens_texts, output_file='outpu
     with open(output_file.replace('.json', '.txt'), 'w') as file:
         file.write("\n\n".join([str(segment['start']) + ' - ' + str(segment['end']) + ': ' + segment['text'] for segment in segments]))
     # remove output_file
-    os.remove(output_file)
+    # os.remove(output_file)
 
     # Step 3: Find the best match segment for the tokens
     segments_to_add, segments_end, remaining_tokens, matched_sentences = find_best_segment_match([{
@@ -94,7 +94,7 @@ def get_segments_from_segments_file(audio_file, tokens_texts, output_file='outpu
     print('===')
     print(f"Best match segment text: {segments_to_add}")
     print('===')
-    raise ValueError("Stop")
+    # raise ValueError("Stop")
     if None == segments_end:
         raise ValueError("segments_end is None")
     print(f"Best match segment end: {segments_end}")
@@ -121,9 +121,14 @@ def get_segments_from_segments_file(audio_file, tokens_texts, output_file='outpu
     trimmed_audio_file = cut_audio_file(audio_file, start, None)
     with open(f"{trimmed_audio_file}-remaining.txt", 'w') as file:
         file.write(remaining_tokens_joined)
+        
+    return trimmed_audio_file, remaining_tokens, start, segments
+
+def recursive_get_segments_from_audio_file(audio_file, tokens_texts, output_file='output.json'):
+    trimmed_audio_file, remaining_tokens, start, segments = get_segments_from_audio_file(audio_file, tokens_texts, output_file)
 
     # Step 8: Recursively process remaining audio and tokens
-    remaining_segments = get_segments_from_audio_file(trimmed_audio_file, remaining_tokens, trimmed_audio_file + '.json')
+    remaining_segments = recursive_get_segments_from_audio_file(trimmed_audio_file, remaining_tokens, trimmed_audio_file + '.json')
 
     # Step 9: Adjust the start and end times for the remaining segments and combine results
     aligned_segments = [{

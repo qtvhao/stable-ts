@@ -1,7 +1,7 @@
 import pytest
 import json
 from hypothesis import given, strategies as st
-from audio_operations import cut_audio_file, get_segments_from_audio_file
+from audio_operations import cut_audio_file, get_segments_from_segments_file
 
 @pytest.mark.parametrize("tokens_json, audio_file, output_file", [
     (
@@ -10,9 +10,9 @@ from audio_operations import cut_audio_file, get_segments_from_audio_file
         "output.json"
     ),
 ])
-def test_get_segments_from_audio_file(tokens_json, audio_file, output_file):
+def test_get_segments_from_segments_file(tokens_json, audio_file, output_file):
     tokens = json.loads(open(tokens_json).read())
     tokens_texts = [token['text'] for token in tokens]
-    segments = get_segments_from_audio_file(audio_file, tokens_texts, output_file)
+    segments = get_segments_from_segments_file(audio_file, tokens_texts, output_file)
     assert segments != None
 
