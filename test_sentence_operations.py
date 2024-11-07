@@ -1,6 +1,6 @@
 import pytest
 from hypothesis import given, strategies as st
-from sentence_operations import get_processed_and_remaining_sentences
+from sentence_operations import split_sentences_by_highest_similarity_to_segments
 
 @pytest.mark.parametrize("sentences_texts, corrected_segments, expected_processed, expected_remaining", [
     (
@@ -24,11 +24,71 @@ from sentence_operations import get_processed_and_remaining_sentences
             "Nullam nec nulla ac libero.",
         ]
     ),
+    (
+        ["The quick brown fox", "jumps over the lazy dog", "and runs away."],
+        [
+            {
+                "text": "The quick brown fox",
+            },
+            {
+                "text": "jumps over the lazy dog",
+            },
+        ],
+        [
+            "The quick brown fox",
+            "jumps over the lazy dog",
+        ],
+        [
+            "and runs away.",
+        ]
+    ),
+    (
+        ["Hello world", "This is a test", "Another sentence"],
+        [
+            {
+                "text": "Hello world",
+            },
+            {
+                "text": "This is a test",
+            },
+        ],
+        [
+            "Hello world",
+            "This is a test",
+        ],
+        [
+            "Another sentence",
+        ]
+    ),
+    (
+        ["One sentence", "Two sentence", "Three sentence"],
+        [
+            {
+                "text": "One sentence",
+            },
+            {
+                "text": "Two sentence",
+            },
+        ],
+        [
+            "One sentence",
+            "Two sentence",
+        ],
+        [
+            "Three sentence",
+        ]
+    ),
 ])
 def test_get_processed_and_remaining_sentences(sentences_texts, corrected_segments, expected_processed, expected_remaining):
-    processed, remaining = get_processed_and_remaining_sentences(sentences_texts, corrected_segments)
+    processed, remaining = split_sentences_by_highest_similarity_to_segments(sentences_texts, corrected_segments)
     assert processed == expected_processed
     assert remaining == expected_remaining
+
+# @given(st.lists(st.text()), st.lists(st.text()))
+# def test_get_processed_and_remaining_sentences_random(sentences_texts, corrected_segments):
+#     processed, remaining = get_processed_and_remaining_sentences(sentences_texts, corrected_segments)
+#     assert isinstance(processed, (str, type(None)))
+#     assert isinstance(remaining, list)
 
 # @given(st.lists(st.text()), st.lists(st.text()))
 # def test_get_processed_and_remaining_sentences_random(sentences_texts, corrected_segments):
