@@ -12,13 +12,21 @@ def cut_audio_file(audio_file, start=None, end=None):
     end_str = str(end).replace('.', '_') if end is not None else 'end'
     output_file = audio_file.replace('.mp3', f'_{start_str}_{end_str}.mp3')
     if start is None:
-        subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-to", str(end), "-c", "copy", output_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        process = subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-to", str(end), "-c", "copy", output_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     elif end is None:
-        subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-ss", str(start), "-c", "copy", output_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        process = subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-ss", str(start), "-c", "copy", output_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     else:
-        subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-ss", str(start), "-to", str(end), "-c", "copy", output_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        process = subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-ss", str(start), "-to", str(end), "-c", "copy", output_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    # Print stdout and stderr
+    print("=== ffmpeg stdout ===")
+    print(process.stdout)
+    print("=== ffmpeg stderr ===")
+    print(process.stderr)
+
+    process.check_returncode()  # Ensure the subprocess completed successfully
     return output_file
-        
+
 def get_segments_from_audio_file(audio_file, tokens_texts, output_file='output.json'):
     # Step 1: Align the tokens with the audio file
     tokens_texts_joined = "\n\n".join(tokens_texts)
@@ -55,9 +63,15 @@ def get_segments_from_audio_file(audio_file, tokens_texts, output_file='output.j
         process.wait()
 
         print("=== Output ===")
+        if 1 == process.returncode:
+            raise ValueError("Alignment failed")
     else:
         alignment_result = model.align(audio_file, tokens_texts_joined, language="vi")
         alignment_result.save_as_json(output_file)
+        
+    return get_segments_from_segments_file(audio_file, tokens_texts, output_file)
+
+def get_segments_from_segments_file(audio_file, tokens_texts, output_file='output.json'):
     # Step 2: Load the alignment results
     with open(output_file, 'r') as file:
         human_written_segments = json.load(file)
@@ -80,6 +94,9 @@ def get_segments_from_audio_file(audio_file, tokens_texts, output_file='output.j
     print('===')
     print(f"Best match segment text: {segments_to_add}")
     print('===')
+    raise ValueError("Stop")
+    if None == segments_end:
+        raise ValueError("segments_end is None")
     print(f"Best match segment end: {segments_end}")
     # print(f"Best match: {best_match}")
     print('===')
