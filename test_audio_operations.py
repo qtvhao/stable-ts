@@ -16,13 +16,22 @@ import subprocess
         "2. Các chứng chỉ nổi bật của CompTIA"
     ),
     (
-        "tokens-2.json",
+        "tokens.json",
         "synthesize-result-2532432836___61_54_end.mp3",
         "synthesize-result-2532432836___61_54_end.mp3.json",
         23.5,
         159.792,
         "và chuẩn bị cho các chứng chỉ cao cấp hơn.",
         "CompTIA A+: Một chứng chỉ căn bản nhưng quan trọng"
+    ),
+    (
+        "tokens.json",
+        "synthesize-result-2532432836___61_54___23_5_end.mp3",
+        "synthesize-result-2532432836___61_54___23_5_end.mp3.json", 
+        57.32,
+        102.288,
+        "và triển khai các giải pháp an ninh mạng.",
+        "3. Ưu điểm khi sở hữu chứng chỉ CompTIA"
     )
 ])
 def test_get_segments_from_segments_file(tokens_json, audio_file, output_file, startStampToCompare, cutAudioDuration, segmentsTextToCompare, remainingTokensStartsWith): 
