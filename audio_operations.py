@@ -6,23 +6,28 @@ import stable_whisper
 from alignutils import find_best_segment_match
 model = stable_whisper.load_model(name="tiny", device="cpu", in_memory=True)
 from random import randint
+def seconds_to_ffmpeg_time(seconds):
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    sec = seconds % 60
+    return f"{hours:02}:{minutes:02}:{sec:06.3f}"
 
 def cut_audio_file(audio_file, start=None, end=None):
     start_str = str(start).replace('.', '_') if start is not None else 'start'
     end_str = str(end).replace('.', '_') if end is not None else 'end'
-    output_file = audio_file.replace('.mp3', f'_{start_str}_{end_str}.mp3')
+    output_file = audio_file.replace('_end', '').replace('.mp3', f'___{start_str}_{end_str}.mp3')
     if start is None:
-        process = subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-to", str(end), "-c", "copy", output_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        process = subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-to", seconds_to_ffmpeg_time(end), "-c", "copy", output_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     elif end is None:
-        process = subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-ss", str(start), "-c", "copy", output_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        process = subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-ss", seconds_to_ffmpeg_time(start), "-c", "copy", output_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     else:
-        process = subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-ss", str(start), "-to", str(end), "-c", "copy", output_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        process = subprocess.run(["ffmpeg", "-y", "-i", audio_file, "-ss", seconds_to_ffmpeg_time(start), "-to", seconds_to_ffmpeg_time(end), "-c", "copy", output_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     # Print stdout and stderr
     print("=== ffmpeg stdout ===")
-    print(process.stdout)
+    # print(process.stdout)
     print("=== ffmpeg stderr ===")
-    print(process.stderr)
+    # print(process.stderr)
 
     process.check_returncode()  # Ensure the subprocess completed successfully
     return output_file
@@ -86,44 +91,50 @@ def get_segments_from_segments_file(audio_file, tokens_texts, output_file='outpu
     map_segments = [{
         "start": segment['start'],
         "end": segment['end'],
-        "text": segment['text']
+        "text": segment['text'],
+        "words": [{
+            "probability": word['probability'] * 1e8,
+        } for word in segment['words']]
     } for segment in segments]
     segments_to_add, segments_end, remaining_tokens, matched_sentences = find_best_segment_match(map_segments, tokens_texts)
     start = segments_end
     
     # Step 4: Print debug information
-    print(f"Matched sentences: {matched_sentences}")
-    print('===')
-    print(f"Best match segment text: {segments_to_add}")
-    print('===')
+    # print(f"Matched sentences: {matched_sentences}")
+    # print('===')
+    # print(f"Best match segment text: {segments_to_add}")
+    # print('===')
     # raise ValueError("Stop")
     # if None == segments_end:
         # raise ValueError("segments_end is None")
-    print(f"Best match segment end: {segments_end}")
+    # print(f"Best match segment end: {segments_end}")
     # print(f"Best match: {best_match}")
-    print('===')
+    # print('===')
     # print(best_match_segment)
-    print(f"Remaining tokens: {remaining_tokens}")
+    # print(f"Remaining tokens: {remaining_tokens}")
 
     # Step 5: If there are no remaining tokens, return the initial matched segments
     if None == start:
         trimmed_audio_file = ''
         if len(remaining_tokens) > 0:
+            print("segments_to_add)")
+            print(map_segments)
+            print(tokens_texts)
             raise ValueError("remaining_tokens is not empty")
 
         return trimmed_audio_file, remaining_tokens, start, segments_to_add
     
     # Step 6: Determine starting point for the next segment and process remaining tokens
-    remaining_tokens_joined = "\n\n".join(remaining_tokens)
+    # remaining_tokens_joined = "\n\n".join(remaining_tokens)
     matched_sentences_joined = "\n\n".join(matched_sentences)
 
     # Step 7: Cut the audio file from the best match endpoint and save remaining tokens
     none_start = cut_audio_file(audio_file, None, start)
-    with open(f"{none_start}-processed.txt", 'w') as file:
-        file.write(matched_sentences_joined)
     trimmed_audio_file = cut_audio_file(audio_file, start, None)
-    with open(f"{trimmed_audio_file}-remaining.txt", 'w') as file:
-        file.write(remaining_tokens_joined)
+    with open(f"{trimmed_audio_file}-processed.txt", 'w') as file:
+        file.write(matched_sentences_joined)
+    # with open(f"{trimmed_audio_file}-remaining.txt", 'w') as file:
+        # file.write(remaining_tokens_joined)
         
     return trimmed_audio_file, remaining_tokens, start, segments_to_add
 

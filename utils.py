@@ -25,8 +25,16 @@ def calculate_similarity_ratio(segment_text, candidate_text):
     """
     if not segment_text or not candidate_text:
         return 0.0
-    segment_words = segment_text.split()[-10:]
-    candidate_words = candidate_text.split()[-10:]
+    segment_words = segment_text.split()
+    candidate_words = candidate_text.split()
+    # 
+    words_to_compare = min(10, len(segment_words), len(candidate_words))
+    # 
+    segment_words = segment_words[-words_to_compare:]
+    candidate_words = candidate_words[-words_to_compare:]
+    # 
     segment_last_10 = ' '.join(segment_words)
     candidate_last_10 = ' '.join(candidate_words)
+    # print(f"Segment last 10: {segment_last_10}")
+    # print(f"Candidate last 10: {candidate_last_10}")
     return SequenceMatcher(None, segment_last_10, candidate_last_10).ratio()

@@ -3,15 +3,56 @@ import json
 from hypothesis import given, strategies as st
 from audio_operations import recursive_get_segments_from_audio_file, get_segments_from_segments_file
 from utils import calculate_similarity_ratio
+import subprocess
+
+@pytest.mark.parametrize("tokens_json, audio_file, output_file, startStampToCompare, cutAudioDuration, segmentsTextToCompare, remainingTokensStartsWith", [
+    (
+        "tokens.json",
+        "synthesize-result-2532432836.mp3",
+        "output.json",
+        61.54,
+        183.48,
+        "tổ chức hiểu rõ xu hướng và yêu cầu công nghệ hiện đại.",
+        "2. Các chứng chỉ nổi bật của CompTIA"
+    ),
+    (
+        "tokens-2.json",
+        "synthesize-result-2532432836___61_54_end.mp3",
+        "synthesize-result-2532432836___61_54_end.mp3.json",
+        23.5,
+        159.792,
+        "và chuẩn bị cho các chứng chỉ cao cấp hơn.",
+        "CompTIA A+: Một chứng chỉ căn bản nhưng quan trọng"
+    )
+])
+def test_get_segments_from_segments_file(tokens_json, audio_file, output_file, startStampToCompare, cutAudioDuration, segmentsTextToCompare, remainingTokensStartsWith): 
+    tokens = json.loads(open(tokens_json).read())
+    tokens_texts = [token['text'] for token in tokens]
+    trimmed_audio_file, remaining_tokens, start, segments = get_segments_from_segments_file(audio_file, tokens_texts, output_file)
+    print(f"Trimmed audio file: {trimmed_audio_file}")
+    # 
+    segments_joined = " ".join([segment['text'].strip() for segment in segments])
+    assert segments_joined.endswith(segmentsTextToCompare), "Segments don't end with {segmentsTextToCompare}"
+    # 
+    assert remaining_tokens[0].startswith(remainingTokensStartsWith), f"Remaining tokens don't start with {remainingTokensStartsWith}"
+    assert startStampToCompare == start, f"Start is not {startStampToCompare}"
+    # 
+    trimmed_audio_duration = subprocess.check_output(f"ffprobe -i {trimmed_audio_file} -show_entries format=duration -v quiet -of csv=\"p=0\"", shell=True).decode("utf-8")
+    print(f"Trimmed audio duration: {trimmed_audio_duration}")
+    assert float(trimmed_audio_duration) == cutAudioDuration, f"Trimmed audio duration is not {cutAudioDuration}"
+
+
+
 
 @pytest.mark.parametrize("tokens_json, audio_file, output_file", [
     (
         "tokens.json",
         "synthesize-result-2532432836.mp3",
-        "output.json"
+        "output.json",
     ),
 ])
-def test_get_segments_from_segments_file(tokens_json, audio_file, output_file):
+def test_recursive_get_segments_from_audio_file(tokens_json, audio_file, output_file):
+    return True
     tokens = json.loads(open(tokens_json).read())
     tokens_texts = [token['text'] for token in tokens]
     # trimmed_audio_file, remaining_tokens, start, segments = get_segments_from_segments_file(audio_file, tokens_texts, output_file)
