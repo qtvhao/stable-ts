@@ -10,7 +10,7 @@ python = "^3.11"
 
 
 [tool.poetry.group.dev.dependencies]
-ptw = "^1.0.1"
+pytest-watch = "^4.2.0"
 
 [build-system]
 requires = ["poetry-core"]
