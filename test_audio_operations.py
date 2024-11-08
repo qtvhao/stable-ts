@@ -32,6 +32,15 @@ import subprocess
         102.288,
         "và triển khai các giải pháp an ninh mạng.",
         "3. Ưu điểm khi sở hữu chứng chỉ CompTIA"
+    ),
+    (
+        "tokens.json",
+        "synthesize-result-2532432836___61_54___23_5___57_32_end.mp3",
+        "synthesize-result-2532432836___61_54___23_5___57_32_end.mp3.json",
+        100.98,
+        1.128,
+        "đồng thời mở rộng cơ hội cho người làm việc trong ngành công nghệ.",
+        False
     )
 ])
 def test_get_segments_from_segments_file(tokens_json, audio_file, output_file, startStampToCompare, cutAudioDuration, segmentsTextToCompare, remainingTokensStartsWith): 
@@ -43,15 +52,13 @@ def test_get_segments_from_segments_file(tokens_json, audio_file, output_file, s
     segments_joined = " ".join([segment['text'].strip() for segment in segments])
     assert segments_joined.endswith(segmentsTextToCompare), "Segments don't end with {segmentsTextToCompare}"
     # 
-    assert remaining_tokens[0].startswith(remainingTokensStartsWith), f"Remaining tokens don't start with {remainingTokensStartsWith}"
+    if remainingTokensStartsWith:
+        assert remaining_tokens[0].startswith(remainingTokensStartsWith), f"Remaining tokens don't start with {remainingTokensStartsWith}"
     assert startStampToCompare == start, f"Start is not {startStampToCompare}"
     # 
     trimmed_audio_duration = subprocess.check_output(f"ffprobe -i {trimmed_audio_file} -show_entries format=duration -v quiet -of csv=\"p=0\"", shell=True).decode("utf-8")
     print(f"Trimmed audio duration: {trimmed_audio_duration}")
     assert float(trimmed_audio_duration) == cutAudioDuration, f"Trimmed audio duration is not {cutAudioDuration}"
-
-
-
 
 @pytest.mark.parametrize("tokens_json, audio_file, output_file", [
     (
