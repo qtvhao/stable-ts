@@ -41,7 +41,7 @@ import subprocess
         1.128,
         "đồng thời mở rộng cơ hội cho người làm việc trong ngành công nghệ.",
         False
-    )
+    ),
 ])
 def test_get_segments_from_segments_file(tokens_json, audio_file, output_file, startStampToCompare, cutAudioDuration, segmentsTextToCompare, remainingTokensStartsWith): 
     tokens = json.loads(open(tokens_json).read())
@@ -60,19 +60,16 @@ def test_get_segments_from_segments_file(tokens_json, audio_file, output_file, s
     print(f"Trimmed audio duration: {trimmed_audio_duration}")
     assert float(trimmed_audio_duration) == cutAudioDuration, f"Trimmed audio duration is not {cutAudioDuration}"
 
-@pytest.mark.parametrize("tokens_json, audio_file, output_file", [
+@pytest.mark.parametrize("tokens_json, audio_file", [
     (
         "tokens.json",
-        "synthesize-result-2532432836.mp3",
-        "output.json",
+        "synthesize-result-2532432836.mp3"
     ),
 ])
-def test_recursive_get_segments_from_audio_file(tokens_json, audio_file, output_file):
-    return True
+def test_recursive_get_segments_from_audio_file(tokens_json, audio_file):
     tokens = json.loads(open(tokens_json).read())
     tokens_texts = [token['text'] for token in tokens]
-    # trimmed_audio_file, remaining_tokens, start, segments = get_segments_from_segments_file(audio_file, tokens_texts, output_file)
-    segments = recursive_get_segments_from_audio_file(audio_file, tokens_texts, output_file)
+    segments = recursive_get_segments_from_audio_file(audio_file, tokens_texts)
     print(segments)
     for segment in segments:
         assert segment['start'] != segment['end'], f"Segment {segment} don't have time"
@@ -83,4 +80,7 @@ def test_recursive_get_segments_from_audio_file(tokens_json, audio_file, output_
     similarity_ratio = calculate_similarity_ratio(tokens_joined, segments_joined)
     print(f"Similarity ratio: {similarity_ratio}")
     assert similarity_ratio >= 0.8, "Similarity ratio is too low"
+    for segment in segments:
+        assert segment['start'] != segment['end'], f"Segment {segment} don't have time"
+        print(f"Segment {segment['start']} - {segment['end']}: {segment['text']}")
 

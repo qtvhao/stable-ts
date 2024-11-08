@@ -138,13 +138,16 @@ def get_segments_from_segments_file(audio_file, tokens_texts, output_file='outpu
         
     return trimmed_audio_file, remaining_tokens, start, segments_to_add
 
-def recursive_get_segments_from_audio_file(audio_file, tokens_texts, output_file='output.json'):
+def recursive_get_segments_from_audio_file(audio_file, tokens_texts):
     if None == tokens_texts:
         return []
+    if len(tokens_texts) == 0:
+        return []
+    output_file = audio_file.replace('.mp3', '.json')
     trimmed_audio_file, remaining_tokens, start, segments = get_segments_from_audio_file(audio_file, tokens_texts, output_file)
 
     # Step 8: Recursively process remaining audio and tokens
-    remaining_segments = recursive_get_segments_from_audio_file(trimmed_audio_file, remaining_tokens, trimmed_audio_file + '.json')
+    remaining_segments = recursive_get_segments_from_audio_file(trimmed_audio_file, remaining_tokens)
     # Step 9: Adjust the start and end times for the remaining segments and combine results
     aligned_segments = [{
         'start': segment['start'] + start,
