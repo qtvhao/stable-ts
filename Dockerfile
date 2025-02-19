@@ -10,6 +10,7 @@ ENV STABLE_TS_MODEL=tiny
 # // medium	769 M	medium.en	medium	~5 GB	~2x
 # // large	1550 M	N/A	large	~10 GB	1x
 
+
 ENV STABLE_TS_LANGUAGE=vi
 COPY in.wav .
 COPY output/all.txt .
