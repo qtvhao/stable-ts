@@ -90,20 +90,22 @@ def create_app():
             with request_lock:
                 start_time = time.time()
 
-                if 'audio_file' not in request.files or 'text' not in request.form:
+                if 'audio_file' not in request.files or 'text' not in request.files:
                     logging.warning("⚠️ Missing required parameters: audio_file, text")
                     return create_utf8_json_response({"error": "Missing required parameters (audio_file, text)"}, 400)
 
                 audio_file = request.files['audio_file']
-                text = request.form['text'].strip()
-
-                if not audio_file.filename or not text:
+                text_file = request.files['text']
+                
+                if not audio_file.filename or not text_file.filename:
                     logging.warning("❌ Invalid input values for alignment.")
                     return create_utf8_json_response({"error": "Invalid input values"}, 400)
 
                 filename = secure_filename(audio_file.filename)
                 file_size = len(audio_file.read())
                 audio_file.seek(0)  # Reset file pointer
+
+                text = text_file.read().decode('utf-8').strip()
 
                 logging.info(f"📂 Received file: {filename} ({file_size / 1024:.2f} KB)")
                 logging.info(f"📝 Text to align: {text[:50]}... (truncated)")

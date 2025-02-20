@@ -31,4 +31,4 @@ services:
       sleep 5 &&
       curl -X POST 'http://app:8000/align' \
       -F 'audio_file=@/test_audio/audio.mp3' \
-      -F 'text=Machines thinking, breeding. You were to bear us a new, promised land.'"
+      -F 'text=@/test_audio/text.txt'"
