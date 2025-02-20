@@ -1,2 +1,4 @@
 import stable_whisper
-model = stable_whisper.load_model('base')
+import os
+
+model = stable_whisper.load_model(os.environ.get('WHISPER_MODEL'))

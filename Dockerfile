@@ -10,24 +10,21 @@ ENV STABLE_TS_MODEL=tiny
 # // medium	769 M	medium.en	medium	~5 GB	~2x
 # // large	1550 M	N/A	large	~10 GB	1x
 
-
 ENV STABLE_TS_LANGUAGE=vi
 COPY in.wav .
-COPY output/all.txt .
-RUN stable-ts in.wav --model ${STABLE_TS_MODEL} --language ${STABLE_TS_LANGUAGE} --align all.txt --overwrite --output ni.json
+ENV WHISPER_MODEL=base
+COPY output/all.txt load_model.py .
+# RUN stable-ts in.wav --model ${STABLE_TS_MODEL} --language ${STABLE_TS_LANGUAGE} --align all.txt --overwrite --output ni.json
 
 RUN pip install -U faster-whisper
-RUN stable-ts in.wav --model ${STABLE_TS_MODEL} --language ${STABLE_TS_LANGUAGE} --align all.txt --overwrite --output ni.json -fw
-RUN bash -c "set -xeo pipefail; cat ni.json | grep 'trong IaC mang lại nhiều lợi ích cho doanh nghiệp' > /dev/null"
-COPY yarn.lock package.json ./
-RUN yarn install
-RUN which jest || npm install -g jest
-RUN mkdir -p /workspace/align-input/ /workspace/align-output/
+RUN pip install gunicorn flask
+# RUN stable-ts in.wav --model ${STABLE_TS_MODEL} --language ${STABLE_TS_LANGUAGE} --align all.txt --overwrite --output ni.json -fw
+RUN python3 load_model.py
 
-COPY audio.json .
-COPY alignment.js .
-COPY backup-processor.js .
-COPY getAlignedSubtitle.js .
-COPY src src
-# RUN node /workspace/alignment.js
+# Expose the port for the application
+EXPOSE 8000
 
+COPY app.py audio_operations.py alignutils.py sentence_operations.py utils.py .
+# RUN gunicorn -w 4 -b 0.0.0.0:8000 app:app
+
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "app:app"]
