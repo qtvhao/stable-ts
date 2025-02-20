@@ -4,7 +4,7 @@ import os
 import stable_whisper
 # from time import sleep
 from alignutils import find_best_segment_match
-model = stable_whisper.load_model(name="tiny", device="cpu", in_memory=True)
+model = stable_whisper.load_model(name=os.environ.get('STABLE_TS_MODEL'), device="cpu", in_memory=True)
 from random import randint
 def seconds_to_ffmpeg_time(seconds):
     hours = int(seconds // 3600)

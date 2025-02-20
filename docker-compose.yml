@@ -13,7 +13,7 @@ services:
       - FLASK_ENV=production
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,6 +29,6 @@ services:
     command: >
       sh -c "
       sleep 5 &&
-      curl -X POST 'http://app:5000/align' \
+      curl -X POST 'http://app:8000/align' \
       -F 'audio_file=@/test_audio/audio.mp3' \
       -F 'text=Machines thinking, breeding. You were to bear us a new, promised land.'"
