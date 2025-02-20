@@ -12,3 +12,23 @@ services:
       - FLASK_APP=app.py
       - FLASK_ENV=production
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  test:
+    image: curlimages/curl
+    container_name: api_test
+    depends_on:
+      app:
+        condition: service_healthy  # Ensure app is healthy before testing
+    volumes:
+      - ./test_audio:/test_audio  # Ensure test audio is available
+    command: >
+      sh -c "
+      sleep 5 &&
+      curl -X POST 'http://app:5000/align' \
+      -F 'audio_file=@/test_audio/audio.mp3' \
+      -F 'text=Machines thinking, breeding. You were to bear us a new, promised land.'"
