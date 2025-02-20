@@ -4,90 +4,99 @@ import FormData from 'form-data';
 import path from 'path';
 
 // Define response types
-interface Word {
+interface WordData {
     word: string;
     start: number;
     end: number;
     probability: number;
 }
 
-interface Segment {
+interface TranscriptSegment {
     start: number;
     end: number;
     text: string;
-    words: Word[];
+    words: WordData[];
 }
 
 interface AlignmentResponse {
     alignment: {
-        segments: Segment[];
+        segments: TranscriptSegment[];
     };
 }
 
 // Function to check if a word is speech-able (not only special characters)
-const isSpeechable = (word: string): boolean => {
-    let speechable = !/^[^a-zA-Z0-9]+$/.test(word); // Returns true if the word has letters/numbers
-    if (!speechable) {
-        console.log('!isSpeechable', {word})
+const isValidSpeechWord = (text: string): boolean => {
+    const isSpeechWord = !/^[^a-zA-Z0-9]+$/.test(text);
+    if (!isSpeechWord) {
+        console.log('Invalid Speech Word:', { text });
     }
-
-    return speechable;
+    return isSpeechWord;
 };
 
-async function uploadAudio(): Promise<void> {
-    const form = new FormData();
-
-    const audioPath = ('./test_audio/audio.mp3');
-    const textPath = ('./test_audio/text.txt');
-
-    if (!fs.existsSync(audioPath) || !fs.existsSync(textPath)) {
-        console.error('Error: One or both files are missing.');
-        return;
+const areFilesAvailable = (audioFilePath: string, transcriptFilePath: string): boolean => {
+    if (!fs.existsSync(audioFilePath) || !fs.existsSync(transcriptFilePath)) {
+        console.error('Error: Missing one or both required files.');
+        return false;
     }
+    return true;
+};
 
-    form.append('audio_file', fs.createReadStream(audioPath));
-    form.append('text', fs.createReadStream(textPath));
+const prepareFormData = (audioFilePath: string, transcriptFilePath: string): FormData => {
+    const formData = new FormData();
+    formData.append('audio_file', fs.createReadStream(audioFilePath));
+    formData.append('text', fs.createReadStream(transcriptFilePath));
+    return formData;
+};
 
+const uploadAudioFile = async (formData: FormData): Promise<TranscriptSegment[]> => {
     try {
-        const response = await axios.post<AlignmentResponse>('http://localhost:5000/align', form, {
+        const response = await axios.post<AlignmentResponse>('http://localhost:5000/align', formData, {
             headers: {
-                ...form.getHeaders(),
+                ...formData.getHeaders(),
                 'Content-Type': 'multipart/form-data',
             },
         });
-
-        const segments = response.data.alignment.segments;
-
-        // Validate probability check for speech-able words
-        segments.forEach((segment, index) => {
-            const speechableWords = segment.words.filter(word => isSpeechable(word.word));
-            const probabilities = speechableWords.map(word => word.probability);
-
-            if (probabilities.length === 0) {
-                console.warn(`Segment ${index} has no speech-able words, skipping.`);
-                throw new Error("")
-            }
-
-            const avgProbability = probabilities.reduce((a, b) => a + b, 0) / probabilities.length;
-
-            if (avgProbability <= 0.2) {
-                console.log(JSON.stringify(segment, null, 2))
-                throw new Error(`Segment ${index} has an average probability of ${avgProbability}, which is too low.`);
-            }
-        });
-
-        console.log('All segments passed the probability check!');
+        return response.data.alignment.segments;
     } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
             if (error.response) {
-                console.error('Error Response:', error.response.data);
+                console.error('API Error Response:', error.response.data);
             } else if (error.request) {
-                console.error('No response received:', error.request);
+                console.error('No response received from API:', error.request);
             }
         } else {
             console.error('Unexpected Error:', (error as Error).message);
         }
+        throw new Error("Failed to upload and process the audio file.");
     }
-}
+};
 
-uploadAudio().catch(console.log);
+const analyzeTranscriptSegments = (segments: TranscriptSegment[]): void => {
+    segments.forEach((segment, index) => {
+        const validSpeechWords = segment.words.filter(word => isValidSpeechWord(word.word));
+        const confidenceScores = validSpeechWords.map(word => word.probability);
+
+        if (confidenceScores.length === 0) {
+            console.warn(`Segment ${index} contains no valid speech words, skipping.`);
+            throw new Error("No valid speech words in segment.");
+        }
+
+        const averageConfidence = confidenceScores.reduce((sum, score) => sum + score, 0) / confidenceScores.length;
+
+        if (averageConfidence <= 0.2) {
+            console.log(JSON.stringify(segment, null, 2));
+            throw new Error(`Segment ${index} has a low average confidence score of ${averageConfidence}.`);
+        }
+    });
+    console.log('All transcript segments passed the confidence validation!');
+};
+
+const processTranscript = async (audioFilePath: string, transcriptFilePath: string): Promise<void> => {
+    if (!areFilesAvailable(audioFilePath, transcriptFilePath)) return;
+    
+    const formData = prepareFormData(audioFilePath, transcriptFilePath);
+    const segments = await uploadAudioFile(formData);
+    analyzeTranscriptSegments(segments);
+};
+
+processTranscript('./test_audio/audio.mp3', './test_audio/text.txt').catch(console.log);
