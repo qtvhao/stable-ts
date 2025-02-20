@@ -29,4 +29,4 @@ EXPOSE 8000
 COPY app.py audio_operations.py alignutils.py sentence_operations.py utils.py .
 # RUN gunicorn -w 4 -b 0.0.0.0:8000 app:app
 
-CMD ["gunicorn", "-w", "1", "-b", "0.0.0.0:8000", "app:app"]
+CMD ["gunicorn", "-w", "1", "-b", "0.0.0.0:8000", "--timeout", "240", "app:app"]

@@ -1,7 +1,6 @@
 import axios from 'axios';
 import * as fs from 'fs';
 import FormData from 'form-data';
-import path from 'path';
 
 // Define response types
 interface WordData {
