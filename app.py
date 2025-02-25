@@ -118,13 +118,14 @@ def create_app():
 
         audio_file = request.files['audio_file']
         text_file = request.files['text']
-        language = request.files['language']  # Default to English if not provided
+        language_file = request.files['language']
 
         if not audio_file.filename or not text_file.filename:
             logging.warning("❌ Invalid input values for alignment.")
             return None, None, None
 
         text = text_file.read().decode('utf-8').strip()
+        language = language_file.read().decode('utf-8').strip()
         return audio_file, text, language
 
 
