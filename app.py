@@ -92,13 +92,13 @@ def create_app():
                 start_time = time.time()
 
                 # Validate input
-                audio_file, text = validate_alignment_request()
+                audio_file, text, language = validate_alignment_request()
                 if not audio_file or not text:
                     return create_utf8_json_response({"error": "Invalid input values"}, 400)
 
                 # Save audio file temporarily
                 with save_uploaded_audio(audio_file) as temp_audio:
-                    result = process_audio_alignment(temp_audio.name, text)
+                    result = process_audio_alignment(temp_audio.name, text, language)
 
                 elapsed_time = time.time() - start_time
                 logging.info(f"✅ Alignment completed in {elapsed_time:.2f} seconds.")
@@ -114,17 +114,18 @@ def create_app():
         """Validate and extract the required files from request."""
         if 'audio_file' not in request.files or 'text' not in request.files:
             logging.warning("⚠️ Missing required parameters: audio_file, text")
-            return None, None
+            return None, None, None
 
         audio_file = request.files['audio_file']
         text_file = request.files['text']
+        language = request.files['language']  # Default to English if not provided
 
         if not audio_file.filename or not text_file.filename:
             logging.warning("❌ Invalid input values for alignment.")
-            return None, None
+            return None, None, None
 
         text = text_file.read().decode('utf-8').strip()
-        return audio_file, text
+        return audio_file, text, language
 
 
     def save_uploaded_audio(audio_file):
@@ -134,11 +135,11 @@ def create_app():
         return temp_audio
 
 
-    def process_audio_alignment(audio_path, text):
+    def process_audio_alignment(audio_path, text, language):
         """Perform multi-step alignment on the given audio and text."""
         logging.info("🎙️ Processing audio alignment...")
 
-        result = model.align(audio_path, text, language='vi')
+        result = model.align(audio_path, text, language=language)
         logging.info("📌 Initial alignment complete.")
 
         return result
